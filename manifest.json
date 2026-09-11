@@ -1,0 +1,19 @@
+{
+  "name": "Sör",
+  "short_name": "Sör",
+  "description": "Rate and track beers with friends",
+  "start_url": "index.html",
+  "scope": ".",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#faf7f2",
+  "theme_color": "#c8792a",
+  "icons": [
+    {
+      "src": "img/logo.png",
+      "sizes": "1254x1254",
+      "type": "image/png",
+      "purpose": "any"
+    }
+  ]
+}

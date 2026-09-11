@@ -1,0 +1,652 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, viewport-fit=cover">
+<title>Sör</title>
+<link rel="manifest" href="manifest.json">
+<meta name="theme-color" content="#c8792a">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="apple-mobile-web-app-title" content="Sör">
+<link rel="apple-touch-icon" href="img/logo.png">
+<script>
+  try {
+    const saved = localStorage.getItem('beer-theme');
+    const theme = saved || (matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
+    document.documentElement.setAttribute('data-theme', theme);
+  } catch (e) {}
+</script>
+<style>
+  :root{
+    --bg:#faf7f2; --bg-card:#ffffff; --bg-elev:#ffffff; --text:#1c1410; --text-dim:#7a6f63;
+    --border:#e8e0d5; --accent:#c8792a; --accent-2:#e0a542; --danger:#d64545;
+    --shadow:0 2px 10px rgba(0,0,0,.08); --overlay:rgba(20,15,10,.55);
+  }
+  [data-theme="dark"]{
+    --bg:#171310; --bg-card:#231d18; --bg-elev:#2a231c; --text:#f1e9df; --text-dim:#a89a8a;
+    --border:#3a2f26; --accent:#e0a542; --accent-2:#f0c070; --danger:#e0685f;
+    --shadow:0 2px 10px rgba(0,0,0,.45); --overlay:rgba(0,0,0,.65);
+  }
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--bg);color:var(--text);font-family:system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;-webkit-tap-highlight-color:transparent}
+  button,input,select,textarea{font-family:inherit;color:inherit}
+  header{position:sticky;top:0;z-index:20;display:flex;align-items:center;justify-content:space-between;padding:14px 16px;background:var(--bg);border-bottom:1px solid var(--border)}
+  header h1{font-size:1rem;margin:0;display:flex;align-items:center;gap:8px;min-width:0;line-height:1.2}
+  header h1 span{overflow-wrap:break-word}
+  header h1 .logo{width:28px;height:28px;border-radius:8px;object-fit:cover;flex:0 0 auto}
+  #themeBtn{background:none;border:none;font-size:1.3rem;cursor:pointer;padding:4px}
+
+  #toolbar{position:sticky;top:53px;z-index:19;background:var(--bg);padding:10px 12px;border-bottom:1px solid var(--border);display:flex;flex-direction:column;gap:8px}
+  .row{display:flex;gap:8px;flex-wrap:wrap}
+  #searchInput{flex:1 1 140px;min-width:0}
+  #sortSelect,#typeSelect{flex:1;min-width:0}
+  input,select,textarea{background:var(--bg-elev);border:1px solid var(--border);border-radius:10px;padding:9px 11px;font-size:.92rem;color:var(--text)}
+  select{cursor:pointer}
+
+  #beerList{padding:14px;display:grid;grid-template-columns:repeat(auto-fill,minmax(158px,1fr));gap:12px;padding-bottom:90px}
+  .card{background:var(--bg-card);border-radius:14px;overflow:hidden;box-shadow:var(--shadow);cursor:pointer;display:flex;flex-direction:column;border:1px solid var(--border)}
+  .cover{position:relative;aspect-ratio:4/3;background:var(--bg-elev);display:flex;align-items:center;justify-content:center;font-size:2.2rem;overflow:hidden}
+  .cover img{width:100%;height:100%;object-fit:cover}
+  .badge{position:absolute;top:6px;font-weight:700;font-size:.72rem;padding:3px 7px;border-radius:8px;color:#1c1410;box-shadow:0 1px 4px rgba(0,0,0,.25)}
+  .badge.rating{left:6px}
+  .badge.abv{right:6px;background:rgba(255,255,255,.85);color:#1c1410}
+  [data-theme="dark"] .badge.abv{background:rgba(0,0,0,.55);color:#f1e9df}
+  .body{padding:9px 10px 11px;display:flex;flex-direction:column;gap:4px}
+  .name-row{display:flex;align-items:baseline;gap:6px}
+  .name-row .flag{font-size:1rem;cursor:text;outline:none;border-radius:4px;padding:0 2px}
+  .name-row .flag:focus{background:var(--bg-elev)}
+  .name{font-weight:700;font-size:.94rem;line-height:1.2}
+  .meta{font-size:.76rem;color:var(--text-dim)}
+  .empty{text-align:center;color:var(--text-dim);padding:60px 20px;grid-column:1/-1}
+
+  #fab{position:fixed;right:18px;bottom:22px;z-index:25;width:56px;height:56px;border-radius:50%;background:var(--accent);color:#1c1410;border:none;font-size:1.6rem;box-shadow:0 4px 14px rgba(0,0,0,.3);cursor:pointer;display:flex;align-items:center;justify-content:center}
+
+  .overlay{position:fixed;inset:0;background:var(--overlay);display:none;align-items:flex-end;justify-content:center;z-index:50}
+  .overlay.show{display:flex}
+  @media (min-width:560px){.overlay{align-items:center}}
+  .sheet{background:var(--bg);width:100%;max-width:480px;max-height:92vh;overflow-y:auto;border-radius:18px 18px 0 0;padding:18px 18px 24px}
+  @media (min-width:560px){.sheet{border-radius:18px}}
+  .sheetHead{display:flex;justify-content:space-between;align-items:center;margin-bottom:12px}
+  .sheetHead h2{margin:0;font-size:1.1rem}
+  .closeX{background:none;border:none;font-size:1.3rem;cursor:pointer;color:var(--text-dim)}
+  form{display:flex;flex-direction:column;gap:10px}
+  label{font-size:.75rem;color:var(--text-dim);font-weight:600;text-transform:uppercase;letter-spacing:.03em;margin-bottom:2px;display:block}
+  .field{display:flex;flex-direction:column}
+  .twoCol{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+  .flagCountry{display:grid;grid-template-columns:56px 1fr;gap:8px}
+  .ratingButtons{display:flex;gap:3px}
+  .ratingBtn{flex:1;min-width:0;height:28px;padding:0;border-radius:6px;border:1px solid var(--border);background:var(--bg-elev);color:var(--text-dim);font-weight:700;font-size:.7rem;cursor:pointer;display:flex;align-items:center;justify-content:center}
+  .ratingBtn.active{color:#1c1410;border-color:transparent}
+  textarea{resize:vertical;min-height:56px}
+
+  .viewCarousel{display:flex;overflow-x:auto;scroll-snap-type:x mandatory;border-radius:12px;margin-bottom:14px;background:var(--bg-elev)}
+  .viewCarousel img{flex:0 0 100%;scroll-snap-align:center;width:100%;height:220px;object-fit:cover;cursor:pointer}
+  .viewCarousel .placeholder{flex:0 0 100%;height:220px;display:flex;align-items:center;justify-content:center;font-size:3rem}
+  .viewStats{display:flex;flex-direction:column;gap:10px;margin-bottom:6px}
+  .viewTitle{display:flex;align-items:center;gap:8px;font-size:1.25rem;font-weight:700}
+  .viewMeta{color:var(--text-dim);font-size:.9rem}
+  .viewBadges{display:flex;gap:8px}
+  .viewBadges span{padding:4px 11px;border-radius:8px;font-weight:700;font-size:.85rem}
+  .viewComment{white-space:pre-wrap;font-size:.92rem;line-height:1.45}
+
+  #photoStrip{display:flex;gap:8px;overflow-x:auto;padding-bottom:4px}
+  .thumb{position:relative;flex:0 0 auto;width:74px;height:74px;border-radius:10px;overflow:hidden;background:var(--bg-elev);border:1px solid var(--border)}
+  .thumb img{width:100%;height:100%;object-fit:cover;cursor:pointer}
+  .thumb .rm{position:absolute;top:2px;right:2px;background:rgba(0,0,0,.55);color:#fff;border:none;border-radius:50%;width:18px;height:18px;font-size:.65rem;cursor:pointer;line-height:1}
+  .addThumb{flex:0 0 auto;width:74px;height:74px;border-radius:10px;border:1.5px dashed var(--border);display:flex;align-items:center;justify-content:center;font-size:1.4rem;color:var(--text-dim);cursor:pointer;background:none}
+
+  .formActions{display:flex;gap:10px;margin-top:6px}
+  .btn{flex:1;border:none;border-radius:10px;padding:12px;font-weight:700;font-size:.92rem;cursor:pointer}
+  .btn.primary{background:var(--accent);color:#1c1410}
+  .btn.ghost{background:var(--bg-elev);color:var(--text);border:1px solid var(--border)}
+  .btn.danger{background:none;color:var(--danger);flex:0 0 auto}
+
+  #lightbox{position:fixed;inset:0;background:#000d;display:none;align-items:center;justify-content:center;z-index:80;flex-direction:column}
+  #lightbox.show{display:flex}
+  #lightbox img{max-width:92vw;max-height:74vh;object-fit:contain;border-radius:8px}
+  .lbBar{position:absolute;top:16px;left:0;right:0;display:flex;justify-content:flex-end;padding:0 16px}
+  .lbBar button{background:rgba(255,255,255,.15);border:none;color:#fff;width:38px;height:38px;border-radius:50%;font-size:1.1rem;cursor:pointer}
+  .lbNav{position:absolute;top:50%;transform:translateY(-50%);display:flex;justify-content:space-between;left:0;right:0;padding:0 10px}
+  .lbNav button{background:rgba(255,255,255,.15);border:none;color:#fff;width:42px;height:42px;border-radius:50%;font-size:1.2rem;cursor:pointer}
+
+  #confirmModal .sheet{max-width:340px}
+  #confirmModal p{margin:0 0 16px;font-size:.92rem}
+
+  #toast{position:fixed;bottom:90px;left:50%;transform:translateX(-50%);background:var(--text);color:var(--bg);padding:10px 18px;border-radius:999px;font-size:.85rem;box-shadow:var(--shadow);opacity:0;pointer-events:none;transition:opacity .25s;z-index:90}
+  #toast.show{opacity:1}
+</style>
+</head>
+<body>
+
+<header>
+  <h1><img src="img/logo.png" alt="" class="logo"><span>A legszebb öröm a Söröm</span></h1>
+  <button id="themeBtn" title="Toggle theme">🌙</button>
+</header>
+
+<div id="toolbar">
+  <div class="row">
+    <input id="searchInput" type="search" placeholder="Search name, brewery, country, notes…">
+  </div>
+  <div class="row">
+    <select id="sortSelect">
+      <option value="newest">New -> Old</option>
+      <option value="oldest">Old -> New</option>
+      <option value="name">Name A–Z</option>
+      <option value="rating-desc">Rating high→low</option>
+      <option value="rating-asc">Rating low→high</option>
+    </select>
+    <select id="typeSelect">
+      <option value="">All types</option>
+    </select>
+  </div>
+</div>
+
+<div id="beerList"></div>
+<button id="fab" title="Add beer">+</button>
+
+<div class="overlay" id="viewOverlay">
+  <div class="sheet">
+    <div class="sheetHead">
+      <h2>Beer</h2>
+      <button class="closeX" id="viewClose">✕</button>
+    </div>
+    <div class="viewCarousel" id="viewCarousel"></div>
+    <div class="viewStats" id="viewStats"></div>
+    <div class="formActions">
+      <button type="button" class="btn primary" id="viewEditBtn">Edit</button>
+    </div>
+  </div>
+</div>
+
+<div class="overlay" id="formOverlay">
+  <div class="sheet">
+    <div class="sheetHead">
+      <h2 id="formTitle">Add Beer</h2>
+      <button class="closeX" id="formClose">✕</button>
+    </div>
+    <div id="photoStrip"></div>
+    <input type="file" id="photoInput" accept="image/*" multiple style="display:none">
+    <form id="beerForm">
+      <div class="field">
+        <label>Name</label>
+        <input id="fName" required placeholder="e.g. Zlatý Bažant">
+      </div>
+      <div class="field">
+        <label>Brewery</label>
+        <input id="fBrewery" placeholder="e.g. Heineken Slovensko">
+      </div>
+      <div class="flagCountry">
+        <div class="field">
+          <label>Flag</label>
+          <input id="fFlag" maxlength="8" placeholder="🏳️">
+        </div>
+        <div class="field">
+          <label>Country</label>
+          <input id="fCountry" placeholder="e.g. Slovakia">
+        </div>
+      </div>
+      <div class="twoCol">
+        <div class="field">
+          <label>Beer type</label>
+          <input id="fType" list="typeList" placeholder="e.g. Lager">
+          <datalist id="typeList"></datalist>
+        </div>
+        <div class="field">
+          <label>ALC %</label>
+          <input id="fAbv" type="number" step="0.1" min="0" max="100" placeholder="5.0">
+        </div>
+      </div>
+      <div class="field">
+        <label>Rating</label>
+        <div class="ratingButtons" id="ratingButtons"></div>
+      </div>
+      <div class="field">
+        <label>Comment</label>
+        <textarea id="fComment" placeholder="Tasting notes…"></textarea>
+      </div>
+      <div class="formActions">
+        <button type="button" class="btn danger" id="deleteBtn" style="display:none">Delete</button>
+        <button type="button" class="btn ghost" id="cancelBtn">Cancel</button>
+        <button type="submit" class="btn primary" id="saveBtn">Add Beer</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<div id="lightbox">
+  <div class="lbBar">
+    <button id="lbClose">✕</button>
+  </div>
+  <img id="lbImg" src="" alt="">
+  <div class="lbNav">
+    <button id="lbPrev">‹</button>
+    <button id="lbNext">›</button>
+  </div>
+</div>
+
+<div class="overlay" id="confirmModal">
+  <div class="sheet">
+    <p id="confirmText">Are you sure?</p>
+    <div class="formActions">
+      <button class="btn ghost" id="confirmCancel">Cancel</button>
+      <button class="btn primary" style="background:var(--danger);color:#fff" id="confirmOk">Delete</button>
+    </div>
+  </div>
+</div>
+
+<div id="toast"></div>
+
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-storage-compat.js"></script>
+<script>
+// ---------- Firebase ----------
+const firebaseConfig = {
+  apiKey: "AIzaSyCZB9ZYc0IxaKbGzXFYgKXN92U7yrCkHHA",
+  authDomain: "beer-dca5c.firebaseapp.com",
+  projectId: "beer-dca5c",
+  storageBucket: "beer-dca5c.firebasestorage.app",
+  messagingSenderId: "40162684518",
+  appId: "1:40162684518:web:d51b9fef0b7d22772407a7"
+};
+if ('serviceWorker' in navigator) {
+  navigator.serviceWorker.register('sw.js').catch(() => {});
+}
+
+firebase.initializeApp(firebaseConfig);
+const db = firebase.firestore();
+const storage = firebase.storage();
+const beersCol = db.collection('beers');
+
+// ---------- Theme ----------
+const themeBtn = document.getElementById('themeBtn');
+function applyThemeIcon(){
+  const t = document.documentElement.getAttribute('data-theme');
+  themeBtn.textContent = t === 'dark' ? '☀️' : '🌙';
+}
+themeBtn.onclick = () => {
+  const cur = document.documentElement.getAttribute('data-theme');
+  const next = cur === 'dark' ? 'light' : 'dark';
+  document.documentElement.setAttribute('data-theme', next);
+  try { localStorage.setItem('beer-theme', next); } catch (e) {}
+  applyThemeIcon();
+};
+applyThemeIcon();
+
+// ---------- State ----------
+let allBeers = [];
+let editingId = null;
+let pendingPhotos = []; // {file, url} for new beers not yet saved
+let lbPhotos = [], lbIdx = 0;
+let pendingDelete = null;
+
+const beerList = document.getElementById('beerList');
+const searchInput = document.getElementById('searchInput');
+const sortSelect = document.getElementById('sortSelect');
+const typeSelect = document.getElementById('typeSelect');
+const typeList = document.getElementById('typeList');
+
+const COMMON_TYPES = ['Lager','Pilsner','IPA','Pale Ale','Amber Ale','Stout','Porter','Wheat / Weizen','Sour','Belgian','Bock','Cider','Other'];
+
+function ratingColor(r){
+  const hue = Math.max(0, Math.min(120, ((r - 1) / 9) * 120));
+  return `hsl(${hue},70%,55%)`;
+}
+
+// ---------- Render ----------
+function distinctTypes(){
+  const set = new Set(COMMON_TYPES);
+  allBeers.forEach(b => { if (b.beerType) set.add(b.beerType); });
+  return [...set].sort();
+}
+function renderFilters(){
+  const curType = typeSelect.value;
+  typeSelect.innerHTML = '<option value="">All types</option>' +
+    distinctTypes().map(t => `<option value="${escapeHtml(t)}">${escapeHtml(t)}</option>`).join('');
+  typeSelect.value = curType;
+
+  typeList.innerHTML = distinctTypes().map(t => `<option value="${escapeHtml(t)}">`).join('');
+}
+
+function escapeHtml(s){
+  return String(s ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+}
+
+function filteredSorted(){
+  let list = allBeers.slice();
+  const q = searchInput.value.trim().toLowerCase();
+  if (q) list = list.filter(b => [b.name, b.brewery, b.country, b.comment].some(v => (v || '').toLowerCase().includes(q)));
+  if (typeSelect.value) list = list.filter(b => b.beerType === typeSelect.value);
+  switch (sortSelect.value) {
+    case 'name': list.sort((a, b) => (a.name || '').localeCompare(b.name || '')); break;
+    case 'rating-desc': list.sort((a, b) => (b.rating || 0) - (a.rating || 0)); break;
+    case 'rating-asc': list.sort((a, b) => (a.rating || 0) - (b.rating || 0)); break;
+    case 'oldest': list.sort((a, b) => (a.ts || 0) - (b.ts || 0)); break;
+    default: list.sort((a, b) => (b.ts || 0) - (a.ts || 0));
+  }
+  return list;
+}
+
+function render(){
+  const list = filteredSorted();
+  if (!list.length){
+    beerList.innerHTML = '<div class="empty">No beers yet 🍺<br>Tap + to add the first one.</div>';
+    return;
+  }
+  beerList.innerHTML = list.map(b => {
+    const cover = (b.photos && b.photos[0])
+      ? `<img src="${escapeHtml(b.photos[0].url)}" alt="">`
+      : '🍺';
+    return `
+    <div class="card" data-id="${b.id}">
+      <div class="cover">
+        ${cover}
+        <span class="badge rating" style="background:${ratingColor(b.rating || 0)}">${b.rating ?? '–'}/10</span>
+        ${b.abv != null ? `<span class="badge abv">${b.abv}%</span>` : ''}
+      </div>
+      <div class="body">
+        <div class="name-row">
+          <span class="flag" contenteditable="true" spellcheck="false" data-flag="${b.id}">${escapeHtml(b.flag || '🏳️')}</span>
+          <span class="name">${escapeHtml(b.name || 'Unnamed')}</span>
+        </div>
+        <div class="meta">${escapeHtml(b.country || '')}${b.country && b.beerType ? ' · ' : ''}${escapeHtml(b.beerType || '')}</div>
+      </div>
+    </div>`;
+  }).join('');
+
+  beerList.querySelectorAll('.card').forEach(card => {
+    card.addEventListener('click', (e) => {
+      if (e.target.closest('.flag')) return;
+      const beer = allBeers.find(b => b.id === card.dataset.id);
+      if (beer) openView(beer);
+    });
+  });
+}
+
+function selectFlagContents(el){
+  const range = document.createRange();
+  range.selectNodeContents(el);
+  const sel = window.getSelection();
+  sel.removeAllRanges();
+  sel.addRange(range);
+}
+beerList.addEventListener('focusin', (e) => {
+  const el = e.target.closest('.flag');
+  if (el) selectFlagContents(el);
+});
+beerList.addEventListener('focusout', async (e) => {
+  const el = e.target.closest('.flag');
+  if (!el) return;
+  const id = el.dataset.flag;
+  const val = el.textContent.trim() || '🏳️';
+  try { await beersCol.doc(id).update({ flag: val }); } catch (err) { showToast('Could not save flag'); }
+});
+beerList.addEventListener('keydown', (e) => {
+  if (e.target.closest('.flag') && e.key === 'Enter'){ e.preventDefault(); e.target.blur(); }
+});
+beerList.addEventListener('click', (e) => {
+  const el = e.target.closest('.flag');
+  if (el){
+    e.stopPropagation();
+    setTimeout(() => selectFlagContents(el), 0);
+  }
+});
+
+searchInput.oninput = render;
+sortSelect.onchange = render;
+typeSelect.onchange = render;
+
+// ---------- Firestore live sync ----------
+beersCol.onSnapshot(snap => {
+  allBeers = snap.docs.map(d => ({ id: d.id, ...d.data() }));
+  renderFilters();
+  render();
+}, err => showToast('Sync error: ' + err.message));
+
+// ---------- Add/Edit form ----------
+const formOverlay = document.getElementById('formOverlay');
+const beerForm = document.getElementById('beerForm');
+const formTitle = document.getElementById('formTitle');
+const photoStrip = document.getElementById('photoStrip');
+const photoInput = document.getElementById('photoInput');
+const ratingButtonsEl = document.getElementById('ratingButtons');
+const deleteBtn = document.getElementById('deleteBtn');
+let formRating = 7;
+
+function renderRatingButtons(){
+  ratingButtonsEl.innerHTML = '';
+  for (let n = 1; n <= 10; n++){
+    const btn = document.createElement('button');
+    btn.type = 'button';
+    btn.className = 'ratingBtn' + (n === formRating ? ' active' : '');
+    btn.textContent = n;
+    if (n === formRating) btn.style.background = ratingColor(n);
+    btn.onclick = () => { formRating = n; renderRatingButtons(); };
+    ratingButtonsEl.appendChild(btn);
+  }
+}
+
+function renderPhotoStrip(beer){
+  photoStrip.innerHTML = '';
+  const photos = (beer && beer.photos) || [];
+  photos.forEach((p, i) => {
+    const div = document.createElement('div');
+    div.className = 'thumb';
+    div.innerHTML = `<img src="${escapeHtml(p.url)}"><button class="rm" title="Remove">✕</button>`;
+    div.querySelector('img').onclick = () => openLightbox(photos, i);
+    div.querySelector('.rm').onclick = () => removeExistingPhoto(beer.id, p);
+    photoStrip.appendChild(div);
+  });
+  pendingPhotos.forEach((pp, i) => {
+    const div = document.createElement('div');
+    div.className = 'thumb';
+    div.innerHTML = `<img src="${pp.url}"><button class="rm" title="Remove">✕</button>`;
+    div.querySelector('.rm').onclick = () => { pendingPhotos.splice(i, 1); renderPhotoStrip(beer); };
+    photoStrip.appendChild(div);
+  });
+  const addTile = document.createElement('button');
+  addTile.type = 'button';
+  addTile.className = 'addThumb';
+  addTile.textContent = '+';
+  addTile.onclick = () => photoInput.click();
+  photoStrip.appendChild(addTile);
+}
+
+photoInput.onchange = async () => {
+  const files = Array.from(photoInput.files || []);
+  photoInput.value = '';
+  if (!files.length) return;
+  if (editingId){
+    try {
+      for (const file of files) await uploadPhotoToBeer(editingId, file);
+      const fresh = allBeers.find(b => b.id === editingId);
+      renderPhotoStrip(fresh);
+    } catch (err) {
+      showToast('Photo upload failed: ' + err.message);
+    }
+  } else {
+    files.forEach(file => pendingPhotos.push({ file, url: URL.createObjectURL(file) }));
+    renderPhotoStrip(null);
+  }
+};
+
+async function uploadPhotoToBeer(beerId, file){
+  const path = `beers/${beerId}/${Date.now()}_${file.name}`;
+  const ref = storage.ref(path);
+  await ref.put(file);
+  const url = await ref.getDownloadURL();
+  await beersCol.doc(beerId).update({
+    photos: firebase.firestore.FieldValue.arrayUnion({ url, path, ts: Date.now() })
+  });
+}
+
+async function removeExistingPhoto(beerId, photoObj){
+  try {
+    await storage.ref(photoObj.path).delete();
+  } catch (e) { /* file may already be gone */ }
+  await beersCol.doc(beerId).update({
+    photos: firebase.firestore.FieldValue.arrayRemove(photoObj)
+  });
+  const fresh = allBeers.find(b => b.id === beerId);
+  const updatedPhotos = (fresh.photos || []).filter(p => p.path !== photoObj.path);
+  renderPhotoStrip({ id: beerId, photos: updatedPhotos });
+}
+
+function openForm(beer){
+  editingId = beer ? beer.id : null;
+  pendingPhotos = [];
+  formTitle.textContent = beer ? 'Edit Beer' : 'Add Beer';
+  document.getElementById('saveBtn').textContent = beer ? 'Save' : 'Add Beer';
+  deleteBtn.style.display = beer ? 'block' : 'none';
+
+  document.getElementById('fName').value = beer?.name || '';
+  document.getElementById('fBrewery').value = beer?.brewery || '';
+  document.getElementById('fFlag').value = beer?.flag || '';
+  document.getElementById('fCountry').value = beer?.country || '';
+  document.getElementById('fType').value = beer?.beerType || '';
+  document.getElementById('fAbv').value = beer?.abv ?? '';
+  formRating = beer?.rating ?? 7;
+  renderRatingButtons();
+  document.getElementById('fComment').value = beer?.comment || '';
+  renderPhotoStrip(beer);
+
+  formOverlay.classList.add('show');
+}
+function closeForm(){
+  formOverlay.classList.remove('show');
+  pendingPhotos = [];
+  editingId = null;
+}
+document.getElementById('fab').onclick = () => openForm(null);
+document.getElementById('formClose').onclick = closeForm;
+document.getElementById('cancelBtn').onclick = closeForm;
+formOverlay.addEventListener('click', (e) => { if (e.target === formOverlay) closeForm(); });
+
+beerForm.onsubmit = async (e) => {
+  e.preventDefault();
+  const saveBtn = document.getElementById('saveBtn');
+  saveBtn.disabled = true;
+  const data = {
+    name: document.getElementById('fName').value.trim(),
+    brewery: document.getElementById('fBrewery').value.trim(),
+    flag: document.getElementById('fFlag').value.trim() || '🏳️',
+    country: document.getElementById('fCountry').value.trim(),
+    beerType: document.getElementById('fType').value.trim(),
+    abv: document.getElementById('fAbv').value === '' ? null : Number(document.getElementById('fAbv').value),
+    rating: formRating,
+    comment: document.getElementById('fComment').value.trim()
+  };
+  try {
+    if (editingId){
+      await beersCol.doc(editingId).update(data);
+      showToast('Beer updated');
+    } else {
+      data.photos = [];
+      data.ts = Date.now();
+      const ref = await beersCol.add(data);
+      for (const pp of pendingPhotos) await uploadPhotoToBeer(ref.id, pp.file);
+      showToast('Beer added');
+    }
+    closeForm();
+  } catch (err) {
+    showToast('Save failed: ' + err.message);
+  } finally {
+    saveBtn.disabled = false;
+  }
+};
+
+// ---------- Delete beer ----------
+function confirmDeleteBeer(beer){
+  askConfirm(`Delete "${beer.name || 'this beer'}"? Its photos will be removed too.`, async () => {
+    for (const p of (beer.photos || [])){
+      try { await storage.ref(p.path).delete(); } catch (e) {}
+    }
+    await beersCol.doc(beer.id).delete();
+    showToast('Beer deleted');
+  });
+}
+deleteBtn.onclick = () => {
+  const beer = allBeers.find(b => b.id === editingId);
+  if (!beer) return;
+  confirmDeleteBeer(beer);
+  closeForm();
+};
+
+// ---------- Confirm modal ----------
+const confirmModal = document.getElementById('confirmModal');
+const confirmText = document.getElementById('confirmText');
+function askConfirm(msg, fn){
+  confirmText.textContent = msg;
+  pendingDelete = fn;
+  confirmModal.classList.add('show');
+}
+document.getElementById('confirmCancel').onclick = () => { confirmModal.classList.remove('show'); pendingDelete = null; };
+document.getElementById('confirmOk').onclick = async () => {
+  const fn = pendingDelete;
+  confirmModal.classList.remove('show');
+  pendingDelete = null;
+  if (fn) await fn();
+};
+
+// ---------- Lightbox ----------
+const lightbox = document.getElementById('lightbox');
+const lbImg = document.getElementById('lbImg');
+function openLightbox(photos, idx){
+  lbPhotos = photos; lbIdx = idx;
+  lbImg.src = photos[idx].url;
+  lightbox.classList.add('show');
+}
+function lbShow(){ lbImg.src = lbPhotos[lbIdx].url; }
+document.getElementById('lbClose').onclick = () => lightbox.classList.remove('show');
+document.getElementById('lbPrev').onclick = () => { lbIdx = (lbIdx - 1 + lbPhotos.length) % lbPhotos.length; lbShow(); };
+document.getElementById('lbNext').onclick = () => { lbIdx = (lbIdx + 1) % lbPhotos.length; lbShow(); };
+
+// ---------- View (read-only) ----------
+const viewOverlay = document.getElementById('viewOverlay');
+const viewCarousel = document.getElementById('viewCarousel');
+const viewStats = document.getElementById('viewStats');
+let currentViewId = null;
+
+function openView(beer){
+  currentViewId = beer.id;
+  const photos = beer.photos || [];
+  viewCarousel.innerHTML = photos.length
+    ? photos.map((p, i) => `<img src="${escapeHtml(p.url)}" data-i="${i}">`).join('')
+    : '<div class="placeholder">🍺</div>';
+  viewCarousel.querySelectorAll('img').forEach(img => {
+    img.onclick = () => openLightbox(photos, Number(img.dataset.i));
+  });
+  viewStats.innerHTML = `
+    <div class="viewTitle"><span>${escapeHtml(beer.flag || '🏳️')}</span><span>${escapeHtml(beer.name || 'Unnamed')}</span></div>
+    <div class="viewMeta">${[escapeHtml(beer.brewery || ''), escapeHtml(beer.country || ''), escapeHtml(beer.beerType || '')].filter(Boolean).join(' · ')}</div>
+    <div class="viewBadges">
+      <span style="background:${ratingColor(beer.rating || 0)};color:#1c1410">${beer.rating ?? '–'}/10</span>
+      ${beer.abv != null ? `<span style="background:var(--bg-elev);color:var(--text);border:1px solid var(--border)">${beer.abv}% ALC</span>` : ''}
+    </div>
+    ${beer.comment ? `<div class="viewComment">${escapeHtml(beer.comment)}</div>` : ''}
+  `;
+  viewOverlay.classList.add('show');
+}
+function closeView(){ viewOverlay.classList.remove('show'); currentViewId = null; }
+document.getElementById('viewClose').onclick = closeView;
+viewOverlay.addEventListener('click', (e) => { if (e.target === viewOverlay) closeView(); });
+document.getElementById('viewEditBtn').onclick = () => {
+  const beer = allBeers.find(b => b.id === currentViewId);
+  closeView();
+  if (beer) openForm(beer);
+};
+
+// ---------- Toast ----------
+let toastTimer;
+function showToast(msg){
+  const el = document.getElementById('toast');
+  el.textContent = msg;
+  el.classList.add('show');
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(() => el.classList.remove('show'), 2200);
+}
+</script>
+</body>
+</html>
