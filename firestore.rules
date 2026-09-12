@@ -18,11 +18,42 @@ service cloud.firestore {
       allow write: if true;
     }
 
-    // Required in addition to the nested rule above so that a
-    // collectionGroup('ratings') query (used to compute badge stats
-    // across all beers) is authorized — the nested rule only covers
-    // direct /beers/{beerId}/ratings/{userId} path access.
+    match /parties/{partyId} {
+      allow read: if true;
+      allow create: if request.resource.data.name is string
+                    && request.resource.data.name.size() > 0
+                    && request.resource.data.name.size() < 200;
+      allow update, delete: if true;
+
+      match /participants/{userId} {
+        allow read: if true;
+        allow write: if true;
+      }
+    }
+
+    match /drinkLogs/{logId} {
+      allow read: if true;
+      allow write: if true;
+    }
+
+    match /leaderboardArchives/{year} {
+      allow read: if true;
+      // Immutable once written: creation is open, but an existing
+      // archived year can never be changed or removed.
+      allow create: if true;
+      allow update, delete: if false;
+    }
+
+    // Required in addition to the nested rules above so that
+    // collectionGroup('ratings') / collectionGroup('participants') queries
+    // (used to compute badge stats and party totals across all
+    // beers/parties) are authorized — the nested rules only cover direct
+    // /beers/{beerId}/ratings/{userId} and /parties/{partyId}/participants/{userId}
+    // path access, not cross-collection queries.
     match /{path=**}/ratings/{userId} {
+      allow read: if true;
+    }
+    match /{path=**}/participants/{userId} {
       allow read: if true;
     }
   }

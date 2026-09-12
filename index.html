@@ -49,6 +49,39 @@
   select{cursor:pointer}
 
   #beerList{padding:14px;display:grid;grid-template-columns:repeat(auto-fill,minmax(158px,1fr));gap:12px;padding-bottom:90px}
+  .tabSwitch{display:flex;gap:8px;margin-bottom:10px}
+  .tabBtn{flex:1;padding:9px;border-radius:10px;border:1px solid var(--border);background:var(--bg-elev);color:var(--text-dim);font-weight:700;font-size:.85rem;cursor:pointer;transition:filter .1s,transform .1s}
+  .tabBtn:active{filter:brightness(0.9);transform:scale(0.97)}
+  .tabBtn.active{background:var(--accent);color:#1c1410;border-color:var(--accent)}
+  #beerToolbarRows{display:flex;flex-direction:column;gap:8px}
+  #partyList{padding:14px;padding-bottom:90px;display:flex;flex-direction:column;gap:10px}
+  .partyRow{display:flex;gap:12px;padding:10px;background:var(--bg-card);border:1px solid var(--border);border-radius:14px;cursor:pointer;align-items:center}
+  .partyThumb{width:60px;height:60px;border-radius:10px;overflow:hidden;background:var(--bg-elev);flex:0 0 auto;display:flex;align-items:center;justify-content:center;font-size:1.6rem}
+  .partyThumb img{width:100%;height:100%;object-fit:cover}
+  .partyInfo{min-width:0}
+  .partyName{font-weight:700;font-size:.95rem}
+  .partyMeta{font-size:.8rem;color:var(--text-dim);margin-top:2px}
+  .partyParticipantRow{display:flex;align-items:center;gap:10px;padding:9px 0;border-bottom:1px solid var(--border)}
+  .partyParticipantRow:last-child{border-bottom:none}
+  .partyParticipantRow .userName{flex:1;min-width:0}
+  .partyCount{font-weight:800;font-size:1rem;min-width:44px;text-align:center;white-space:nowrap;flex:0 0 auto}
+  .partyPlusBtn,.partyMinusBtn{flex:0 0 auto;width:32px;height:32px;border-radius:50%;border:none;font-size:1.1rem;font-weight:700;cursor:pointer;transition:filter .1s,transform .1s}
+  .partyPlusBtn{background:var(--accent);color:#1c1410}
+  .partyMinusBtn{background:var(--bg-elev);color:var(--text);border:1px solid var(--border)}
+  .partyPlusBtn:active,.partyMinusBtn:active{filter:brightness(0.85);transform:scale(0.92)}
+  .partyJoinBtn{flex:0 0 auto;padding:6px 14px;font-size:.8rem}
+  .notJoined{flex:0 0 auto;font-size:.78rem;color:var(--text-dim);font-style:italic}
+  .leaderboardYearHead{font-size:1.1rem;font-weight:800;padding:14px 14px 4px}
+  #leaderboardList{padding:0 14px}
+  .leaderboardRow{display:flex;align-items:center;gap:10px;padding:10px 0;border-bottom:1px solid var(--border)}
+  .leaderboardRow:last-child{border-bottom:none}
+  .leaderboardRank{font-weight:800;font-size:1rem;width:26px;text-align:center;color:var(--text-dim);flex:0 0 auto}
+  .leaderboardInfo{flex:1;min-width:0}
+  .leaderboardName{font-weight:700;font-size:.92rem}
+  .leaderboardMeta{font-size:.75rem;color:var(--text-dim)}
+  .leaderboardTotal{font-weight:800;font-size:1rem;flex:0 0 auto;text-align:center;min-width:44px;white-space:nowrap}
+  .archiveRow{display:flex;gap:12px;padding:10px;background:var(--bg-card);border:1px solid var(--border);border-radius:14px;cursor:pointer;align-items:center;margin-bottom:10px}
+  .archiveRow .partyThumb{font-size:1.6rem}
   .card{background:var(--bg-card);border-radius:14px;overflow:hidden;box-shadow:var(--shadow);cursor:pointer;display:flex;flex-direction:column;border:1px solid var(--border)}
   .cover{position:relative;aspect-ratio:4/3;background:var(--bg-elev);display:flex;align-items:center;justify-content:center;font-size:2.2rem;overflow:hidden}
   .cover img{width:100%;height:100%;object-fit:cover}
@@ -66,7 +99,8 @@
 
   #fab{position:fixed;right:18px;bottom:22px;z-index:25;width:56px;height:56px;border-radius:50%;background:var(--accent);color:#1c1410;border:none;font-size:1.6rem;box-shadow:0 4px 14px rgba(0,0,0,.3);cursor:pointer;display:flex;align-items:center;justify-content:center;transition:filter .1s,transform .1s}
   #fab:active{filter:brightness(0.9);transform:scale(0.95)}
-  #uacFab{position:fixed;right:18px;bottom:88px;z-index:25;width:56px;height:56px;border-radius:50%;background:#fff;color:#000;border:none;font-size:.78rem;font-weight:800;box-shadow:0 4px 14px rgba(0,0,0,.3);cursor:pointer;display:flex;align-items:center;justify-content:center;transition:filter .1s,transform .1s}
+  #uacFab{position:fixed;right:18px;bottom:88px;z-index:25;width:56px;height:56px;border-radius:50%;background:#fff;color:#000;border:none;font-size:.78rem;font-weight:800;box-shadow:0 4px 14px rgba(0,0,0,.3);cursor:pointer;display:none;align-items:center;justify-content:center;transition:filter .1s,transform .1s}
+  #uacFab.enabled{display:flex}
   #uacFab:active{filter:brightness(0.9);transform:scale(0.95)}
   #uacOverlay{position:fixed;inset:0;background:#fff;z-index:95;display:none;align-items:center;justify-content:center}
   #uacOverlay.show{display:flex}
@@ -84,6 +118,7 @@
   form{display:flex;flex-direction:column;gap:10px}
   label{font-size:.75rem;color:var(--text-dim);font-weight:600;text-transform:uppercase;letter-spacing:.03em;margin-bottom:2px;display:block}
   .hint{font-size:.72rem;color:var(--text-dim);font-style:italic}
+  .hint.warn{color:var(--danger);font-style:normal;font-weight:600}
   .field{display:flex;flex-direction:column}
   .twoCol{display:grid;grid-template-columns:1fr 1fr;gap:10px}
   .threeCol{display:grid;grid-template-columns:0.7fr 1fr 1fr;gap:10px}
@@ -123,7 +158,7 @@
   .reviewStars{font-size:.78rem;color:var(--text-dim);white-space:nowrap;flex:0 0 auto}
   .reviewComment{font-size:.85rem;color:var(--text);margin-top:2px;white-space:pre-wrap;overflow-wrap:break-word}
 
-  #photoStrip{display:flex;gap:8px;overflow-x:auto;padding-bottom:4px}
+  #photoStrip,#partyPhotoStrip{display:flex;gap:8px;overflow-x:auto;padding-bottom:4px}
   .thumb{position:relative;flex:0 0 auto;width:74px;height:74px;border-radius:10px;overflow:hidden;background:var(--bg-elev);border:1px solid var(--border)}
   .thumb img{width:100%;height:100%;object-fit:cover;cursor:pointer}
   .thumb .rm{position:absolute;top:2px;right:2px;background:rgba(0,0,0,.55);color:#fff;border:none;border-radius:50%;width:18px;height:18px;font-size:.65rem;cursor:pointer;line-height:1}
@@ -151,7 +186,7 @@
   .bigAvatarBtn img{width:100%;height:100%;object-fit:cover}
   .myProfileSection{display:flex;flex-direction:column;gap:10px;margin-bottom:20px;padding-bottom:18px;border-bottom:1px solid var(--border)}
   .profileViewSection{display:flex;flex-direction:column;align-items:center;gap:6px;margin-bottom:16px}
-  .profileViewSection .bigAvatarBtn{margin-bottom:6px}
+  .profileViewSection .bigAvatarBtn{width:140px;height:140px;font-size:3rem;border:none;margin-bottom:6px}
   .profileViewName{font-size:1.2rem;font-weight:700}
   .profileViewBadge{font-size:.9rem;color:var(--text-dim)}
   .profileViewStats{font-size:.78rem;color:var(--text-dim);opacity:.8;margin-top:2px}
@@ -188,26 +223,50 @@
 </header>
 
 <div id="toolbar">
-  <div class="row">
-    <input id="searchInput" type="search" placeholder="Search name, brewery, country, notes…">
+  <div class="tabSwitch" id="tabSwitch">
+    <button type="button" class="tabBtn active" data-tab="beers">🍺 Beers</button>
+    <button type="button" class="tabBtn" data-tab="parties">🍻 Parties</button>
+    <button type="button" class="tabBtn" data-tab="leaderboard">🏆 Rank</button>
   </div>
-  <div class="row">
-    <select id="sortSelect">
-      <option value="newest">New -> Old</option>
-      <option value="oldest">Old -> New</option>
-      <option value="name">Name A–Z</option>
-      <option value="rating-desc">Rating high→low</option>
-      <option value="rating-asc">Rating low→high</option>
-    </select>
-    <select id="typeSelect">
-      <option value="">All types</option>
-    </select>
+  <div id="beerToolbarRows">
+    <div class="row">
+      <input id="searchInput" type="search" placeholder="Search name, brewery, country, notes…">
+    </div>
+    <div class="row">
+      <select id="sortSelect">
+        <option value="newest">New -> Old</option>
+        <option value="oldest">Old -> New</option>
+        <option value="name">Name A–Z</option>
+        <option value="rating-desc">Rating high→low</option>
+        <option value="rating-asc">Rating low→high</option>
+      </select>
+      <select id="typeSelect">
+        <option value="">All types</option>
+      </select>
+    </div>
   </div>
 </div>
 
 <div id="beerList"></div>
+<div id="partyList" style="display:none"></div>
+<div id="leaderboardPage" style="display:none">
+  <div class="leaderboardYearHead" id="leaderboardYearHead"></div>
+  <div id="leaderboardList"></div>
+  <div class="userListHead" style="margin:20px 14px 8px">Past Years</div>
+  <div id="archivesList" style="padding:0 14px 90px"></div>
+</div>
 <button id="uacFab" title="UAC">UAC</button>
 <button id="fab" title="Add beer">+</button>
+
+<div class="overlay" id="archiveViewOverlay">
+  <div class="sheet">
+    <div class="sheetHead">
+      <h2 id="archiveViewTitle">Year</h2>
+      <button class="closeX" id="archiveViewClose">✕</button>
+    </div>
+    <div id="archiveViewList"></div>
+  </div>
+</div>
 
 <div id="uacOverlay">
   <button id="uacClose">✕</button>
@@ -250,6 +309,7 @@
       <div class="field">
         <label>Name</label>
         <input id="fName" required placeholder="e.g. Zlatý Bažant">
+        <span class="hint" id="fNameDupeHint" style="display:none"></span>
       </div>
       <div class="field">
         <label>Brewery</label>
@@ -316,6 +376,46 @@
   </div>
 </div>
 
+<div class="overlay" id="partyViewOverlay">
+  <div class="sheet">
+    <div class="sheetHead">
+      <h2>Party</h2>
+      <button class="closeX" id="partyViewClose">✕</button>
+    </div>
+    <div class="viewCarousel" id="partyViewCarousel"></div>
+    <div class="viewTitleRow">
+      <div class="viewTitle"><span id="partyViewName"></span></div>
+      <button type="button" class="btn primary viewEditBtnInline" id="partyViewEditBtn">Edit</button>
+    </div>
+    <div class="field">
+      <label>Drinkers</label>
+      <div id="partyParticipants"></div>
+    </div>
+  </div>
+</div>
+
+<div class="overlay" id="partyFormOverlay">
+  <div class="sheet">
+    <div class="sheetHead">
+      <h2 id="partyFormTitle">Add Party</h2>
+      <button class="closeX" id="partyFormClose">✕</button>
+    </div>
+    <div id="partyPhotoStrip"></div>
+    <input type="file" id="partyPhotoInput" accept="image/*" multiple style="display:none">
+    <form id="partyForm">
+      <div class="field">
+        <label>Name</label>
+        <input id="pfName" required placeholder="e.g. Friday Night">
+      </div>
+      <div class="formActions">
+        <button type="button" class="btn danger" id="partyDeleteBtn" style="display:none">Delete</button>
+        <button type="button" class="btn ghost" id="partyCancelBtn">Cancel</button>
+        <button type="submit" class="btn primary" id="partySaveBtn">Add Party</button>
+      </div>
+    </form>
+  </div>
+</div>
+
 <div id="lightbox">
   <div class="lbBar">
     <button id="lbClose">✕</button>
@@ -361,6 +461,13 @@
       <div class="field">
         <label>Name</label>
         <input id="profileNameInput" placeholder="Your name">
+      </div>
+      <div class="field">
+        <label>UAC</label>
+        <label class="switch">
+          <input type="checkbox" id="uacToggle">
+          <span class="slider"></span>
+        </label>
       </div>
       <button type="button" class="btn primary" id="profileSaveBtn">Save</button>
     </div>
@@ -613,6 +720,20 @@ fDegreeEl.addEventListener('input', () => {
   fAbvEl.value = estimatedAbv;
 });
 
+const fNameEl = document.getElementById('fName');
+const fNameDupeHint = document.getElementById('fNameDupeHint');
+fNameEl.addEventListener('input', () => {
+  const name = fNameEl.value.trim().toLowerCase();
+  const dupe = name && allBeers.find(b => b.id !== editingId && (b.name || '').trim().toLowerCase() === name);
+  if (dupe){
+    fNameDupeHint.textContent = `A beer named "${dupe.name}" already exists`;
+    fNameDupeHint.className = 'hint warn';
+    fNameDupeHint.style.display = 'block';
+  } else {
+    fNameDupeHint.style.display = 'none';
+  }
+});
+
 function renderRatingButtons(){
   buildRatingButtons(ratingButtonsEl, formRating, async (n) => {
     formRating = n;
@@ -704,6 +825,7 @@ async function openForm(beer){
   deleteBtn.style.display = beer ? 'block' : 'none';
 
   document.getElementById('fName').value = beer?.name || '';
+  fNameDupeHint.style.display = 'none';
   document.getElementById('fBrewery').value = beer?.brewery || '';
   document.getElementById('fFlag').value = beer?.flag || '';
   document.getElementById('fCountry').value = beer?.country || '';
@@ -821,6 +943,517 @@ document.getElementById('confirmOk').onclick = async () => {
   if (fn) await fn();
   history.back();
 };
+
+// ---------- Parties ----------
+const partiesCol = db.collection('parties');
+let allParties = [];
+let allPartyParticipants = {}; // partyId -> [{id: userId, count, ts}]
+let activeTab = 'beers';
+
+const tabSwitch = document.getElementById('tabSwitch');
+const beerToolbarRows = document.getElementById('beerToolbarRows');
+const partyListEl = document.getElementById('partyList');
+
+function setActiveTab(tab){
+  activeTab = tab;
+  tabSwitch.querySelectorAll('.tabBtn').forEach(b => b.classList.toggle('active', b.dataset.tab === tab));
+  const isBeers = tab === 'beers';
+  const isParties = tab === 'parties';
+  const isLeaderboard = tab === 'leaderboard';
+  beerToolbarRows.style.display = isBeers ? 'flex' : 'none';
+  beerList.style.display = isBeers ? 'grid' : 'none';
+  partyListEl.style.display = isParties ? 'flex' : 'none';
+  document.getElementById('leaderboardPage').style.display = isLeaderboard ? 'block' : 'none';
+  document.getElementById('fab').style.display = isLeaderboard ? 'none' : 'flex';
+  document.getElementById('fab').title = isParties ? 'Add party' : 'Add beer';
+  if (isParties) renderPartyList();
+  if (isLeaderboard) renderLeaderboard();
+}
+tabSwitch.querySelectorAll('.tabBtn').forEach(b => {
+  b.onclick = () => setActiveTab(b.dataset.tab);
+});
+document.getElementById('fab').onclick = () => {
+  if (activeTab === 'parties') openPartyForm(null);
+  else openForm(null);
+};
+
+function partyTotals(partyId){
+  const participants = allPartyParticipants[partyId] || [];
+  const totalBeers = participants.reduce((s, p) => s + (p.count || 0), 0);
+  return { joined: participants.length, totalBeers };
+}
+
+function renderPartyList(){
+  if (!allParties.length){
+    partyListEl.innerHTML = '<div class="empty">No parties yet 🎉<br>Tap + to start one.</div>';
+    return;
+  }
+  const sorted = allParties.slice().sort((a, b) => (b.ts || 0) - (a.ts || 0));
+  partyListEl.innerHTML = sorted.map(p => {
+    const totals = partyTotals(p.id);
+    const cover = (p.photos && p.photos[0]) ? `<img src="${escapeHtml(p.photos[0].url)}">` : '🎉';
+    return `<div class="partyRow" data-party="${p.id}">
+      <div class="partyThumb">${cover}</div>
+      <div class="partyInfo">
+        <div class="partyName">${escapeHtml(p.name || 'Unnamed party')}</div>
+        <div class="partyMeta">${totals.joined} joined · ${totals.totalBeers} 🍺</div>
+      </div>
+    </div>`;
+  }).join('');
+  partyListEl.querySelectorAll('.partyRow').forEach(row => {
+    row.onclick = () => {
+      const party = allParties.find(p => p.id === row.dataset.party);
+      if (party) openPartyView(party);
+    };
+  });
+}
+
+partiesCol.onSnapshot(snap => {
+  allParties = snap.docs.map(d => ({ id: d.id, ...d.data() }));
+  if (activeTab === 'parties') renderPartyList();
+  refreshPartyViewIfOpen();
+  allParties.forEach(p => backfillPartyIfNeeded(p));
+}, err => showToast('Sync error: ' + err.message));
+
+db.collectionGroup('participants').onSnapshot(snap => {
+  allPartyParticipants = {};
+  snap.docs.forEach(d => {
+    const partyId = d.ref.parent.parent.id;
+    if (!allPartyParticipants[partyId]) allPartyParticipants[partyId] = [];
+    allPartyParticipants[partyId].push({ id: d.id, ...d.data() });
+  });
+  if (activeTab === 'parties') renderPartyList();
+  refreshPartyViewIfOpen();
+}, err => showToast('Sync error: ' + err.message));
+
+// ---------- Party view ----------
+const partyViewOverlay = document.getElementById('partyViewOverlay');
+const partyViewCarousel = document.getElementById('partyViewCarousel');
+const partyViewName = document.getElementById('partyViewName');
+const partyViewEditBtn = document.getElementById('partyViewEditBtn');
+const partyParticipantsEl = document.getElementById('partyParticipants');
+let currentPartyViewId = null;
+
+function renderPartyParticipants(party){
+  const participants = allPartyParticipants[party.id] || [];
+  const byUser = {};
+  participants.forEach(p => { byUser[p.id] = p; });
+  const knownIds = new Set(allUsers.map(u => u.id));
+  participants.forEach(p => knownIds.add(p.id));
+  knownIds.add(myUid);
+  const allKnownUsers = [...knownIds].map(id => allUsers.find(u => u.id === id) || { id });
+  const joined = allKnownUsers.filter(u => byUser[u.id]).sort((a, b) => (byUser[b.id].count || 0) - (byUser[a.id].count || 0));
+  const notJoined = allKnownUsers.filter(u => !byUser[u.id]);
+
+  const rows = [];
+  joined.forEach(u => {
+    const p = byUser[u.id];
+    const canIncrement = u.id === myUid || isAdmin();
+    rows.push(`<div class="partyParticipantRow">
+      <div class="userAvatar">${avatarInner(u.name, u.photoURL)}</div>
+      <div class="userName">${escapeHtml(u.name || 'Anonymous')}</div>
+      ${canIncrement && (p.count || 0) > 0 ? `<button type="button" class="partyMinusBtn" data-user="${u.id}">–</button>` : ''}
+      <div class="partyCount">${p.count || 0} 🍺</div>
+      ${canIncrement ? `<button type="button" class="partyPlusBtn" data-user="${u.id}">+</button>` : ''}
+    </div>`);
+  });
+  notJoined.forEach(u => {
+    const isMe = u.id === myUid;
+    rows.push(`<div class="partyParticipantRow">
+      <div class="userAvatar">${avatarInner(u.name, u.photoURL)}</div>
+      <div class="userName">${escapeHtml(u.name || 'Anonymous')}</div>
+      ${isMe ? `<button type="button" class="btn ghost partyJoinBtn">Join</button>` : `<span class="notJoined">Not joined</span>`}
+    </div>`);
+  });
+
+  if (!rows.length){
+    partyParticipantsEl.innerHTML = '<div class="empty" style="padding:14px 0">No drinkers yet</div>';
+    return;
+  }
+  partyParticipantsEl.innerHTML = rows.join('');
+
+  partyParticipantsEl.querySelectorAll('.partyPlusBtn').forEach(btn => {
+    btn.onclick = async () => {
+      const userId = btn.dataset.user;
+      try {
+        await partiesCol.doc(party.id).collection('participants').doc(userId).set(
+          { count: firebase.firestore.FieldValue.increment(1) }, { merge: true }
+        );
+        await logDrink(userId, 1, dateKeyFromTs(party.ts));
+      } catch (err) {
+        showToast('Could not add beer: ' + err.message);
+      }
+    };
+  });
+  partyParticipantsEl.querySelectorAll('.partyMinusBtn').forEach(btn => {
+    btn.onclick = async () => {
+      const userId = btn.dataset.user;
+      try {
+        await partiesCol.doc(party.id).collection('participants').doc(userId).set(
+          { count: firebase.firestore.FieldValue.increment(-1) }, { merge: true }
+        );
+        await logDrink(userId, -1, dateKeyFromTs(party.ts));
+      } catch (err) {
+        showToast('Could not remove beer: ' + err.message);
+      }
+    };
+  });
+  const joinBtn = partyParticipantsEl.querySelector('.partyJoinBtn');
+  if (joinBtn){
+    joinBtn.onclick = async () => {
+      try {
+        await partiesCol.doc(party.id).collection('participants').doc(myUid).set(
+          { count: 0, ts: Date.now() }, { merge: true }
+        );
+        showToast('Joined the party!');
+      } catch (err) {
+        showToast('Could not join: ' + err.message);
+      }
+    };
+  }
+}
+
+function renderPartyViewContent(party){
+  const photos = party.photos || [];
+  partyViewCarousel.innerHTML = photos.length
+    ? photos.map((p, i) => `<img src="${escapeHtml(p.url)}" data-i="${i}">`).join('')
+    : '<div class="placeholder">🎉</div>';
+  partyViewCarousel.querySelectorAll('img').forEach(img => {
+    img.onclick = () => openLightbox(photos, Number(img.dataset.i));
+  });
+  partyViewName.textContent = party.name || 'Unnamed party';
+  const canEdit = party.createdBy === myUid || isAdmin();
+  partyViewEditBtn.style.display = canEdit ? 'flex' : 'none';
+  renderPartyParticipants(party);
+}
+
+function refreshPartyViewIfOpen(){
+  if (!partyViewOverlay.classList.contains('show') || !currentPartyViewId) return;
+  const fresh = allParties.find(p => p.id === currentPartyViewId);
+  if (!fresh) return;
+  renderPartyViewContent(fresh);
+}
+
+function showPartyView(party){
+  currentPartyViewId = party.id;
+  renderPartyViewContent(party);
+  partyViewOverlay.classList.add('show');
+}
+function openPartyView(party){
+  pushOverlayState();
+  showPartyView(party);
+}
+function hidePartyView(){
+  partyViewOverlay.classList.remove('show');
+  currentPartyViewId = null;
+}
+function closePartyView(){ history.back(); }
+document.getElementById('partyViewClose').onclick = closePartyView;
+partyViewOverlay.addEventListener('click', (e) => { if (e.target === partyViewOverlay) closePartyView(); });
+partyViewEditBtn.onclick = () => {
+  const party = allParties.find(p => p.id === currentPartyViewId);
+  hidePartyView();
+  if (party) openPartyForm(party);
+};
+
+// ---------- Party add/edit form ----------
+const partyFormOverlay = document.getElementById('partyFormOverlay');
+const partyForm = document.getElementById('partyForm');
+const partyFormTitle = document.getElementById('partyFormTitle');
+const partyPhotoStrip = document.getElementById('partyPhotoStrip');
+const partyPhotoInput = document.getElementById('partyPhotoInput');
+const partyDeleteBtn = document.getElementById('partyDeleteBtn');
+let partyEditingId = null;
+let partyPendingPhotos = [];
+let partyFormOpenedFromId = null;
+
+function renderPartyPhotoStrip(party){
+  partyPhotoStrip.innerHTML = '';
+  const photos = (party && party.photos) || [];
+  photos.forEach((p, i) => {
+    const div = document.createElement('div');
+    div.className = 'thumb';
+    div.innerHTML = `<img src="${escapeHtml(p.url)}"><button class="rm" title="Remove">✕</button>`;
+    div.querySelector('img').onclick = () => openLightbox(photos, i);
+    div.querySelector('.rm').onclick = () => removePartyPhoto(party.id, p);
+    partyPhotoStrip.appendChild(div);
+  });
+  partyPendingPhotos.forEach((pp, i) => {
+    const div = document.createElement('div');
+    div.className = 'thumb';
+    div.innerHTML = `<img src="${pp.url}"><button class="rm" title="Remove">✕</button>`;
+    div.querySelector('.rm').onclick = () => { partyPendingPhotos.splice(i, 1); renderPartyPhotoStrip(party); };
+    partyPhotoStrip.appendChild(div);
+  });
+  const addTile = document.createElement('button');
+  addTile.type = 'button';
+  addTile.className = 'addThumb';
+  addTile.textContent = '+';
+  addTile.onclick = () => partyPhotoInput.click();
+  partyPhotoStrip.appendChild(addTile);
+}
+
+async function uploadPhotoToParty(partyId, file){
+  const path = `parties/${partyId}/${Date.now()}_${file.name}`;
+  const ref = storage.ref(path);
+  await ref.put(file);
+  const url = await ref.getDownloadURL();
+  await partiesCol.doc(partyId).update({
+    photos: firebase.firestore.FieldValue.arrayUnion({ url, path, ts: Date.now() })
+  });
+}
+
+async function removePartyPhoto(partyId, photoObj){
+  try { await storage.ref(photoObj.path).delete(); } catch (e) {}
+  await partiesCol.doc(partyId).update({
+    photos: firebase.firestore.FieldValue.arrayRemove(photoObj)
+  });
+  const fresh = allParties.find(p => p.id === partyId);
+  const updatedPhotos = (fresh?.photos || []).filter(p => p.path !== photoObj.path);
+  renderPartyPhotoStrip({ id: partyId, photos: updatedPhotos });
+}
+
+partyPhotoInput.onchange = async () => {
+  const files = Array.from(partyPhotoInput.files || []);
+  partyPhotoInput.value = '';
+  if (!files.length) return;
+  if (partyEditingId){
+    try {
+      for (const file of files) await uploadPhotoToParty(partyEditingId, file);
+      const fresh = allParties.find(p => p.id === partyEditingId);
+      renderPartyPhotoStrip(fresh);
+    } catch (err) {
+      showToast('Photo upload failed: ' + err.message);
+    }
+  } else {
+    files.forEach(file => partyPendingPhotos.push({ file, url: URL.createObjectURL(file) }));
+    renderPartyPhotoStrip(null);
+  }
+};
+
+function openPartyForm(party){
+  partyFormOpenedFromId = party ? party.id : null;
+  pushOverlayState();
+  partyEditingId = party ? party.id : null;
+  partyPendingPhotos = [];
+  partyFormTitle.textContent = party ? 'Edit Party' : 'Add Party';
+  document.getElementById('partySaveBtn').textContent = party ? 'Save' : 'Add Party';
+  partyDeleteBtn.style.display = party ? 'block' : 'none';
+  document.getElementById('pfName').value = party?.name || '';
+  renderPartyPhotoStrip(party);
+  partyFormOverlay.classList.add('show');
+}
+function hidePartyForm(){
+  partyFormOverlay.classList.remove('show');
+  partyPendingPhotos = [];
+  partyEditingId = null;
+}
+function closePartyForm(){ history.back(); }
+document.getElementById('partyFormClose').onclick = closePartyForm;
+document.getElementById('partyCancelBtn').onclick = closePartyForm;
+partyFormOverlay.addEventListener('click', (e) => { if (e.target === partyFormOverlay) closePartyForm(); });
+
+partyForm.onsubmit = async (e) => {
+  e.preventDefault();
+  const saveBtn = document.getElementById('partySaveBtn');
+  saveBtn.disabled = true;
+  const name = document.getElementById('pfName').value.trim();
+  try {
+    if (partyEditingId){
+      await partiesCol.doc(partyEditingId).update({ name });
+      showToast('Party updated');
+    } else {
+      const ref = await partiesCol.add({ name, photos: [], createdBy: myUid, ts: Date.now() });
+      for (const pp of partyPendingPhotos) await uploadPhotoToParty(ref.id, pp.file);
+      showToast('Party added');
+    }
+    closePartyForm();
+  } catch (err) {
+    showToast('Save failed: ' + err.message);
+  } finally {
+    saveBtn.disabled = false;
+  }
+};
+
+function confirmDeleteParty(party){
+  askConfirm(`Delete "${party.name || 'this party'}"? This removes its photos and everyone's counts.`, async () => {
+    for (const p of (party.photos || [])){
+      try { await storage.ref(p.path).delete(); } catch (e) {}
+    }
+    const partSnap = await partiesCol.doc(party.id).collection('participants').get();
+    for (const doc of partSnap.docs){
+      try { await doc.ref.delete(); } catch (e) {}
+    }
+    await partiesCol.doc(party.id).delete();
+    showToast('Party deleted');
+  });
+}
+partyDeleteBtn.onclick = () => {
+  const party = allParties.find(p => p.id === partyEditingId);
+  if (!party) return;
+  confirmDeleteParty(party);
+};
+
+// ---------- Leaderboard ----------
+const CURRENT_YEAR = new Date().getFullYear();
+const drinkLogsCol = db.collection('drinkLogs');
+let currentYearLogs = [];
+const RANK_MEDALS = ['🥇', '🥈', '🥉'];
+
+function dateKeyFromTs(ts){
+  const d = new Date(ts);
+  return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
+}
+function todayKey(){ return dateKeyFromTs(Date.now()); }
+
+async function logDrink(userId, delta, dateKey){
+  const key = dateKey || todayKey();
+  await drinkLogsCol.doc(`${userId}_${key}`).set({
+    userId,
+    date: key,
+    year: Number(key.slice(0, 4)),
+    count: firebase.firestore.FieldValue.increment(delta)
+  }, { merge: true });
+}
+
+async function backfillPartyIfNeeded(party){
+  if (party.backfilled) return;
+  try {
+    const partSnap = await partiesCol.doc(party.id).collection('participants').get();
+    const dateKey = dateKeyFromTs(party.ts || Date.now());
+    for (const doc of partSnap.docs){
+      const count = doc.data().count || 0;
+      if (count > 0) await logDrink(doc.id, count, dateKey);
+    }
+    await partiesCol.doc(party.id).update({ backfilled: true });
+  } catch (e) { /* will retry on next load */ }
+}
+
+function computeStandings(logs, usersList){
+  const byUser = {};
+  logs.forEach(log => {
+    if (!byUser[log.userId]) byUser[log.userId] = { totalBeers: 0, days: new Set() };
+    byUser[log.userId].totalBeers += (log.count || 0);
+    if ((log.count || 0) > 0) byUser[log.userId].days.add(log.date);
+  });
+  const ids = new Set([...usersList.map(u => u.id), ...Object.keys(byUser), myUid]);
+  const standings = [...ids].map(id => {
+    const u = usersList.find(x => x.id === id);
+    const stats = byUser[id] || { totalBeers: 0, days: new Set() };
+    return {
+      id,
+      name: u?.name || null,
+      photoURL: u?.photoURL || null,
+      totalBeers: stats.totalBeers,
+      totalDays: stats.days.size
+    };
+  });
+  standings.sort((a, b) => b.totalBeers - a.totalBeers || (a.name || '').localeCompare(b.name || ''));
+  return standings;
+}
+
+function renderLeaderboard(){
+  document.getElementById('leaderboardYearHead').textContent = `${CURRENT_YEAR} Leaderboard`;
+  const standings = computeStandings(currentYearLogs, allUsers);
+  const listEl = document.getElementById('leaderboardList');
+  if (!standings.length){
+    listEl.innerHTML = '<div class="empty">No beers logged yet this year</div>';
+  } else {
+    listEl.innerHTML = standings.map((s, i) => {
+      const canControl = s.id === myUid || isAdmin();
+      return `<div class="leaderboardRow">
+        <div class="leaderboardRank">${RANK_MEDALS[i] || (i + 1)}</div>
+        <div class="userAvatar">${avatarInner(s.name, s.photoURL)}</div>
+        <div class="leaderboardInfo">
+          <div class="leaderboardName">${escapeHtml(s.name || 'Anonymous')}</div>
+          <div class="leaderboardMeta">${s.totalDays} day${s.totalDays === 1 ? '' : 's'}</div>
+        </div>
+        ${canControl && s.totalBeers > 0 ? `<button type="button" class="partyMinusBtn" data-user="${s.id}">–</button>` : ''}
+        <div class="leaderboardTotal">${s.totalBeers} 🍺</div>
+        ${canControl ? `<button type="button" class="partyPlusBtn" data-user="${s.id}">+</button>` : ''}
+      </div>`;
+    }).join('');
+    listEl.querySelectorAll('.partyPlusBtn').forEach(btn => {
+      btn.onclick = async () => {
+        try { await logDrink(btn.dataset.user, 1); } catch (err) { showToast('Could not add beer: ' + err.message); }
+      };
+    });
+    listEl.querySelectorAll('.partyMinusBtn').forEach(btn => {
+      btn.onclick = async () => {
+        try { await logDrink(btn.dataset.user, -1); } catch (err) { showToast('Could not remove beer: ' + err.message); }
+      };
+    });
+  }
+  renderArchivesList();
+}
+
+drinkLogsCol.where('year', '==', CURRENT_YEAR).onSnapshot(snap => {
+  currentYearLogs = snap.docs.map(d => d.data());
+  if (activeTab === 'leaderboard') renderLeaderboard();
+}, err => showToast('Sync error: ' + err.message));
+
+// ---------- Year-end archiving ----------
+async function checkAndArchivePreviousYear(){
+  const prevYear = CURRENT_YEAR - 1;
+  try {
+    const archiveRef = db.collection('leaderboardArchives').doc(String(prevYear));
+    const existing = await archiveRef.get();
+    if (existing.exists) return;
+    const snap = await drinkLogsCol.where('year', '==', prevYear).get();
+    if (snap.empty) return;
+    const logs = snap.docs.map(d => d.data());
+    const standings = computeStandings(logs, allUsers).filter(s => s.totalBeers > 0 || s.totalDays > 0);
+    if (!standings.length) return;
+    await archiveRef.set({ year: prevYear, standings, archivedAt: Date.now() });
+  } catch (e) { /* another device may already be archiving, or we're offline — safe to ignore */ }
+}
+
+let allArchives = [];
+db.collection('leaderboardArchives').onSnapshot(snap => {
+  allArchives = snap.docs.map(d => ({ id: d.id, ...d.data() })).sort((a, b) => b.year - a.year);
+  if (activeTab === 'leaderboard') renderArchivesList();
+}, err => showToast('Sync error: ' + err.message));
+
+function renderArchivesList(){
+  const el = document.getElementById('archivesList');
+  if (!allArchives.length){
+    el.innerHTML = '<div class="empty" style="padding:10px 0">No past years yet</div>';
+    return;
+  }
+  el.innerHTML = allArchives.map(a => `<div class="archiveRow" data-year="${a.year}">
+    <div class="partyThumb">🏆</div>
+    <div class="partyInfo">
+      <div class="partyName">${a.year}</div>
+      <div class="partyMeta">${a.standings.length} drinkers</div>
+    </div>
+  </div>`).join('');
+  el.querySelectorAll('.archiveRow').forEach(row => {
+    row.onclick = () => openArchiveView(allArchives.find(a => String(a.year) === row.dataset.year));
+  });
+}
+
+const archiveViewOverlay = document.getElementById('archiveViewOverlay');
+function openArchiveView(archive){
+  pushOverlayState();
+  document.getElementById('archiveViewTitle').textContent = `${archive.year} Final Standings`;
+  const listEl = document.getElementById('archiveViewList');
+  listEl.innerHTML = archive.standings.map((s, i) => `<div class="leaderboardRow">
+    <div class="leaderboardRank">${RANK_MEDALS[i] || (i + 1)}</div>
+    <div class="userAvatar">${avatarInner(s.name, s.photoURL)}</div>
+    <div class="leaderboardInfo">
+      <div class="leaderboardName">${escapeHtml(s.name || 'Anonymous')}</div>
+      <div class="leaderboardMeta">${s.totalDays} day${s.totalDays === 1 ? '' : 's'}</div>
+    </div>
+    <div class="leaderboardTotal">${s.totalBeers} 🍺</div>
+  </div>`).join('');
+  archiveViewOverlay.classList.add('show');
+}
+function hideArchiveView(){ archiveViewOverlay.classList.remove('show'); }
+function closeArchiveView(){ history.back(); }
+document.getElementById('archiveViewClose').onclick = closeArchiveView;
+archiveViewOverlay.addEventListener('click', (e) => { if (e.target === archiveViewOverlay) closeArchiveView(); });
+
+checkAndArchivePreviousYear();
 
 // ---------- Lightbox ----------
 const lightbox = document.getElementById('lightbox');
@@ -1113,10 +1746,16 @@ function refreshProfileDisplays(){
   if (profileEditOverlay.classList.contains('show')) renderBadgeLadder(myUid);
 }
 
+function updateUacFabVisibility(){
+  const me = allUsers.find(u => u.id === myUid);
+  document.getElementById('uacFab').classList.toggle('enabled', !!me?.uacEnabled);
+}
+
 usersCol.onSnapshot(snap => {
   allUsers = snap.docs.map(d => ({ id: d.id, ...d.data() }));
   renderHeaderAvatar();
   refreshProfileDisplays();
+  updateUacFabVisibility();
 }, err => showToast('Sync error: ' + err.message));
 
 db.collectionGroup('ratings').onSnapshot(snap => {
@@ -1150,6 +1789,7 @@ function openProfileEdit(){
   pushOverlayState();
   const me = allUsers.find(u => u.id === myUid);
   profileNameInput.value = me?.name || '';
+  document.getElementById('uacToggle').checked = !!me?.uacEnabled;
   myAvatarBtn.innerHTML = avatarInner(me?.name, me?.photoURL);
   renderBadgeLadder(myUid);
   hideProfileView();
@@ -1183,8 +1823,9 @@ profilePhotoInput.onchange = async () => {
 
 document.getElementById('profileSaveBtn').onclick = async () => {
   const name = profileNameInput.value.trim();
+  const uacEnabled = document.getElementById('uacToggle').checked;
   try {
-    await usersCol.doc(myUid).set({ name }, { merge: true });
+    await usersCol.doc(myUid).set({ name, uacEnabled }, { merge: true });
     showToast('Profile saved');
     closeProfileEdit();
   } catch (err) {
@@ -1215,6 +1856,14 @@ window.addEventListener('popstate', () => {
     }
     return;
   }
+  if (partyFormOverlay.classList.contains('show')){
+    hidePartyForm();
+    if (partyFormOpenedFromId){
+      const party = allParties.find(p => p.id === partyFormOpenedFromId);
+      if (party) showPartyView(party);
+    }
+    return;
+  }
   if (profileEditOverlay.classList.contains('show')){
     hideProfileEdit();
     showProfileView(myUid);
@@ -1222,6 +1871,14 @@ window.addEventListener('popstate', () => {
   }
   if (viewOverlay.classList.contains('show')){
     hideView();
+    return;
+  }
+  if (partyViewOverlay.classList.contains('show')){
+    hidePartyView();
+    return;
+  }
+  if (archiveViewOverlay.classList.contains('show')){
+    hideArchiveView();
     return;
   }
   if (profileViewOverlay.classList.contains('show')){
