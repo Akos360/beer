@@ -7,6 +7,23 @@ service cloud.firestore {
                     && request.resource.data.name.size() > 0
                     && request.resource.data.name.size() < 200;
       allow update, delete: if true;
+
+      match /ratings/{userId} {
+        allow read: if true;
+        allow write: if true;
+      }
+    }
+    match /users/{userId} {
+      allow read: if true;
+      allow write: if true;
+    }
+
+    // Required in addition to the nested rule above so that a
+    // collectionGroup('ratings') query (used to compute badge stats
+    // across all beers) is authorized — the nested rule only covers
+    // direct /beers/{beerId}/ratings/{userId} path access.
+    match /{path=**}/ratings/{userId} {
+      allow read: if true;
     }
   }
 }

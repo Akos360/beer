@@ -37,6 +37,9 @@
   header h1 span{overflow-wrap:break-word}
   header h1 .logo{width:28px;height:28px;border-radius:8px;object-fit:cover;flex:0 0 auto}
   #themeBtn{background:none;border:none;font-size:1.3rem;cursor:pointer;padding:4px}
+  .headerRight{display:flex;align-items:center;gap:10px;flex:0 0 auto}
+  .avatarBtn{width:34px;height:34px;border-radius:50%;border:none;padding:0;cursor:pointer;background:var(--accent);color:#1c1410;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:.9rem;overflow:hidden;flex:0 0 auto}
+  .avatarBtn img{width:100%;height:100%;object-fit:cover}
 
   #toolbar{position:sticky;top:53px;z-index:19;background:var(--bg);padding:10px 12px;border-bottom:1px solid var(--border);display:flex;flex-direction:column;gap:8px}
   .row{display:flex;gap:8px;flex-wrap:wrap}
@@ -61,7 +64,14 @@
   .meta{font-size:.76rem;color:var(--text-dim)}
   .empty{text-align:center;color:var(--text-dim);padding:60px 20px;grid-column:1/-1}
 
-  #fab{position:fixed;right:18px;bottom:22px;z-index:25;width:56px;height:56px;border-radius:50%;background:var(--accent);color:#1c1410;border:none;font-size:1.6rem;box-shadow:0 4px 14px rgba(0,0,0,.3);cursor:pointer;display:flex;align-items:center;justify-content:center}
+  #fab{position:fixed;right:18px;bottom:22px;z-index:25;width:56px;height:56px;border-radius:50%;background:var(--accent);color:#1c1410;border:none;font-size:1.6rem;box-shadow:0 4px 14px rgba(0,0,0,.3);cursor:pointer;display:flex;align-items:center;justify-content:center;transition:filter .1s,transform .1s}
+  #fab:active{filter:brightness(0.9);transform:scale(0.95)}
+  #uacFab{position:fixed;right:18px;bottom:88px;z-index:25;width:56px;height:56px;border-radius:50%;background:#fff;color:#000;border:none;font-size:.78rem;font-weight:800;box-shadow:0 4px 14px rgba(0,0,0,.3);cursor:pointer;display:flex;align-items:center;justify-content:center;transition:filter .1s,transform .1s}
+  #uacFab:active{filter:brightness(0.9);transform:scale(0.95)}
+  #uacOverlay{position:fixed;inset:0;background:#fff;z-index:95;display:none;align-items:center;justify-content:center}
+  #uacOverlay.show{display:flex}
+  #uacOverlay .uacText{color:#000;font-size:32vw;font-weight:900;letter-spacing:.02em;line-height:1}
+  #uacClose{position:absolute;top:16px;right:16px;background:none;border:none;color:#000;font-size:1.8rem;cursor:pointer;padding:8px;line-height:1}
 
   .overlay{position:fixed;inset:0;background:var(--overlay);display:none;align-items:flex-end;justify-content:center;z-index:50}
   .overlay.show{display:flex}
@@ -73,8 +83,21 @@
   .closeX{background:none;border:none;font-size:1.3rem;cursor:pointer;color:var(--text-dim)}
   form{display:flex;flex-direction:column;gap:10px}
   label{font-size:.75rem;color:var(--text-dim);font-weight:600;text-transform:uppercase;letter-spacing:.03em;margin-bottom:2px;display:block}
+  .hint{font-size:.72rem;color:var(--text-dim);font-style:italic}
   .field{display:flex;flex-direction:column}
   .twoCol{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+  .threeCol{display:grid;grid-template-columns:0.7fr 1fr 1fr;gap:10px}
+  .threeCol .field{min-width:0}
+  .threeCol input{width:100%;min-width:0}
+  .switch{position:relative;display:inline-block;width:44px;height:26px}
+  .switch input{opacity:0;width:0;height:0}
+  .switch .slider{position:absolute;inset:0;background:var(--border);transition:.15s;border-radius:999px;cursor:pointer}
+  .switch .slider:before{content:"";position:absolute;height:20px;width:20px;left:3px;top:3px;background:#fff;transition:.15s;border-radius:50%}
+  .switch input:checked + .slider{background:var(--accent)}
+  .switch input:checked + .slider:before{transform:translateX(18px)}
+  .priceField{position:relative}
+  .priceField .euro{position:absolute;left:11px;top:50%;transform:translateY(-50%);color:var(--text-dim);pointer-events:none}
+  .priceField input{padding-left:24px;width:100%}
   .flagCountry{display:grid;grid-template-columns:56px 1fr;gap:8px}
   .ratingButtons{display:flex;gap:3px}
   .ratingBtn{flex:1;min-width:0;height:28px;padding:0;border-radius:6px;border:1px solid var(--border);background:var(--bg-elev);color:var(--text-dim);font-weight:700;font-size:.7rem;cursor:pointer;display:flex;align-items:center;justify-content:center}
@@ -82,14 +105,23 @@
   textarea{resize:vertical;min-height:56px}
 
   .viewCarousel{display:flex;overflow-x:auto;scroll-snap-type:x mandatory;border-radius:12px;margin-bottom:14px;background:var(--bg-elev)}
-  .viewCarousel img{flex:0 0 100%;scroll-snap-align:center;width:100%;height:220px;object-fit:cover;cursor:pointer}
-  .viewCarousel .placeholder{flex:0 0 100%;height:220px;display:flex;align-items:center;justify-content:center;font-size:3rem}
+  .viewCarousel img{flex:0 0 100%;scroll-snap-align:center;width:100%;height:340px;object-fit:cover;cursor:pointer}
+  .viewCarousel .placeholder{flex:0 0 100%;height:340px;display:flex;align-items:center;justify-content:center;font-size:3rem}
   .viewStats{display:flex;flex-direction:column;gap:10px;margin-bottom:6px}
-  .viewTitle{display:flex;align-items:center;gap:8px;font-size:1.25rem;font-weight:700}
+  .viewTitleRow{display:flex;align-items:center;justify-content:space-between;gap:10px}
+  .viewTitle{display:flex;align-items:center;gap:8px;font-size:1.25rem;font-weight:700;min-width:0}
   .viewMeta{color:var(--text-dim);font-size:.9rem}
   .viewBadges{display:flex;gap:8px}
   .viewBadges span{padding:4px 11px;border-radius:8px;font-weight:700;font-size:.85rem}
   .viewComment{white-space:pre-wrap;font-size:.92rem;line-height:1.45}
+  .viewReviews{max-height:260px;overflow-y:auto;display:flex;flex-direction:column;gap:2px}
+  .reviewRow{display:flex;gap:10px;padding:10px 0;border-bottom:1px solid var(--border)}
+  .reviewRow:last-child{border-bottom:none}
+  .reviewBody{flex:1;min-width:0}
+  .reviewHead{display:flex;justify-content:space-between;align-items:baseline;gap:8px}
+  .reviewHead .userName{font-weight:700;font-size:.88rem}
+  .reviewStars{font-size:.78rem;color:var(--text-dim);white-space:nowrap;flex:0 0 auto}
+  .reviewComment{font-size:.85rem;color:var(--text);margin-top:2px;white-space:pre-wrap;overflow-wrap:break-word}
 
   #photoStrip{display:flex;gap:8px;overflow-x:auto;padding-bottom:4px}
   .thumb{position:relative;flex:0 0 auto;width:74px;height:74px;border-radius:10px;overflow:hidden;background:var(--bg-elev);border:1px solid var(--border)}
@@ -98,10 +130,12 @@
   .addThumb{flex:0 0 auto;width:74px;height:74px;border-radius:10px;border:1.5px dashed var(--border);display:flex;align-items:center;justify-content:center;font-size:1.4rem;color:var(--text-dim);cursor:pointer;background:none}
 
   .formActions{display:flex;gap:10px;margin-top:6px}
-  .btn{flex:1;border:none;border-radius:10px;padding:12px;font-weight:700;font-size:.92rem;cursor:pointer}
+  .btn{flex:1;border:none;border-radius:10px;padding:12px;font-weight:700;font-size:.92rem;cursor:pointer;transition:filter .1s,transform .1s}
+  .btn:active{filter:brightness(0.82);transform:scale(0.97)}
   .btn.primary{background:var(--accent);color:#1c1410}
   .btn.ghost{background:var(--bg-elev);color:var(--text);border:1px solid var(--border)}
   .btn.danger{background:none;color:var(--danger);flex:0 0 auto}
+  .viewEditBtnInline{flex:0 0 auto;align-self:stretch;width:auto;padding:0 14px;font-size:.78rem;white-space:nowrap;display:flex;align-items:center;justify-content:center}
 
   #lightbox{position:fixed;inset:0;background:#000d;display:none;align-items:center;justify-content:center;z-index:80;flex-direction:column}
   #lightbox.show{display:flex}
@@ -112,6 +146,31 @@
   .lbNav button{background:rgba(255,255,255,.15);border:none;color:#fff;width:42px;height:42px;border-radius:50%;font-size:1.2rem;cursor:pointer}
 
   #confirmModal .sheet{max-width:340px}
+
+  .bigAvatarBtn{width:84px;height:84px;border-radius:50%;border:2px dashed var(--border);background:var(--bg-elev);display:flex;align-items:center;justify-content:center;font-size:1.8rem;font-weight:700;color:var(--text-dim);cursor:pointer;overflow:hidden;margin:0 auto 4px;padding:0}
+  .bigAvatarBtn img{width:100%;height:100%;object-fit:cover}
+  .myProfileSection{display:flex;flex-direction:column;gap:10px;margin-bottom:20px;padding-bottom:18px;border-bottom:1px solid var(--border)}
+  .profileViewSection{display:flex;flex-direction:column;align-items:center;gap:6px;margin-bottom:16px}
+  .profileViewSection .bigAvatarBtn{margin-bottom:6px}
+  .profileViewName{font-size:1.2rem;font-weight:700}
+  .profileViewBadge{font-size:.9rem;color:var(--text-dim)}
+  .profileViewStats{font-size:.78rem;color:var(--text-dim);opacity:.8;margin-top:2px}
+  #profileViewListWrap{border-top:1px solid var(--border);padding-top:16px;margin-top:4px}
+  .badgeLadder{display:flex;flex-direction:column;gap:6px}
+  .badgeSummary{font-size:.8rem;color:var(--text-dim);margin-bottom:2px}
+  .badgeTier{display:flex;justify-content:space-between;align-items:center;padding:8px 12px;border-radius:10px;border:1px solid var(--border);background:var(--bg-elev);font-size:.85rem;color:var(--text-dim)}
+  .badgeTier.current{background:var(--accent);border-color:var(--accent);color:#1c1410;font-weight:700}
+  .badgeTierName{display:flex;gap:6px;align-items:center}
+  .badgeTierReq{font-size:.75rem}
+  .userListHead{font-size:.75rem;color:var(--text-dim);font-weight:700;text-transform:uppercase;letter-spacing:.03em;margin-bottom:8px}
+  .userRow{display:flex;align-items:center;gap:10px;padding:9px 0;border-bottom:1px solid var(--border)}
+  .userRow:last-child{border-bottom:none}
+  .userAvatar{width:40px;height:40px;border-radius:50%;overflow:hidden;background:var(--bg-elev);display:flex;align-items:center;justify-content:center;font-weight:700;color:var(--text-dim);flex:0 0 auto}
+  .userAvatar img{width:100%;height:100%;object-fit:cover}
+  .userName{font-weight:700;font-size:.9rem}
+  .userBadge{font-size:.78rem;color:var(--text-dim)}
+  .userStats{font-size:.72rem;color:var(--text-dim);opacity:.8;margin-top:1px}
+  .adminTag{display:inline-block;padding:1px 7px;border:1px solid var(--accent);border-radius:999px;font-size:.65rem;font-weight:700;color:var(--accent);vertical-align:middle}
   #confirmModal p{margin:0 0 16px;font-size:.92rem}
 
   #toast{position:fixed;bottom:90px;left:50%;transform:translateX(-50%);background:var(--text);color:var(--bg);padding:10px 18px;border-radius:999px;font-size:.85rem;box-shadow:var(--shadow);opacity:0;pointer-events:none;transition:opacity .25s;z-index:90}
@@ -122,7 +181,10 @@
 
 <header>
   <h1><img src="img/logo.png" alt="" class="logo"><span>A legszebb öröm a Söröm</span></h1>
-  <button id="themeBtn" title="Toggle theme">🌙</button>
+  <div class="headerRight">
+    <button id="themeBtn" title="Toggle theme">🌙</button>
+    <button id="profileBtn" class="avatarBtn" title="Profile"></button>
+  </div>
 </header>
 
 <div id="toolbar">
@@ -144,7 +206,13 @@
 </div>
 
 <div id="beerList"></div>
+<button id="uacFab" title="UAC">UAC</button>
 <button id="fab" title="Add beer">+</button>
+
+<div id="uacOverlay">
+  <button id="uacClose">✕</button>
+  <div class="uacText">UAC</div>
+</div>
 
 <div class="overlay" id="viewOverlay">
   <div class="sheet">
@@ -154,8 +222,18 @@
     </div>
     <div class="viewCarousel" id="viewCarousel"></div>
     <div class="viewStats" id="viewStats"></div>
-    <div class="formActions">
-      <button type="button" class="btn primary" id="viewEditBtn">Edit</button>
+    <div class="field">
+      <label>Your rating</label>
+      <div class="ratingButtons" id="viewRatingButtons"></div>
+    </div>
+    <div class="field" style="margin-top:14px">
+      <label>Your review</label>
+      <textarea id="viewReviewInput" placeholder="What did you think?"></textarea>
+      <button type="button" class="btn primary" id="viewReviewPostBtn" style="margin-top:8px">Post review</button>
+    </div>
+    <div class="field" style="margin-top:14px">
+      <label>Reviews</label>
+      <div class="viewReviews" id="viewReviews"></div>
     </div>
   </div>
 </div>
@@ -194,12 +272,35 @@
           <datalist id="typeList"></datalist>
         </div>
         <div class="field">
+          <label>Filtered</label>
+          <label class="switch">
+            <input type="checkbox" id="fFiltered">
+            <span class="slider"></span>
+          </label>
+        </div>
+      </div>
+      <div class="threeCol">
+        <div class="field">
+          <label>Degree (°)</label>
+          <input id="fDegree" type="number" step="1" min="0" placeholder="11">
+        </div>
+        <div class="field">
           <label>ALC %</label>
           <input id="fAbv" type="number" step="0.1" min="0" max="100" placeholder="5.0">
         </div>
+        <div class="field">
+          <label>Price</label>
+          <div class="priceField">
+            <span class="euro">€</span>
+            <input id="fPrice" type="number" step="0.1" min="0" placeholder="0.00">
+          </div>
+        </div>
+      </div>
+      <div class="field" style="margin-top:-4px">
+        <span class="hint">Degree gives an estimated ALC % — adjust it to match the label if needed</span>
       </div>
       <div class="field">
-        <label>Rating</label>
+        <label>Your rating</label>
         <div class="ratingButtons" id="ratingButtons"></div>
       </div>
       <div class="field">
@@ -223,6 +324,50 @@
   <div class="lbNav">
     <button id="lbPrev">‹</button>
     <button id="lbNext">›</button>
+  </div>
+</div>
+
+<div class="overlay" id="profileViewOverlay">
+  <div class="sheet">
+    <div class="sheetHead">
+      <h2>Profile</h2>
+      <button class="closeX" id="profileViewClose">✕</button>
+    </div>
+    <div class="profileViewSection">
+      <div id="profileViewAvatar" class="bigAvatarBtn" style="cursor:default"></div>
+      <div id="profileViewName" class="profileViewName"></div>
+      <div id="profileViewBadge" class="profileViewBadge"></div>
+      <div id="profileViewStats" class="profileViewStats"></div>
+    </div>
+    <div class="formActions" id="profileViewActions">
+      <button type="button" class="btn primary" id="profileViewEditBtn">Edit</button>
+    </div>
+    <div id="profileViewListWrap">
+      <div class="userListHead">All Drinkers</div>
+      <div id="userList"></div>
+    </div>
+  </div>
+</div>
+
+<div class="overlay" id="profileEditOverlay">
+  <div class="sheet">
+    <div class="sheetHead">
+      <h2>Edit Profile</h2>
+      <button class="closeX" id="profileEditClose">✕</button>
+    </div>
+    <div class="myProfileSection" style="border-bottom:none;margin-bottom:0;padding-bottom:0">
+      <button type="button" id="myAvatarBtn" class="bigAvatarBtn" title="Change photo"></button>
+      <input type="file" id="profilePhotoInput" accept="image/*" style="display:none">
+      <div class="field">
+        <label>Name</label>
+        <input id="profileNameInput" placeholder="Your name">
+      </div>
+      <button type="button" class="btn primary" id="profileSaveBtn">Save</button>
+    </div>
+    <div class="field" style="margin-top:16px">
+      <label>Badge progress</label>
+      <div id="badgeLadder" class="badgeLadder"></div>
+    </div>
   </div>
 </div>
 
@@ -295,6 +440,48 @@ function ratingColor(r){
   return `hsl(${hue},70%,55%)`;
 }
 
+function pushOverlayState(){
+  history.pushState({ sorOverlay: true }, '');
+}
+
+function buildRatingButtons(container, value, onSelect){
+  container.innerHTML = '';
+  for (let n = 1; n <= 10; n++){
+    const btn = document.createElement('button');
+    btn.type = 'button';
+    btn.className = 'ratingBtn' + (n === value ? ' active' : '');
+    btn.textContent = n;
+    if (n === value) btn.style.background = ratingColor(n);
+    btn.onclick = () => onSelect(n);
+    container.appendChild(btn);
+  }
+}
+
+async function submitMyRating(beerId, ratingValue){
+  await beersCol.doc(beerId).collection('ratings').doc(myUid).set(
+    { rating: ratingValue, userId: myUid, ts: Date.now() }, { merge: true }
+  );
+  const snap = await beersCol.doc(beerId).collection('ratings').get();
+  const ratings = snap.docs.map(d => d.data().rating).filter(r => typeof r === 'number');
+  const count = ratings.length;
+  const avg = count ? ratings.reduce((a, b) => a + b, 0) / count : null;
+  await beersCol.doc(beerId).update({ avgRating: avg, ratingCount: count });
+  return { avgRating: avg, ratingCount: count };
+}
+
+async function getMyRatingFor(beerId){
+  try {
+    const doc = await beersCol.doc(beerId).collection('ratings').doc(myUid).get();
+    return doc.exists ? doc.data().rating : null;
+  } catch (e) { return null; }
+}
+
+async function submitMyReview(beerId, commentText){
+  await beersCol.doc(beerId).collection('ratings').doc(myUid).set(
+    { comment: commentText, userId: myUid, ts: Date.now() }, { merge: true }
+  );
+}
+
 // ---------- Render ----------
 function distinctTypes(){
   const set = new Set(COMMON_TYPES);
@@ -321,8 +508,8 @@ function filteredSorted(){
   if (typeSelect.value) list = list.filter(b => b.beerType === typeSelect.value);
   switch (sortSelect.value) {
     case 'name': list.sort((a, b) => (a.name || '').localeCompare(b.name || '')); break;
-    case 'rating-desc': list.sort((a, b) => (b.rating || 0) - (a.rating || 0)); break;
-    case 'rating-asc': list.sort((a, b) => (a.rating || 0) - (b.rating || 0)); break;
+    case 'rating-desc': list.sort((a, b) => (b.avgRating || 0) - (a.avgRating || 0)); break;
+    case 'rating-asc': list.sort((a, b) => (a.avgRating || 0) - (b.avgRating || 0)); break;
     case 'oldest': list.sort((a, b) => (a.ts || 0) - (b.ts || 0)); break;
     default: list.sort((a, b) => (b.ts || 0) - (a.ts || 0));
   }
@@ -343,7 +530,7 @@ function render(){
     <div class="card" data-id="${b.id}">
       <div class="cover">
         ${cover}
-        <span class="badge rating" style="background:${ratingColor(b.rating || 0)}">${b.rating ?? '–'}/10</span>
+        <span class="badge rating" style="background:${ratingColor(b.avgRating || 0)}">${b.avgRating != null ? b.avgRating.toFixed(1) : '–'}/10</span>
         ${b.abv != null ? `<span class="badge abv">${b.abv}%</span>` : ''}
       </div>
       <div class="body">
@@ -403,6 +590,8 @@ beersCol.onSnapshot(snap => {
   allBeers = snap.docs.map(d => ({ id: d.id, ...d.data() }));
   renderFilters();
   render();
+  refreshViewIfOpen();
+  refreshProfileDisplays();
 }, err => showToast('Sync error: ' + err.message));
 
 // ---------- Add/Edit form ----------
@@ -413,19 +602,29 @@ const photoStrip = document.getElementById('photoStrip');
 const photoInput = document.getElementById('photoInput');
 const ratingButtonsEl = document.getElementById('ratingButtons');
 const deleteBtn = document.getElementById('deleteBtn');
-let formRating = 7;
+const fDegreeEl = document.getElementById('fDegree');
+const fAbvEl = document.getElementById('fAbv');
+let formRating = null;
+
+fDegreeEl.addEventListener('input', () => {
+  const degree = Number(fDegreeEl.value);
+  if (fDegreeEl.value === '' || isNaN(degree) || degree <= 0) return;
+  const estimatedAbv = Math.round((degree - 1) * 0.4 * 10) / 10;
+  fAbvEl.value = estimatedAbv;
+});
 
 function renderRatingButtons(){
-  ratingButtonsEl.innerHTML = '';
-  for (let n = 1; n <= 10; n++){
-    const btn = document.createElement('button');
-    btn.type = 'button';
-    btn.className = 'ratingBtn' + (n === formRating ? ' active' : '');
-    btn.textContent = n;
-    if (n === formRating) btn.style.background = ratingColor(n);
-    btn.onclick = () => { formRating = n; renderRatingButtons(); };
-    ratingButtonsEl.appendChild(btn);
-  }
+  buildRatingButtons(ratingButtonsEl, formRating, async (n) => {
+    formRating = n;
+    renderRatingButtons();
+    if (editingId){
+      try {
+        await submitMyRating(editingId, n);
+      } catch (err) {
+        showToast('Rating failed: ' + err.message);
+      }
+    }
+  });
 }
 
 function renderPhotoStrip(beer){
@@ -494,7 +693,10 @@ async function removeExistingPhoto(beerId, photoObj){
   renderPhotoStrip({ id: beerId, photos: updatedPhotos });
 }
 
-function openForm(beer){
+let formOpenedFromBeerId = null;
+async function openForm(beer){
+  formOpenedFromBeerId = beer ? beer.id : null;
+  pushOverlayState();
   editingId = beer ? beer.id : null;
   pendingPhotos = [];
   formTitle.textContent = beer ? 'Edit Beer' : 'Add Beer';
@@ -506,20 +708,42 @@ function openForm(beer){
   document.getElementById('fFlag').value = beer?.flag || '';
   document.getElementById('fCountry').value = beer?.country || '';
   document.getElementById('fType').value = beer?.beerType || '';
+  document.getElementById('fFiltered').checked = !!beer?.filtered;
+  document.getElementById('fDegree').value = beer?.degree ?? '';
   document.getElementById('fAbv').value = beer?.abv ?? '';
-  formRating = beer?.rating ?? 7;
+  document.getElementById('fPrice').value = beer?.price ?? '';
+  formRating = null;
   renderRatingButtons();
   document.getElementById('fComment').value = beer?.comment || '';
   renderPhotoStrip(beer);
 
   formOverlay.classList.add('show');
+
+  if (beer){
+    const mine = await getMyRatingFor(beer.id);
+    if (editingId === beer.id){
+      formRating = mine;
+      renderRatingButtons();
+    }
+  }
 }
-function closeForm(){
+function hideForm(){
   formOverlay.classList.remove('show');
   pendingPhotos = [];
   editingId = null;
 }
+function closeForm(){ history.back(); }
 document.getElementById('fab').onclick = () => openForm(null);
+
+// ---------- UAC easter egg ----------
+const uacOverlay = document.getElementById('uacOverlay');
+function openUac(){
+  pushOverlayState();
+  uacOverlay.classList.add('show');
+}
+function hideUac(){ uacOverlay.classList.remove('show'); }
+document.getElementById('uacFab').onclick = openUac;
+document.getElementById('uacClose').onclick = () => history.back();
 document.getElementById('formClose').onclick = closeForm;
 document.getElementById('cancelBtn').onclick = closeForm;
 formOverlay.addEventListener('click', (e) => { if (e.target === formOverlay) closeForm(); });
@@ -534,8 +758,10 @@ beerForm.onsubmit = async (e) => {
     flag: document.getElementById('fFlag').value.trim() || '🏳️',
     country: document.getElementById('fCountry').value.trim(),
     beerType: document.getElementById('fType').value.trim(),
+    filtered: document.getElementById('fFiltered').checked,
+    degree: document.getElementById('fDegree').value === '' ? null : Number(document.getElementById('fDegree').value),
     abv: document.getElementById('fAbv').value === '' ? null : Number(document.getElementById('fAbv').value),
-    rating: formRating,
+    price: document.getElementById('fPrice').value === '' ? null : Number(document.getElementById('fPrice').value),
     comment: document.getElementById('fComment').value.trim()
   };
   try {
@@ -545,8 +771,10 @@ beerForm.onsubmit = async (e) => {
     } else {
       data.photos = [];
       data.ts = Date.now();
+      data.createdBy = myUid;
       const ref = await beersCol.add(data);
       for (const pp of pendingPhotos) await uploadPhotoToBeer(ref.id, pp.file);
+      if (formRating != null) await submitMyRating(ref.id, formRating);
       showToast('Beer added');
     }
     closeForm();
@@ -563,6 +791,10 @@ function confirmDeleteBeer(beer){
     for (const p of (beer.photos || [])){
       try { await storage.ref(p.path).delete(); } catch (e) {}
     }
+    const ratingsSnap = await beersCol.doc(beer.id).collection('ratings').get();
+    for (const doc of ratingsSnap.docs){
+      try { await doc.ref.delete(); } catch (e) {}
+    }
     await beersCol.doc(beer.id).delete();
     showToast('Beer deleted');
   });
@@ -571,7 +803,6 @@ deleteBtn.onclick = () => {
   const beer = allBeers.find(b => b.id === editingId);
   if (!beer) return;
   confirmDeleteBeer(beer);
-  closeForm();
 };
 
 // ---------- Confirm modal ----------
@@ -588,29 +819,126 @@ document.getElementById('confirmOk').onclick = async () => {
   confirmModal.classList.remove('show');
   pendingDelete = null;
   if (fn) await fn();
+  history.back();
 };
 
 // ---------- Lightbox ----------
 const lightbox = document.getElementById('lightbox');
 const lbImg = document.getElementById('lbImg');
 function openLightbox(photos, idx){
+  pushOverlayState();
   lbPhotos = photos; lbIdx = idx;
   lbImg.src = photos[idx].url;
   lightbox.classList.add('show');
 }
+function hideLightbox(){ lightbox.classList.remove('show'); }
 function lbShow(){ lbImg.src = lbPhotos[lbIdx].url; }
-document.getElementById('lbClose').onclick = () => lightbox.classList.remove('show');
+document.getElementById('lbClose').onclick = () => history.back();
 document.getElementById('lbPrev').onclick = () => { lbIdx = (lbIdx - 1 + lbPhotos.length) % lbPhotos.length; lbShow(); };
 document.getElementById('lbNext').onclick = () => { lbIdx = (lbIdx + 1) % lbPhotos.length; lbShow(); };
+
+let lbTouchStartX = null;
+let lbTouchStartY = null;
+lightbox.addEventListener('touchstart', (e) => {
+  const t = e.touches[0];
+  lbTouchStartX = t.clientX;
+  lbTouchStartY = t.clientY;
+}, { passive: true });
+lightbox.addEventListener('touchend', (e) => {
+  if (lbTouchStartX == null || lbPhotos.length < 2) { lbTouchStartX = null; return; }
+  const t = e.changedTouches[0];
+  const dx = t.clientX - lbTouchStartX;
+  const dy = t.clientY - lbTouchStartY;
+  lbTouchStartX = null;
+  if (Math.abs(dx) > 40 && Math.abs(dx) > Math.abs(dy)){
+    lbIdx = dx < 0 ? (lbIdx + 1) % lbPhotos.length : (lbIdx - 1 + lbPhotos.length) % lbPhotos.length;
+    lbShow();
+  }
+}, { passive: true });
 
 // ---------- View (read-only) ----------
 const viewOverlay = document.getElementById('viewOverlay');
 const viewCarousel = document.getElementById('viewCarousel');
 const viewStats = document.getElementById('viewStats');
+const viewRatingButtonsEl = document.getElementById('viewRatingButtons');
+const viewReviewsEl = document.getElementById('viewReviews');
+const viewReviewInput = document.getElementById('viewReviewInput');
+const viewReviewPostBtn = document.getElementById('viewReviewPostBtn');
 let currentViewId = null;
+let currentViewBeer = null;
+let myViewRating = null;
+let viewRatingsUnsub = null;
+let viewReviewInputTouched = false;
 
-function openView(beer){
+function renderReviewsList(ratingsDocs){
+  const reviews = ratingsDocs.filter(r => (r.comment || '').trim().length > 0);
+  if (!reviews.length){
+    viewReviewsEl.innerHTML = '<div class="empty" style="padding:14px 0">No reviews yet</div>';
+    return;
+  }
+  reviews.sort((a, b) => (b.ts || 0) - (a.ts || 0));
+  viewReviewsEl.innerHTML = reviews.map(r => {
+    const u = allUsers.find(x => x.id === r.userId);
+    return `<div class="reviewRow">
+      <div class="userAvatar">${avatarInner(u?.name, u?.photoURL)}</div>
+      <div class="reviewBody">
+        <div class="reviewHead">
+          <span class="userName">${escapeHtml(u?.name || 'Anonymous')}</span>
+          ${r.rating != null ? `<span class="reviewStars">⭐ ${r.rating}/10</span>` : ''}
+        </div>
+        <div class="reviewComment">${escapeHtml(r.comment)}</div>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+function renderViewStats(beer){
+  const canEdit = !beer.createdBy || beer.createdBy === myUid || isAdmin();
+  viewStats.innerHTML = `
+    <div class="viewTitleRow">
+      <div class="viewTitle"><span>${escapeHtml(beer.flag || '🏳️')}</span><span>${escapeHtml(beer.name || 'Unnamed')}</span></div>
+      ${canEdit ? `<button type="button" class="btn primary viewEditBtnInline" id="viewEditBtnInline">Edit</button>` : ''}
+    </div>
+    <div class="viewMeta">${[escapeHtml(beer.brewery || ''), escapeHtml(beer.country || ''), escapeHtml(beer.beerType || '')].filter(Boolean).join(' · ')}</div>
+    <div class="viewBadges">
+      <span style="background:${ratingColor(beer.avgRating || 0)};color:#1c1410">${beer.avgRating != null ? beer.avgRating.toFixed(1) : '–'}/10${beer.ratingCount ? ` (${beer.ratingCount})` : ''}</span>
+      ${beer.degree != null ? `<span style="background:var(--bg-elev);color:var(--text);border:1px solid var(--border)">${beer.degree}°</span>` : ''}
+      ${beer.abv != null ? `<span style="background:var(--bg-elev);color:var(--text);border:1px solid var(--border)">${beer.abv}% ALC</span>` : ''}
+      ${beer.price != null ? `<span style="background:var(--bg-elev);color:var(--text);border:1px solid var(--border)">€${beer.price}</span>` : ''}
+      ${beer.filtered != null ? `<span style="background:var(--bg-elev);color:var(--text);border:1px solid var(--border)">${beer.filtered ? 'Filtered' : 'Unfiltered'}</span>` : ''}
+    </div>
+    ${beer.comment ? `<div class="viewComment">${escapeHtml(beer.comment)}</div>` : ''}
+  `;
+}
+
+function refreshViewIfOpen(){
+  if (!viewOverlay.classList.contains('show') || !currentViewId) return;
+  const fresh = allBeers.find(b => b.id === currentViewId);
+  if (!fresh) return;
+  currentViewBeer = fresh;
+  renderViewStats(fresh);
+}
+
+function renderViewRatingButtons(){
+  buildRatingButtons(viewRatingButtonsEl, myViewRating, async (n) => {
+    const beerId = currentViewId;
+    myViewRating = n;
+    renderViewRatingButtons();
+    try {
+      const result = await submitMyRating(beerId, n);
+      if (currentViewId === beerId && currentViewBeer){
+        currentViewBeer = { ...currentViewBeer, avgRating: result.avgRating, ratingCount: result.ratingCount };
+        renderViewStats(currentViewBeer);
+      }
+    } catch (err) {
+      showToast('Rating failed: ' + err.message);
+    }
+  });
+}
+
+async function showView(beer){
   currentViewId = beer.id;
+  currentViewBeer = beer;
   const photos = beer.photos || [];
   viewCarousel.innerHTML = photos.length
     ? photos.map((p, i) => `<img src="${escapeHtml(p.url)}" data-i="${i}">`).join('')
@@ -618,25 +946,293 @@ function openView(beer){
   viewCarousel.querySelectorAll('img').forEach(img => {
     img.onclick = () => openLightbox(photos, Number(img.dataset.i));
   });
-  viewStats.innerHTML = `
-    <div class="viewTitle"><span>${escapeHtml(beer.flag || '🏳️')}</span><span>${escapeHtml(beer.name || 'Unnamed')}</span></div>
-    <div class="viewMeta">${[escapeHtml(beer.brewery || ''), escapeHtml(beer.country || ''), escapeHtml(beer.beerType || '')].filter(Boolean).join(' · ')}</div>
-    <div class="viewBadges">
-      <span style="background:${ratingColor(beer.rating || 0)};color:#1c1410">${beer.rating ?? '–'}/10</span>
-      ${beer.abv != null ? `<span style="background:var(--bg-elev);color:var(--text);border:1px solid var(--border)">${beer.abv}% ALC</span>` : ''}
-    </div>
-    ${beer.comment ? `<div class="viewComment">${escapeHtml(beer.comment)}</div>` : ''}
-  `;
+  renderViewStats(beer);
+  myViewRating = null;
+  renderViewRatingButtons();
+  viewReviewInput.value = '';
+  viewReviewInputTouched = false;
+  viewReviewsEl.innerHTML = '';
   viewOverlay.classList.add('show');
+
+  if (viewRatingsUnsub) { viewRatingsUnsub(); viewRatingsUnsub = null; }
+  viewRatingsUnsub = beersCol.doc(beer.id).collection('ratings').onSnapshot(snap => {
+    const docs = snap.docs.map(d => ({ id: d.id, ...d.data() }));
+    renderReviewsList(docs);
+    const mine = docs.find(d => d.id === myUid);
+    myViewRating = mine?.rating ?? null;
+    renderViewRatingButtons();
+    if (!viewReviewInputTouched) viewReviewInput.value = mine?.comment || '';
+  }, err => showToast('Sync error: ' + err.message));
 }
-function closeView(){ viewOverlay.classList.remove('show'); currentViewId = null; }
+function openView(beer){
+  pushOverlayState();
+  return showView(beer);
+}
+function hideView(){
+  viewOverlay.classList.remove('show');
+  currentViewId = null;
+  currentViewBeer = null;
+  if (viewRatingsUnsub) { viewRatingsUnsub(); viewRatingsUnsub = null; }
+}
+function closeView(){ history.back(); }
+viewReviewInput.addEventListener('input', () => { viewReviewInputTouched = true; });
+viewReviewPostBtn.onclick = async () => {
+  const beerId = currentViewId;
+  try {
+    await submitMyReview(beerId, viewReviewInput.value.trim());
+    viewReviewInputTouched = false;
+    showToast('Review posted');
+  } catch (err) {
+    showToast('Review failed: ' + err.message);
+  }
+};
 document.getElementById('viewClose').onclick = closeView;
 viewOverlay.addEventListener('click', (e) => { if (e.target === viewOverlay) closeView(); });
-document.getElementById('viewEditBtn').onclick = () => {
+viewStats.addEventListener('click', (e) => {
+  if (!e.target.closest('#viewEditBtnInline')) return;
   const beer = allBeers.find(b => b.id === currentViewId);
-  closeView();
+  hideView();
   if (beer) openForm(beer);
+});
+
+// ---------- Users / Profile ----------
+const usersCol = db.collection('users');
+const TIERS = [
+  { min: 0, emoji: '🍼', label: 'Rookie' },
+  { min: 3, emoji: '😌', label: 'Casual Drinker' },
+  { min: 7, emoji: '🍻', label: 'Enthusiast' },
+  { min: 13, emoji: '🧐', label: 'Beer Snob' },
+  { min: 21, emoji: '🎖️', label: 'Veteran' },
+  { min: 31, emoji: '🧙', label: 'Beer Wizard' },
+  { min: 46, emoji: '🍺', label: 'Alcoholic' },
+  { min: 61, emoji: '🏆', label: 'Legend' },
+  { min: 80, emoji: '🚑', label: 'Liability' }
+];
+
+function getTierForTotal(total){
+  let current = TIERS[0];
+  for (const t of TIERS){ if (total >= t.min) current = t; else break; }
+  return current;
+}
+
+function getUserStats(userId){
+  const beersUploaded = allBeers.filter(b => b.createdBy === userId).length;
+  const mine = allRatings.filter(r => r.userId === userId);
+  const ratingsGiven = mine.filter(r => typeof r.rating === 'number').length;
+  const reviewsWritten = mine.filter(r => (r.comment || '').trim().length > 0).length;
+  const total = beersUploaded + ratingsGiven + reviewsWritten;
+  return { beersUploaded, ratingsGiven, reviewsWritten, total, tier: getTierForTotal(total) };
+}
+
+function getMyUid(){
+  let uid = localStorage.getItem('sor-uid');
+  if (!uid){
+    uid = (window.crypto && crypto.randomUUID) ? crypto.randomUUID() : ('u-' + Date.now() + '-' + Math.random().toString(36).slice(2));
+    localStorage.setItem('sor-uid', uid);
+  }
+  return uid;
+}
+const myUid = getMyUid();
+const ADMIN_UID = 'd1f2adc9-8d6e-4656-930b-b47e71a2cbf9'; // Óki — can edit/delete any beer regardless of who created it
+function isAdmin(){ return myUid === ADMIN_UID; }
+let allUsers = [];
+let allRatings = [];
+
+const profileViewOverlay = document.getElementById('profileViewOverlay');
+const profileViewAvatar = document.getElementById('profileViewAvatar');
+const profileViewName = document.getElementById('profileViewName');
+const profileViewBadge = document.getElementById('profileViewBadge');
+const profileViewStats = document.getElementById('profileViewStats');
+const profileViewActions = document.getElementById('profileViewActions');
+const profileViewListWrap = document.getElementById('profileViewListWrap');
+const profileEditOverlay = document.getElementById('profileEditOverlay');
+const profileBtn = document.getElementById('profileBtn');
+const myAvatarBtn = document.getElementById('myAvatarBtn');
+const profilePhotoInput = document.getElementById('profilePhotoInput');
+const profileNameInput = document.getElementById('profileNameInput');
+const badgeLadderEl = document.getElementById('badgeLadder');
+const userListEl = document.getElementById('userList');
+let currentProfileViewId = null;
+
+function avatarInner(name, photoURL){
+  if (photoURL) return `<img src="${escapeHtml(photoURL)}" alt="">`;
+  const letter = (name || '').trim().charAt(0).toUpperCase() || '?';
+  return escapeHtml(letter);
+}
+
+function renderHeaderAvatar(){
+  const me = allUsers.find(u => u.id === myUid);
+  profileBtn.innerHTML = avatarInner(me?.name, me?.photoURL);
+}
+
+function renderUserList(){
+  if (!allUsers.length){
+    userListEl.innerHTML = '<div class="empty" style="padding:16px 0">No drinkers yet 🍺</div>';
+    return;
+  }
+  userListEl.innerHTML = allUsers.map(u => {
+    const stats = getUserStats(u.id);
+    return `<div class="userRow" data-user="${u.id}">
+      <div class="userAvatar">${avatarInner(u.name, u.photoURL)}</div>
+      <div>
+        <div class="userName">${escapeHtml(u.name || 'Anonymous')}${u.id === ADMIN_UID ? ' <span class="adminTag">Admin</span>' : ''}</div>
+        <div class="userBadge">${stats.tier.emoji} ${escapeHtml(stats.tier.label)}</div>
+        <div class="userStats">${stats.beersUploaded} beers · ${stats.ratingsGiven} ratings · ${stats.reviewsWritten} reviews</div>
+      </div>
+    </div>`;
+  }).join('');
+  userListEl.querySelectorAll('.userRow').forEach(row => {
+    row.style.cursor = 'pointer';
+    row.onclick = () => openProfileView(row.dataset.user);
+  });
+}
+
+function renderBadgeLadder(userId){
+  const stats = getUserStats(userId);
+  badgeLadderEl.innerHTML =
+    `<div class="badgeSummary">Your total: ${stats.total} (${stats.beersUploaded} beers · ${stats.ratingsGiven} ratings · ${stats.reviewsWritten} reviews)</div>` +
+    TIERS.map(t => `<div class="badgeTier ${t.label === stats.tier.label ? 'current' : ''}">
+      <span class="badgeTierName">${t.emoji} ${escapeHtml(t.label)}</span>
+      <span class="badgeTierReq">${t.min}+</span>
+    </div>`).join('');
+}
+
+function renderProfileView(userId, u){
+  const stats = getUserStats(userId);
+  profileViewAvatar.innerHTML = avatarInner(u?.name, u?.photoURL);
+  profileViewName.textContent = u?.name || 'Anonymous';
+  profileViewBadge.textContent = `${stats.tier.emoji} ${stats.tier.label}`;
+  profileViewStats.textContent = `${stats.beersUploaded} beers · ${stats.ratingsGiven} ratings · ${stats.reviewsWritten} reviews`;
+}
+
+function refreshProfileDisplays(){
+  if (profileViewOverlay.classList.contains('show')){
+    if (currentProfileViewId === myUid) renderUserList();
+    if (currentProfileViewId) renderProfileView(currentProfileViewId, allUsers.find(u => u.id === currentProfileViewId));
+  }
+  if (profileEditOverlay.classList.contains('show')) renderBadgeLadder(myUid);
+}
+
+usersCol.onSnapshot(snap => {
+  allUsers = snap.docs.map(d => ({ id: d.id, ...d.data() }));
+  renderHeaderAvatar();
+  refreshProfileDisplays();
+}, err => showToast('Sync error: ' + err.message));
+
+db.collectionGroup('ratings').onSnapshot(snap => {
+  allRatings = snap.docs.map(d => ({ id: d.id, beerId: d.ref.parent.parent.id, ...d.data() }));
+  refreshProfileDisplays();
+}, err => showToast('Sync error: ' + err.message));
+
+function showProfileView(userId){
+  currentProfileViewId = userId;
+  const isMe = userId === myUid;
+  renderProfileView(userId, allUsers.find(u => u.id === userId));
+  profileViewActions.style.display = isMe ? 'flex' : 'none';
+  profileViewListWrap.style.display = isMe ? 'block' : 'none';
+  if (isMe) renderUserList();
+  profileViewOverlay.classList.add('show');
+}
+function openProfileView(userId){
+  pushOverlayState();
+  showProfileView(userId);
+}
+function hideProfileView(){
+  profileViewOverlay.classList.remove('show');
+  currentProfileViewId = null;
+}
+function closeProfileView(){ history.back(); }
+profileBtn.onclick = () => openProfileView(myUid);
+document.getElementById('profileViewClose').onclick = closeProfileView;
+profileViewOverlay.addEventListener('click', (e) => { if (e.target === profileViewOverlay) closeProfileView(); });
+
+function openProfileEdit(){
+  pushOverlayState();
+  const me = allUsers.find(u => u.id === myUid);
+  profileNameInput.value = me?.name || '';
+  myAvatarBtn.innerHTML = avatarInner(me?.name, me?.photoURL);
+  renderBadgeLadder(myUid);
+  hideProfileView();
+  profileEditOverlay.classList.add('show');
+}
+function hideProfileEdit(){ profileEditOverlay.classList.remove('show'); }
+function closeProfileEdit(){ history.back(); }
+document.getElementById('profileViewEditBtn').onclick = openProfileEdit;
+document.getElementById('profileEditClose').onclick = closeProfileEdit;
+profileEditOverlay.addEventListener('click', (e) => { if (e.target === profileEditOverlay) closeProfileEdit(); });
+
+myAvatarBtn.onclick = () => profilePhotoInput.click();
+profilePhotoInput.onchange = async () => {
+  const file = profilePhotoInput.files[0];
+  profilePhotoInput.value = '';
+  if (!file) return;
+  try {
+    const path = `users/${myUid}/${Date.now()}_${file.name}`;
+    const ref = storage.ref(path);
+    await ref.put(file);
+    const url = await ref.getDownloadURL();
+    const me = allUsers.find(u => u.id === myUid);
+    if (me?.photoPath){ try { await storage.ref(me.photoPath).delete(); } catch (e) {} }
+    await usersCol.doc(myUid).set({ photoURL: url, photoPath: path }, { merge: true });
+    myAvatarBtn.innerHTML = avatarInner(profileNameInput.value, url);
+    showToast('Photo updated');
+  } catch (err) {
+    showToast('Photo upload failed: ' + err.message);
+  }
 };
+
+document.getElementById('profileSaveBtn').onclick = async () => {
+  const name = profileNameInput.value.trim();
+  try {
+    await usersCol.doc(myUid).set({ name }, { merge: true });
+    showToast('Profile saved');
+    closeProfileEdit();
+  } catch (err) {
+    showToast('Save failed: ' + err.message);
+  }
+};
+
+// ---------- Back button navigation ----------
+window.addEventListener('popstate', () => {
+  if (uacOverlay.classList.contains('show')){
+    hideUac();
+    return;
+  }
+  if (lightbox.classList.contains('show')){
+    hideLightbox();
+    return;
+  }
+  if (confirmModal.classList.contains('show')){
+    confirmModal.classList.remove('show');
+    pendingDelete = null;
+    return;
+  }
+  if (formOverlay.classList.contains('show')){
+    hideForm();
+    if (formOpenedFromBeerId){
+      const beer = allBeers.find(b => b.id === formOpenedFromBeerId);
+      if (beer) showView(beer);
+    }
+    return;
+  }
+  if (profileEditOverlay.classList.contains('show')){
+    hideProfileEdit();
+    showProfileView(myUid);
+    return;
+  }
+  if (viewOverlay.classList.contains('show')){
+    hideView();
+    return;
+  }
+  if (profileViewOverlay.classList.contains('show')){
+    if (currentProfileViewId && currentProfileViewId !== myUid){
+      showProfileView(myUid);
+    } else {
+      hideProfileView();
+    }
+    return;
+  }
+});
 
 // ---------- Toast ----------
 let toastTimer;
