@@ -102,7 +102,8 @@
       flex: 0 0 auto
     }
 
-    #themeBtn, #jackpotBtn {
+    #themeBtn,
+    #jackpotBtn {
       background: none;
       border: none;
       font-size: 1.3rem;
@@ -1498,10 +1499,30 @@
     }
 
     .jackpotCoins {
+      position: relative;
       text-align: center;
       font-size: 1.3rem;
       font-weight: 800;
       margin-bottom: 16px
+    }
+
+    .jackpotSoundBtn {
+      position: absolute;
+      right: 4px;
+      top: 50%;
+      transform: translateY(-50%);
+      background: none;
+      border: none;
+      line-height: 1;
+      cursor: pointer;
+      color: inherit;
+      padding: 4px
+    }
+
+    .jackpotSoundBtn svg {
+      width: 22px;
+      height: 22px;
+      display: block
     }
 
     .jackpotCoins .coinIcon {
@@ -1590,9 +1611,17 @@
     }
 
     @keyframes reelSpin {
-      0% { transform: translateY(0) }
-      50% { transform: translateY(-6px) }
-      100% { transform: translateY(0) }
+      0% {
+        transform: translateY(0)
+      }
+
+      50% {
+        transform: translateY(-6px)
+      }
+
+      100% {
+        transform: translateY(0)
+      }
     }
 
     .jackpotMessage {
@@ -1641,6 +1670,404 @@
     .jackpotPaytableRow {
       display: flex;
       justify-content: space-between
+    }
+
+    .jackpotAdminRow {
+      margin-top: 18px;
+      padding-top: 14px;
+      border-top: 1px dashed var(--border);
+      display: flex;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 10px;
+      font-size: .82rem;
+      color: var(--text-dim)
+    }
+
+    .jackpotMaxBetEdit {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      width: 100%
+    }
+
+    .jackpotMaxBetEdit input {
+      width: 80px
+    }
+
+    #jackpotTabSwitch {
+      grid-template-columns: repeat(3, 1fr)
+    }
+
+    /* ---------- Shop: borders (avatar rings) ---------- */
+    .uBorder-border_bronze {
+      border: 3px solid #a5682a
+    }
+
+    .uBorder-border_silver {
+      border: 3px solid #c7ccd1;
+      box-shadow: 0 0 8px rgba(199, 204, 209, .6)
+    }
+
+    .uBorder-border_gold {
+      border: 3px solid #e2a53f;
+      box-shadow: 0 0 10px rgba(226, 165, 63, .7)
+    }
+
+    .uBorder-border_ice {
+      border: 3px solid #7fd8e8;
+      box-shadow: 0 0 12px rgba(127, 216, 232, .8)
+    }
+
+    .uBorder-border_rainbow {
+      border: 3px solid #ff5e5e;
+      animation: uRainbowCycle 3s linear infinite
+    }
+
+    @keyframes uRainbowCycle {
+      0% {
+        border-color: #ff5e5e;
+        box-shadow: 0 0 10px 1px #ff5e5e
+      }
+
+      20% {
+        border-color: #ffd35e;
+        box-shadow: 0 0 10px 1px #ffd35e
+      }
+
+      40% {
+        border-color: #5eff8f;
+        box-shadow: 0 0 10px 1px #5eff8f
+      }
+
+      60% {
+        border-color: #5ec8ff;
+        box-shadow: 0 0 10px 1px #5ec8ff
+      }
+
+      80% {
+        border-color: #a05eff;
+        box-shadow: 0 0 10px 1px #a05eff
+      }
+
+      100% {
+        border-color: #ff5e5e;
+        box-shadow: 0 0 10px 1px #ff5e5e
+      }
+    }
+
+    /* The crown sits ON TOP of the avatar as a separate floating badge, rather
+       than reshaping/clipping the avatar itself — the wrapper has no
+       overflow:hidden of its own, so the badge (a sibling of the avatar, not a
+       descendant) can escape upward past the wrapper's top edge freely, while
+       the avatar circle underneath stays a normal, uncut circle. */
+    .avatarCrownWrap {
+      position: relative;
+      display: inline-flex;
+      flex: 0 0 auto
+    }
+
+    .avatarCrownBadge {
+      position: absolute;
+      top: -38%;
+      left: 50%;
+      transform: translateX(-50%) rotate(-4deg);
+      width: 72%;
+      height: 46%;
+      background: #ffd23f;
+      clip-path: polygon(0% 40%, 12.5% 0%, 25% 40%, 37.5% 0%, 50% 40%, 62.5% 0%, 75% 40%, 87.5% 0%, 100% 40%, 100% 100%, 0% 100%);
+      filter: drop-shadow(0 2px 3px rgba(0, 0, 0, .5));
+      pointer-events: none;
+      z-index: 2
+    }
+
+    /* Shop/inventory swatches show the crown badge alone, centered and larger,
+       since there's no real avatar photo to sit on top of there. */
+    .shopPreview .avatarCrownBadge,
+    .invItem .avatarCrownBadge {
+      position: static;
+      transform: none;
+      width: 70%;
+      height: 70%;
+      margin: 15% auto
+    }
+
+    /* ---------- Shop: skins (backgrounds) ---------- */
+    .uSkin-skin_sunset {
+      background: linear-gradient(135deg, #ff9966, #ff5e62) !important
+    }
+
+    .uSkin-skin_ocean {
+      background: linear-gradient(135deg, #2193b0, #6dd5ed) !important
+    }
+
+    .uSkin-skin_forest {
+      background: linear-gradient(135deg, #134e5e, #71b280) !important
+    }
+
+    .uSkin-skin_midnight {
+      background:
+        radial-gradient(circle at 20% 30%, rgba(255, 255, 255, .55) 0 1px, transparent 1.5px),
+        radial-gradient(circle at 70% 65%, rgba(255, 255, 255, .4) 0 1px, transparent 1.5px),
+        radial-gradient(circle at 45% 82%, rgba(255, 255, 255, .35) 0 1px, transparent 1.5px),
+        linear-gradient(160deg, #0b1030, #241b4d) !important
+    }
+
+    .uSkin-skin_royal {
+      background: linear-gradient(120deg, #3a0ca3, #7209b7, #b5179e, #7209b7, #3a0ca3) !important;
+      background-size: 300% 300% !important;
+      animation: uShimmerShift 6s ease-in-out infinite
+    }
+
+    @keyframes uShimmerShift {
+      0% {
+        background-position: 0% 50%
+      }
+
+      50% {
+        background-position: 100% 50%
+      }
+
+      100% {
+        background-position: 0% 50%
+      }
+    }
+
+    .uSkin-skin_prism {
+      background: linear-gradient(90deg, #ff0040, #ff8c00, #ffee00, #00ff66, #00c8ff, #7b2fff, #ff0040) !important;
+      background-size: 400% 100% !important;
+      animation: uPrismShift 5s linear infinite
+    }
+
+    @keyframes uPrismShift {
+      0% {
+        background-position: 0% 50%
+      }
+
+      100% {
+        background-position: 400% 50%
+      }
+    }
+
+    /* ---------- Shop grid + inventory ---------- */
+    .shopCoinsRow {
+      display: flex;
+      justify-content: flex-end;
+      margin-bottom: 6px
+    }
+
+    .shopCoinsBadge {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      border: 2px solid var(--accent);
+      border-radius: 999px;
+      padding: 6px 14px;
+      font-weight: 800;
+      font-size: 1rem;
+      background: var(--bg-elev);
+      box-shadow: 0 2px 8px rgba(0, 0, 0, .3)
+    }
+
+    .shopGrid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(84px, 1fr));
+      gap: 14px;
+      margin-top: 10px
+    }
+
+    .shopItem {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 6px;
+      text-align: center
+    }
+
+    .shopPreview {
+      width: 52px;
+      height: 52px;
+      flex: 0 0 auto
+    }
+
+    .shopPreviewCircle {
+      border-radius: 50%;
+      background: var(--bg-elev)
+    }
+
+    .shopPreviewSquare {
+      border-radius: 10px;
+      background: var(--bg-elev)
+    }
+
+    .shopItem.equipped .shopPreview {
+      box-shadow: 0 0 0 3px var(--accent)
+    }
+
+    .shopItemName {
+      font-weight: 700;
+      font-size: .74rem
+    }
+
+    .shopItemAction {
+      font-size: .72rem
+    }
+
+    .shopEquippedTag {
+      color: var(--accent);
+      font-weight: 700;
+      cursor: pointer
+    }
+
+    .profileViewInventory {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      margin-top: 6px
+    }
+
+    .invItem {
+      position: relative;
+      flex: 0 0 auto;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 4px
+    }
+
+    .invItemPrice {
+      font-size: .68rem;
+      color: var(--text-dim);
+      font-weight: 700
+    }
+
+    .shopPreviewChip {
+      width: 52px;
+      height: 52px;
+      border-radius: 50%;
+      background: #fff;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      font-size: .52rem;
+      font-weight: 800;
+      line-height: 1.15;
+      color: #1c1c1c
+    }
+
+    .chip-beer {
+      border: 5px solid #2fae4e
+    }
+
+    .chip-shot {
+      border: 5px solid #d6362f
+    }
+
+    .shopPreviewChip.redeemed {
+      filter: grayscale(1);
+      opacity: .75
+    }
+
+    .chipGiverRow {
+      display: flex;
+      align-items: center;
+      gap: 10px
+    }
+
+    .chipGiverName {
+      font-weight: 700;
+      font-size: .92rem
+    }
+
+    .chipGiverLabel {
+      font-size: .78rem;
+      color: var(--text-dim)
+    }
+
+    .wheelChecklist {
+      max-height: 260px;
+      overflow-y: auto;
+      display: flex;
+      flex-direction: column;
+      gap: 2px;
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 4px;
+      margin-top: 6px
+    }
+
+    .wheelCheckRow {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 7px 8px;
+      border-radius: 8px;
+      cursor: pointer
+    }
+
+    .wheelCheckRow:active {
+      background: var(--bg-elev)
+    }
+
+    .wheelCheckRow input {
+      width: 18px;
+      height: 18px;
+      flex: 0 0 auto
+    }
+
+    .wheelWrap {
+      position: relative;
+      width: 260px;
+      height: 260px;
+      margin: 10px auto 6px
+    }
+
+    .wheelWrap canvas {
+      width: 100%;
+      height: 100%;
+      border-radius: 50%;
+      transition: transform 4s cubic-bezier(.17, .89, .32, 1.1);
+      box-shadow: 0 4px 16px rgba(0, 0, 0, .4)
+    }
+
+    .wheelPointer {
+      position: absolute;
+      top: -6px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 0;
+      height: 0;
+      border-left: 12px solid transparent;
+      border-right: 12px solid transparent;
+      border-top: 20px solid var(--accent);
+      z-index: 3;
+      filter: drop-shadow(0 2px 2px rgba(0, 0, 0, .4))
+    }
+
+    .wheelResult {
+      text-align: center;
+      font-weight: 800;
+      font-size: 1.05rem;
+      min-height: 26px;
+      margin-top: 4px
+    }
+
+    .invItem.equipped::after {
+      content: '✓';
+      position: absolute;
+      right: -3px;
+      bottom: -3px;
+      width: 16px;
+      height: 16px;
+      border-radius: 50%;
+      background: var(--accent);
+      color: #1c1410;
+      font-size: .62rem;
+      font-weight: 800;
+      display: flex;
+      align-items: center;
+      justify-content: center
     }
 
     #profileViewListWrap {
@@ -1790,7 +2217,8 @@
 <body>
 
   <header>
-    <h1 id="homeLogoBtn" style="cursor:pointer"><img src="img/logo.png" alt="" class="logo"><span>A legszebb öröm a Söröm</span></h1>
+    <h1 id="homeLogoBtn" style="cursor:pointer"><img src="img/logo.png" alt="" class="logo"><span>A legszebb öröm a
+        Söröm</span></h1>
     <div class="headerRight">
       <button id="jackpotBtn" title="Jackpot">🎰</button>
       <button id="themeBtn" title="Toggle theme">🌙</button>
@@ -1856,9 +2284,13 @@
     <div class="tabSwitch" id="jackpotTabSwitch" style="margin:10px 14px 0">
       <button type="button" class="tabBtn active" data-jptab="game">🎰 Jackpot</button>
       <button type="button" class="tabBtn" data-jptab="leaderboard">🏆 Leaderboard</button>
+      <button type="button" class="tabBtn" data-jptab="shop">🛍️ Shop</button>
     </div>
     <div class="jackpotBody" id="jackpotGameBody">
-      <div class="jackpotCoins"><span id="jackpotCoinIcon"></span> <span id="jackpotCoins">50</span></div>
+      <div class="jackpotCoins">
+        <span id="jackpotCoinIcon"></span> <span id="jackpotCoins">50</span>
+        <button type="button" id="jackpotSoundBtn" class="jackpotSoundBtn" title="Toggle sound">🔊</button>
+      </div>
       <div class="jackpotReels" id="jackpotReels">
         <div class="jackpotReel" id="jackpotReel1">🍒</div>
         <div class="jackpotReel" id="jackpotReel2">🍒</div>
@@ -1875,10 +2307,30 @@
       </div>
       <button type="button" class="btn primary jackpotSpinBtn" id="jackpotSpinBtn">SPIN</button>
       <div class="jackpotPaytable" id="jackpotPaytable"></div>
+      <div class="jackpotAdminRow" id="jackpotAdminRow" style="display:none">
+        <span id="jackpotMaxBetLabel"></span>
+        <button type="button" class="btn ghost" id="jackpotEditMaxBetBtn">Edit Max Bet</button>
+        <div class="jackpotMaxBetEdit" id="jackpotMaxBetEdit" style="display:none">
+          <input type="number" id="jackpotMaxBetInput" min="1" step="1">
+          <button type="button" class="btn primary" id="jackpotMaxBetSaveBtn">Save</button>
+          <button type="button" class="btn ghost" id="jackpotMaxBetCancelBtn">Cancel</button>
+        </div>
+      </div>
     </div>
     <div class="jackpotBody" id="jackpotLbBody" style="display:none">
       <div class="userListHead" id="jackpotLbHead">Coin Standings</div>
       <div id="jackpotLbList"></div>
+    </div>
+    <div class="jackpotBody" id="jackpotShopBody" style="display:none">
+      <div class="shopCoinsRow">
+        <span class="shopCoinsBadge"><span id="shopCoinIcon"></span> <span id="shopCoinsValue">50</span></span>
+      </div>
+      <div class="userListHead">Borders</div>
+      <div class="shopGrid" id="shopBorderGrid"></div>
+      <div class="userListHead" style="margin-top:22px">Skins</div>
+      <div class="shopGrid" id="shopSkinGrid"></div>
+      <div class="userListHead" style="margin-top:22px">Chips</div>
+      <div class="shopGrid" id="shopChipsGrid"></div>
     </div>
   </div>
   <button id="uacFab" title="UAC">UAC</button>
@@ -1906,6 +2358,10 @@
         <button class="closeX" id="viewClose">✕</button>
       </div>
       <div class="viewCarousel" id="viewCarousel"></div>
+      <div class="field" style="margin-top:-4px;margin-bottom:14px">
+        <button type="button" class="btn ghost" id="viewAddPhotoBtn" style="padding:8px 14px">+ Add photo</button>
+        <input type="file" id="viewPhotoInput" accept="image/*" multiple style="display:none">
+      </div>
       <div class="viewStats" id="viewStats"></div>
       <div class="field">
         <label>Your rating</label>
@@ -2009,6 +2465,10 @@
         <button class="closeX" id="partyViewClose">✕</button>
       </div>
       <div class="viewCarousel" id="partyViewCarousel"></div>
+      <div class="field" style="margin-top:-4px;margin-bottom:14px">
+        <button type="button" class="btn ghost" id="partyViewAddPhotoBtn" style="padding:8px 14px">+ Add photo</button>
+        <input type="file" id="partyViewPhotoInput" accept="image/*" multiple style="display:none">
+      </div>
       <div class="viewTitleRow">
         <div class="viewTitle"><span id="partyViewName"></span></div>
         <button type="button" class="btn primary viewEditBtnInline" id="partyViewEditBtn">Edit</button>
@@ -2130,8 +2590,10 @@
         <h2>Profile</h2>
         <button class="closeX" id="profileViewClose">✕</button>
       </div>
-      <div class="profileViewSection">
-        <div id="profileViewAvatar" class="bigAvatarBtn" style="cursor:default"></div>
+      <div class="profileViewSection" id="profileViewSectionEl">
+        <span class="avatarCrownWrap" id="profileViewAvatarWrap">
+          <div id="profileViewAvatar" class="bigAvatarBtn" style="cursor:default"></div>
+        </span>
         <div class="profileViewInfo">
           <div id="profileViewName" class="profileViewName"></div>
           <div id="profileViewBadge" class="profileViewBadge"></div>
@@ -2139,6 +2601,14 @@
           <div id="profileViewCoins" class="profileViewCoins"></div>
           <div id="profileViewStats" class="profileViewStats"></div>
         </div>
+      </div>
+      <div class="field" style="margin-top:16px">
+        <label>Inventory</label>
+        <div id="profileViewInventory" class="profileViewInventory"></div>
+      </div>
+      <div class="field" style="margin-top:16px" id="profileViewChipsSection">
+        <label>Chips</label>
+        <div id="profileViewChips" class="profileViewInventory"></div>
       </div>
       <div class="formActions" id="profileViewActions">
         <button type="button" class="btn primary" id="profileViewEditBtn">Edit</button>
@@ -2193,6 +2663,78 @@
         <button class="closeX" id="cardPickerClose">✕</button>
       </div>
       <div class="cardPickerGrid" id="cardPickerGrid"></div>
+    </div>
+  </div>
+
+  <div class="overlay" id="chipPopupOverlay">
+    <div class="sheet">
+      <div class="sheetHead">
+        <h2 id="chipPopupTitle">Free Beer</h2>
+        <button class="closeX" id="chipPopupClose">✕</button>
+      </div>
+      <div id="chipPopupPhotoArea"></div>
+      <div class="field" id="chipPopupPhotoField">
+        <label>Photo (optional)</label>
+        <button type="button" class="btn ghost" id="chipPopupAddPhotoBtn" style="margin-top:6px">+ Add photo</button>
+        <input type="file" id="chipPopupPhotoInput" accept="image/*" style="display:none">
+      </div>
+      <div class="field" style="margin-top:14px" id="chipPopupGiverField">
+        <label>Who bought it for you?</label>
+        <div id="chipPopupGiverDisplay">
+          <button type="button" class="btn ghost" id="chipPopupSpinTriggerBtn">🎡 Spin to pick</button>
+        </div>
+      </div>
+      <div id="chipPopupRedeemedInfo" style="display:none"></div>
+      <div class="formActions">
+        <button type="button" class="btn primary" id="chipPopupRedeemBtn">Redeem</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="overlay" id="editCoinsModal">
+    <div class="sheet">
+      <div class="sheetHead">
+        <h2>Edit Coins</h2>
+        <button class="closeX" id="editCoinsClose">✕</button>
+      </div>
+      <div class="field">
+        <label id="editCoinsLabel">Set balance for</label>
+        <input type="number" id="editCoinsInput" min="0" step="1">
+      </div>
+      <div class="formActions">
+        <button type="button" class="btn ghost" id="editCoinsCancelBtn">Cancel</button>
+        <button type="button" class="btn primary" id="editCoinsSaveBtn">Save</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="overlay" id="wheelOverlay">
+    <div class="sheet">
+      <div class="sheetHead">
+        <h2>Who's Here?</h2>
+        <button class="closeX" id="wheelClose">✕</button>
+      </div>
+      <div id="wheelSelectStep">
+        <div class="field">
+          <label>Select everyone actually at the bar right now</label>
+          <div id="wheelUserChecklist" class="wheelChecklist"></div>
+        </div>
+        <div class="formActions">
+          <button type="button" class="btn ghost" id="wheelSelectAllBtn">Select all</button>
+          <button type="button" class="btn primary" id="wheelGoBtn">Spin the Wheel</button>
+        </div>
+      </div>
+      <div id="wheelSpinStep" style="display:none">
+        <div class="wheelWrap">
+          <div class="wheelPointer"></div>
+          <canvas id="wheelCanvas" width="260" height="260"></canvas>
+        </div>
+        <div class="wheelResult" id="wheelResult"></div>
+        <div class="formActions">
+          <button type="button" class="btn ghost" id="wheelBackBtn">Back</button>
+          <button type="button" class="btn primary" id="wheelSpinBtn">SPIN</button>
+        </div>
+      </div>
     </div>
   </div>
 
@@ -2888,6 +3430,19 @@
       hidePartyView();
       if (party) openPartyForm(party);
     };
+    document.getElementById('partyViewAddPhotoBtn').onclick = () => document.getElementById('partyViewPhotoInput').click();
+    document.getElementById('partyViewPhotoInput').onchange = async () => {
+      const input = document.getElementById('partyViewPhotoInput');
+      const files = Array.from(input.files || []);
+      input.value = '';
+      if (!files.length || !currentPartyViewId) return;
+      try {
+        for (const file of files) await uploadPhotoToParty(currentPartyViewId, file);
+        showToast('Photo added');
+      } catch (err) {
+        showToast('Photo upload failed: ' + err.message);
+      }
+    };
 
     // ---------- Party add/edit form ----------
     const partyFormOverlay = document.getElementById('partyFormOverlay');
@@ -3512,9 +4067,10 @@
       } else {
         listEl.innerHTML = standings.map((s, i) => {
           const canControl = s.id === myUid || isAdmin();
-          return `<div class="leaderboardRow${i < 3 ? ' rank-' + (i + 1) : ''}">
+          const u = allUsers.find(x => x.id === s.id);
+          return `<div class="leaderboardRow${i < 3 ? ' rank-' + (i + 1) : ''}${skinBgClass(u)}">
         <div class="leaderboardRank">${RANK_MEDALS[i] || (i + 1)}</div>
-        <div class="userAvatar lbProfileLink" data-user="${s.id}">${avatarInner(s.name, s.photoURL)}</div>
+        ${wrapAvatarWithCrown(u, `<div class="userAvatar lbProfileLink${avatarBorderClass(u)}" data-user="${s.id}">${avatarInner(s.name, s.photoURL)}</div>`)}
         <div class="leaderboardInfo">
           <div class="leaderboardName lbProfileLink" data-user="${s.id}">${escapeHtml(s.name || 'Anonymous')}</div>
           <div class="leaderboardMeta">${s.totalDays} day${s.totalDays === 1 ? '' : 's'}</div>
@@ -3781,6 +4337,19 @@
     };
     document.getElementById('viewClose').onclick = closeView;
     viewOverlay.addEventListener('click', (e) => { if (e.target === viewOverlay) closeView(); });
+    document.getElementById('viewAddPhotoBtn').onclick = () => document.getElementById('viewPhotoInput').click();
+    document.getElementById('viewPhotoInput').onchange = async () => {
+      const input = document.getElementById('viewPhotoInput');
+      const files = Array.from(input.files || []);
+      input.value = '';
+      if (!files.length || !currentViewId) return;
+      try {
+        for (const file of files) await uploadPhotoToBeer(currentViewId, file);
+        showToast('Photo added');
+      } catch (err) {
+        showToast('Photo upload failed: ' + err.message);
+      }
+    };
     viewStats.addEventListener('click', (e) => {
       if (!e.target.closest('#viewEditBtnInline')) return;
       const beer = allBeers.find(b => b.id === currentViewId);
@@ -3977,6 +4546,16 @@
       const hun = HUN_CARDS.find(c => c.id === u?.hunCard);
       document.getElementById('profileViewCards').innerHTML = [poker, hun].filter(Boolean).map(cardMiniHtml).join('');
       document.getElementById('profileViewCoins').innerHTML = `${JACKPOT_COIN_ICON} ${coinsOf(u)}`;
+      setExclusiveClass(profileViewAvatar, 'uBorder-', avatarBorderClass(u).trim());
+      setExclusiveClass(document.getElementById('profileViewSectionEl'), 'uSkin-', skinBgClass(u).trim());
+      const wrapEl = document.getElementById('profileViewAvatarWrap');
+      const existingBadge = wrapEl.querySelector('.avatarCrownBadge');
+      if (u?.equippedBorder === 'border_crown') {
+        if (!existingBadge) wrapEl.insertAdjacentHTML('beforeend', '<div class="avatarCrownBadge"></div>');
+      } else if (existingBadge) {
+        existingBadge.remove();
+      }
+      renderProfileViewInventory(u, userId === myUid);
     }
 
     function renderCardSlots() {
@@ -4151,6 +4730,90 @@
     // Our own coin: a gold coin with "UAC" minted on it, drawn as plain SVG shapes/text (no third-party art)
     const JACKPOT_COIN_ICON = '<svg viewBox="0 0 32 32" class="coinIcon"><circle cx="16" cy="16" r="15" fill="#f7d154" stroke="#b8860b" stroke-width="1.5"/><circle cx="16" cy="16" r="12" fill="none" stroke="#c9971f" stroke-width="1"/><ellipse cx="11" cy="10" rx="4" ry="2.4" fill="#fff" opacity=".35"/><text x="16" y="20.5" text-anchor="middle" font-family="Arial, Helvetica, sans-serif" font-weight="800" font-size="9.5" fill="#8a6100" letter-spacing="0.3">UAC</text></svg>';
     document.getElementById('jackpotCoinIcon').innerHTML = JACKPOT_COIN_ICON;
+    document.getElementById('shopCoinIcon').innerHTML = JACKPOT_COIN_ICON;
+
+    // ---------- Jackpot sound (synthesized with Web Audio API, no audio files) ----------
+    const jackpotSoundBtn = document.getElementById('jackpotSoundBtn');
+    const JACKPOT_SPEAKER_PATH = 'M3 9H7L12 5V19L7 15H3V9Z';
+    const JACKPOT_SOUND_ON_ICON = `<svg viewBox="0 0 24 24"><path d="${JACKPOT_SPEAKER_PATH}" fill="currentColor"/><path d="M15.5 9c1.6 1.6 1.6 5.4 0 7" stroke="currentColor" stroke-width="1.6" fill="none" stroke-linecap="round"/><path d="M18.3 6.2c3 3 3 8.6 0 11.6" stroke="currentColor" stroke-width="1.6" fill="none" stroke-linecap="round"/></svg>`;
+    const JACKPOT_SOUND_OFF_ICON = `<svg viewBox="0 0 24 24"><path d="${JACKPOT_SPEAKER_PATH}" fill="currentColor"/><line x1="3" y1="3" x2="21" y2="21" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>`;
+    let jackpotAudioCtx = null;
+    function getJackpotAudioCtx() {
+      if (!jackpotAudioCtx) jackpotAudioCtx = new (window.AudioContext || window.webkitAudioContext)();
+      if (jackpotAudioCtx.state === 'suspended') jackpotAudioCtx.resume();
+      return jackpotAudioCtx;
+    }
+    function isJackpotSoundOn() {
+      return localStorage.getItem('sor-jackpot-sound') !== 'off';
+    }
+    function setJackpotSoundOn(on) {
+      localStorage.setItem('sor-jackpot-sound', on ? 'on' : 'off');
+      jackpotSoundBtn.innerHTML = on ? JACKPOT_SOUND_ON_ICON : JACKPOT_SOUND_OFF_ICON;
+    }
+    setJackpotSoundOn(isJackpotSoundOn());
+    jackpotSoundBtn.onclick = () => setJackpotSoundOn(!isJackpotSoundOn());
+
+    function playJackpotTone(freq, duration, type, delay, peak) {
+      if (!isJackpotSoundOn()) return;
+      try {
+        const ctx = getJackpotAudioCtx();
+        const osc = ctx.createOscillator();
+        const gain = ctx.createGain();
+        osc.type = type || 'sine';
+        osc.frequency.value = freq;
+        const t0 = ctx.currentTime + (delay || 0);
+        gain.gain.setValueAtTime(0.0001, t0);
+        gain.gain.linearRampToValueAtTime(peak || 0.2, t0 + 0.008);
+        gain.gain.exponentialRampToValueAtTime(0.0001, t0 + duration);
+        osc.connect(gain).connect(ctx.destination);
+        osc.start(t0);
+        osc.stop(t0 + duration + 0.03);
+      } catch (e) { /* audio not available, fail silently */ }
+    }
+    // Digital Blip Roll: alternating two-tone square-wave blips while spinning,
+    // with a lower, slightly longer blip when a reel locks in place.
+    const JACKPOT_BLIP_NOTES = [740, 988];
+    let jackpotBlipToggle = 0;
+    function playJackpotTickSound() {
+      jackpotBlipToggle = 1 - jackpotBlipToggle;
+      playJackpotTone(JACKPOT_BLIP_NOTES[jackpotBlipToggle], 0.05, 'square', 0, 0.11);
+    }
+    function playJackpotReelStopSound() {
+      playJackpotTone(520, 0.08, 'square', 0, 0.16);
+    }
+    function playJackpotLoseSound() {
+      playJackpotTone(220, 0.22, 'sine', 0, 0.13);
+      playJackpotTone(160, 0.28, 'sine', 0.1, 0.11);
+    }
+    // Ascending arcade-style arpeggio (two-octave major scale) — bigger wins simply
+    // run further up the scale, so "more notes" reads as "bigger win" at a glance.
+    const JACKPOT_ARP_SCALE = [523.25, 587.33, 659.25, 698.46, 783.99, 880, 987.77, 1046.5, 1174.66, 1318.51, 1396.91, 1567.98, 1760];
+    function playJackpotArpRun(notes, noteDur, gap, type, peak) {
+      notes.forEach((f, i) => playJackpotTone(f, noteDur, type, i * gap, peak));
+    }
+    function playJackpotPairSound() {
+      playJackpotArpRun(JACKPOT_ARP_SCALE.slice(2, 6), 0.13, 0.085, 'triangle', 0.22);
+    }
+    function playJackpotSmallWinSound() {
+      playJackpotArpRun(JACKPOT_ARP_SCALE.slice(0, 8), 0.13, 0.078, 'triangle', 0.22);
+    }
+    function playJackpotBigWinSound() {
+      playJackpotArpRun(JACKPOT_ARP_SCALE.slice(0, 10), 0.13, 0.07, 'square', 0.22);
+    }
+    function playJackpotJackpotSound() {
+      playJackpotArpRun(JACKPOT_ARP_SCALE, 0.13, 0.065, 'square', 0.24);
+      const runEnd = (JACKPOT_ARP_SCALE.length - 1) * 0.065 + 0.15;
+      const top = JACKPOT_ARP_SCALE.slice(-4);
+      const flourish = top.concat(top.slice().reverse());
+      flourish.forEach((f, i) => playJackpotTone(f, 0.09, 'square', runEnd + i * 0.05, 0.22));
+    }
+    function playJackpotWinSound(value) {
+      if (value == null) playJackpotLoseSound();
+      else if (value <= 2) playJackpotPairSound();
+      else if (value < 20) playJackpotSmallWinSound();
+      else if (value < 100) playJackpotBigWinSound();
+      else playJackpotJackpotSound();
+    }
     document.getElementById('jackpotMarquee').innerHTML = '<span></span>'.repeat(24);
     const JACKPOT_SYMBOLS = [
       { icon: '🍒', weight: 30, value: 3 },
@@ -4162,119 +4825,365 @@
       { icon: '7️⃣', weight: 1, value: 200 }
     ];
     const JACKPOT_START_COINS = 50;
-    const JACKPOT_MIN_BET = 1;
-    const JACKPOT_MAX_BET = 10;
-    let jackpotSpinning = false;
-    let jackpotPageOpen = false;
 
-    function coinsOf(u){
-      return typeof u?.jackpotCoins === 'number' ? u.jackpotCoins : JACKPOT_START_COINS;
+    // ---------- Shop (borders + skins, bought with UAC coins) ----------
+    const SHOP_BORDERS = [
+      { id: 'border_bronze', name: 'Bronze Ring', price: 8000 },
+      { id: 'border_silver', name: 'Silver Ring', price: 15000 },
+      { id: 'border_gold', name: 'Gold Ring', price: 30000 },
+      { id: 'border_ice', name: 'Ice Ring', price: 60000 },
+      { id: 'border_rainbow', name: 'Rainbow Ring', price: 120000 },
+      { id: 'border_crown', name: 'KTNBOTP', price: 200000 }
+    ];
+    const SHOP_SKINS = [
+      { id: 'skin_sunset', name: 'Sunset', price: 10000 },
+      { id: 'skin_ocean', name: 'Ocean', price: 20000 },
+      { id: 'skin_forest', name: 'Forest', price: 20000 },
+      { id: 'skin_midnight', name: 'Midnight Stars', price: 40000 },
+      { id: 'skin_royal', name: 'Royal Shimmer', price: 80000 },
+      { id: 'skin_prism', name: 'Prism Flow', price: 150000 }
+    ];
+    // Chips (Žetons) are consumable, stackable tokens — unlike borders/skins
+    // they're never "equipped": every purchase adds one more separate chip to
+    // your inventory, each redeemable independently.
+    const SHOP_CHIPS = [
+      { id: 'chip_beer', type: 'beer', name: 'Free Beer', price: 15000, label: '1 FREE<br>BEER' },
+      { id: 'chip_shot', type: 'shot', name: 'Free Shot', price: 20000, label: '1 FREE<br>SHOT' }
+    ];
+    function abbreviatePrice(n) {
+      if (n == null) return '';
+      if (n < 1000) return String(n);
+      const k = n / 1000;
+      return (Number.isInteger(k) ? k : k.toFixed(1)) + 'k';
     }
-    function getJackpotCoins(){
-      return coinsOf(allUsers.find(u => u.id === myUid));
+    function avatarBorderClass(u) {
+      const item = SHOP_BORDERS.find(b => b.id === u?.equippedBorder);
+      if (!item || item.id === 'border_crown') return '';
+      return ` uBorder-${item.id}`;
     }
-    function ensureMyJackpotCoinsInitialized(){
-      const me = allUsers.find(u => u.id === myUid);
-      if (!me || typeof me.jackpotCoins !== 'number'){
-        usersCol.doc(myUid).set({ jackpotCoins: JACKPOT_START_COINS }, { merge: true }).catch(() => {});
-      }
+    function wrapAvatarWithCrown(u, avatarDivHtml) {
+      if (u?.equippedBorder !== 'border_crown') return avatarDivHtml;
+      return `<span class="avatarCrownWrap">${avatarDivHtml}<div class="avatarCrownBadge"></div></span>`;
     }
-    async function adminAdjustJackpotCoins(userId, delta){
+    function skinBgClass(u) {
+      const item = SHOP_SKINS.find(s => s.id === u?.equippedSkin);
+      return item ? ` uSkin-${item.id}` : '';
+    }
+    function setExclusiveClass(el, prefix, newClass) {
+      if (!el) return;
+      [...el.classList].filter(c => c.startsWith(prefix)).forEach(c => el.classList.remove(c));
+      if (newClass) el.classList.add(newClass);
+    }
+    async function buyShopItem(itemId, price) {
       try {
         await db.runTransaction(async (tx) => {
-          const ref = usersCol.doc(userId);
+          const ref = usersCol.doc(myUid);
           const snap = await tx.get(ref);
-          const next = Math.max(0, coinsOf(snap.data()) + delta);
-          tx.set(ref, { jackpotCoins: next }, { merge: true });
+          const data = snap.data() || {};
+          const inventory = data.inventory || [];
+          if (inventory.includes(itemId)) return;
+          const coins = coinsOf(data);
+          if (coins < price) throw new Error('Not enough coins');
+          tx.set(ref, {
+            jackpotCoins: coins - price,
+            inventory: firebase.firestore.FieldValue.arrayUnion(itemId)
+          }, { merge: true });
         });
+        showToast('Purchased!');
+      } catch (err) {
+        showToast(err.message === 'Not enough coins' ? 'Not enough coins' : 'Purchase failed: ' + err.message);
+      }
+    }
+    async function equipShopItem(type, itemId) {
+      const field = type === 'border' ? 'equippedBorder' : 'equippedSkin';
+      try {
+        await usersCol.doc(myUid).set({ [field]: itemId ? itemId : firebase.firestore.FieldValue.delete() }, { merge: true });
       } catch (err) {
         showToast('Failed: ' + err.message);
       }
     }
-    function refreshJackpotIfOpen(){
+    function renderJackpotShop() {
+      const me = allUsers.find(u => u.id === myUid) || {};
+      const inv = me.inventory || [];
+      document.getElementById('shopCoinsValue').textContent = coinsOf(me);
+      function renderGroup(items, type, equippedField, shapeClass) {
+        return items.map(it => {
+          const owned = inv.includes(it.id);
+          const equipped = me[equippedField] === it.id;
+          const isCrown = it.id === 'border_crown';
+          const previewClass = isCrown ? '' : (type === 'border' ? `uBorder-${it.id}` : `uSkin-${it.id}`);
+          const previewHtml = isCrown ? '<div class="avatarCrownBadge"></div>' : '';
+          const action = equipped
+            ? `<span class="shopEquippedTag" data-id="${it.id}" data-type="${type}">Equipped ✕</span>`
+            : owned
+              ? `<button type="button" class="btn ghost shopEquipBtn" data-id="${it.id}" data-type="${type}">Equip</button>`
+              : `<button type="button" class="btn primary shopBuyBtn" data-id="${it.id}" data-type="${type}" data-price="${it.price}">${it.price} ${JACKPOT_COIN_ICON}</button>`;
+          return `<div class="shopItem ${equipped ? 'equipped' : ''}">
+            <div class="shopPreview ${shapeClass} ${previewClass}">${previewHtml}</div>
+            <div class="shopItemName">${escapeHtml(it.name)}</div>
+            <div class="shopItemAction">${action}</div>
+          </div>`;
+        }).join('');
+      }
+      document.getElementById('shopBorderGrid').innerHTML = renderGroup(SHOP_BORDERS, 'border', 'equippedBorder', 'shopPreviewCircle');
+      document.getElementById('shopSkinGrid').innerHTML = renderGroup(SHOP_SKINS, 'skin', 'equippedSkin', 'shopPreviewSquare');
+      document.getElementById('shopChipsGrid').innerHTML = SHOP_CHIPS.map(it => `<div class="shopItem">
+        <div class="shopPreview shopPreviewChip chip-${it.type}">${it.label}</div>
+        <div class="shopItemName">${escapeHtml(it.name)}</div>
+        <div class="shopItemAction"><button type="button" class="btn primary shopBuyChipBtn" data-type="${it.type}" data-price="${it.price}">${it.price} ${JACKPOT_COIN_ICON}</button></div>
+      </div>`).join('');
+      document.querySelectorAll('.shopBuyBtn').forEach(btn => {
+        btn.onclick = () => buyShopItem(btn.dataset.id, Number(btn.dataset.price));
+      });
+      document.querySelectorAll('.shopEquipBtn').forEach(btn => {
+        btn.onclick = () => equipShopItem(btn.dataset.type, btn.dataset.id);
+      });
+      document.querySelectorAll('.shopEquippedTag').forEach(tag => {
+        tag.onclick = () => equipShopItem(tag.dataset.type, null);
+      });
+      document.querySelectorAll('.shopBuyChipBtn').forEach(btn => {
+        btn.onclick = () => buyChip(btn.dataset.type, Number(btn.dataset.price));
+      });
+    }
+    async function buyChip(chipType, price) {
+      try {
+        await db.runTransaction(async (tx) => {
+          const ref = usersCol.doc(myUid);
+          const snap = await tx.get(ref);
+          const data = snap.data() || {};
+          const coins = coinsOf(data);
+          if (coins < price) throw new Error('Not enough coins');
+          const newChip = {
+            id: 'c' + Date.now() + Math.random().toString(36).slice(2, 7),
+            type: chipType,
+            status: 'unredeemed',
+            photoURL: null,
+            photoPath: null,
+            givenByUid: null,
+            ts: Date.now()
+          };
+          tx.set(ref, {
+            jackpotCoins: coins - price,
+            chips: firebase.firestore.FieldValue.arrayUnion(newChip)
+          }, { merge: true });
+        });
+        showToast('Purchased!');
+      } catch (err) {
+        showToast(err.message === 'Not enough coins' ? 'Not enough coins' : 'Purchase failed: ' + err.message);
+      }
+    }
+    function renderProfileViewInventory(u, isOwn) {
+      const inv = u?.inventory || [];
+      const el = document.getElementById('profileViewInventory');
+      if (!inv.length) {
+        el.innerHTML = '<div class="empty" style="padding:6px 0;font-size:.8rem">No items yet</div>';
+      } else {
+        const allItems = SHOP_BORDERS.map(b => ({ ...b, type: 'border' })).concat(SHOP_SKINS.map(s => ({ ...s, type: 'skin' })));
+        el.innerHTML = inv.map(id => {
+          const it = allItems.find(x => x.id === id);
+          if (!it) return '';
+          const equipped = (it.type === 'border' ? u.equippedBorder : u.equippedSkin) === id;
+          const isCrown = id === 'border_crown';
+          const shape = it.type === 'border' ? 'shopPreviewCircle' : 'shopPreviewSquare';
+          const cls = isCrown ? '' : (it.type === 'border' ? `uBorder-${id}` : `uSkin-${id}`);
+          const inner = isCrown ? '<div class="avatarCrownBadge"></div>' : '';
+          return `<div class="invItem ${equipped ? 'equipped' : ''}" data-id="${id}" data-type="${it.type}" title="${escapeHtml(it.name)}">
+            <div class="shopPreview ${shape} ${cls}">${inner}</div>
+            <div class="invItemPrice">${abbreviatePrice(it.price)} ${JACKPOT_COIN_ICON}</div>
+          </div>`;
+        }).join('');
+        if (isOwn) {
+          el.querySelectorAll('.invItem').forEach(elm => {
+            elm.style.cursor = 'pointer';
+            elm.onclick = () => equipShopItem(elm.dataset.type, elm.classList.contains('equipped') ? null : elm.dataset.id);
+          });
+        } else {
+          el.querySelectorAll('.invItem').forEach(elm => { elm.style.cursor = 'default'; });
+        }
+      }
+
+      const chips = u?.chips || [];
+      const chipsSection = document.getElementById('profileViewChipsSection');
+      const chipsEl = document.getElementById('profileViewChips');
+      if (!chips.length) {
+        chipsSection.style.display = 'none';
+      } else {
+        chipsSection.style.display = 'block';
+        chipsEl.innerHTML = chips.slice().sort((a, b) => (b.ts || 0) - (a.ts || 0)).map(c => {
+          const def = SHOP_CHIPS.find(x => x.type === c.type);
+          const redeemed = c.status === 'redeemed';
+          return `<div class="invItem" data-chip-id="${c.id}" title="${def ? escapeHtml(def.name) : ''}">
+            <div class="shopPreview shopPreviewChip chip-${c.type}${redeemed ? ' redeemed' : ''}">${def ? def.label : ''}</div>
+            <div class="invItemPrice">${abbreviatePrice(def ? def.price : null)} ${JACKPOT_COIN_ICON}</div>
+          </div>`;
+        }).join('');
+        if (isOwn) {
+          chipsEl.querySelectorAll('.invItem').forEach(elm => {
+            elm.style.cursor = 'pointer';
+            elm.onclick = () => openChipPopup(elm.dataset.chipId);
+          });
+        } else {
+          chipsEl.querySelectorAll('.invItem').forEach(elm => {
+            const chip = chips.find(c => c.id === elm.dataset.chipId);
+            if (chip && chip.status === 'redeemed') {
+              elm.style.cursor = 'pointer';
+              elm.onclick = () => openChipPopup(elm.dataset.chipId, u.id);
+            } else {
+              elm.style.cursor = 'default';
+            }
+          });
+        }
+      }
+    }
+
+    const JACKPOT_MIN_BET = 1;
+    const JACKPOT_DEFAULT_MAX_BET = 10;
+    let jackpotMaxBetLive = JACKPOT_DEFAULT_MAX_BET;
+    const configCol = db.collection('config');
+    configCol.doc('jackpot').onSnapshot(snap => {
+      const v = snap.data()?.maxBet;
+      jackpotMaxBetLive = typeof v === 'number' && v >= JACKPOT_MIN_BET ? v : JACKPOT_DEFAULT_MAX_BET;
+      if (jackpotPageOpen) {
+        setJackpotBet(getJackpotBet());
+        renderJackpotAdminRow();
+      }
+    }, err => showToast('Sync error: ' + err.message));
+    let jackpotSpinning = false;
+    let jackpotPageOpen = false;
+
+    function coinsOf(u) {
+      return typeof u?.jackpotCoins === 'number' ? u.jackpotCoins : JACKPOT_START_COINS;
+    }
+    function getJackpotCoins() {
+      return coinsOf(allUsers.find(u => u.id === myUid));
+    }
+    function ensureMyJackpotCoinsInitialized() {
+      const me = allUsers.find(u => u.id === myUid);
+      if (!me || typeof me.jackpotCoins !== 'number') {
+        usersCol.doc(myUid).set({ jackpotCoins: JACKPOT_START_COINS }, { merge: true }).catch(() => { });
+      }
+    }
+    async function adminSetJackpotCoins(userId, exactValue) {
+      try {
+        await usersCol.doc(userId).set({ jackpotCoins: exactValue }, { merge: true });
+        showToast('Balance updated');
+      } catch (err) {
+        showToast('Failed: ' + err.message);
+      }
+    }
+
+    // ---------- Admin: edit a user's coin balance directly ----------
+    const editCoinsModal = document.getElementById('editCoinsModal');
+    let editCoinsUserId = null;
+    function openEditCoinsModal(userId, userName, currentValue) {
+      editCoinsUserId = userId;
+      document.getElementById('editCoinsLabel').textContent = `Set balance for ${userName || 'Anonymous'}`;
+      document.getElementById('editCoinsInput').value = currentValue;
+      editCoinsModal.classList.add('show');
+    }
+    function closeEditCoinsModal() {
+      editCoinsModal.classList.remove('show');
+      editCoinsUserId = null;
+    }
+    document.getElementById('editCoinsClose').onclick = closeEditCoinsModal;
+    document.getElementById('editCoinsCancelBtn').onclick = closeEditCoinsModal;
+    editCoinsModal.addEventListener('click', (e) => { if (e.target === editCoinsModal) closeEditCoinsModal(); });
+    document.getElementById('editCoinsSaveBtn').onclick = async () => {
+      const n = Math.floor(Number(document.getElementById('editCoinsInput').value));
+      if (!Number.isFinite(n) || n < 0) {
+        showToast('Enter a whole number, 0 or more');
+        return;
+      }
+      const userId = editCoinsUserId;
+      closeEditCoinsModal();
+      if (userId) await adminSetJackpotCoins(userId, n);
+    };
+    function refreshJackpotIfOpen() {
       if (!jackpotPageOpen) return;
       jackpotCoinsEl.textContent = getJackpotCoins();
       updateJackpotSpinAvailability();
       if (jackpotSubTab === 'leaderboard') renderJackpotLeaderboard();
+      if (jackpotSubTab === 'shop') renderJackpotShop();
     }
-    function getJackpotBet(){
+    function getJackpotBet() {
       const stored = localStorage.getItem('sor-jackpot-bet');
       const n = stored === null ? JACKPOT_MIN_BET : Number(stored);
-      return Math.min(JACKPOT_MAX_BET, Math.max(JACKPOT_MIN_BET, n));
+      return Math.min(jackpotMaxBetLive, Math.max(JACKPOT_MIN_BET, n));
     }
-    function setJackpotBet(n){
-      n = Math.min(JACKPOT_MAX_BET, Math.max(JACKPOT_MIN_BET, n));
+    function setJackpotBet(n) {
+      n = Math.min(jackpotMaxBetLive, Math.max(JACKPOT_MIN_BET, n));
       localStorage.setItem('sor-jackpot-bet', String(n));
       jackpotBetValueEl.textContent = n;
       jackpotBetMinusBtn.disabled = jackpotSpinning || n <= JACKPOT_MIN_BET;
-      jackpotBetPlusBtn.disabled = jackpotSpinning || n >= JACKPOT_MAX_BET;
+      jackpotBetPlusBtn.disabled = jackpotSpinning || n >= jackpotMaxBetLive;
       renderJackpotPaytable();
       updateJackpotSpinAvailability();
     }
     jackpotBetMinusBtn.onclick = () => { if (!jackpotSpinning) setJackpotBet(getJackpotBet() - 1); };
     jackpotBetPlusBtn.onclick = () => { if (!jackpotSpinning) setJackpotBet(getJackpotBet() + 1); };
-    function pickWeightedSymbol(){
+    function pickWeightedSymbol() {
       const total = JACKPOT_SYMBOLS.reduce((s, x) => s + x.weight, 0);
       let r = Math.random() * total;
-      for (const sym of JACKPOT_SYMBOLS){
+      for (const sym of JACKPOT_SYMBOLS) {
         if (r < sym.weight) return sym;
         r -= sym.weight;
       }
       return JACKPOT_SYMBOLS[0];
     }
-    function renderJackpotPaytable(){
+    function renderJackpotPaytable() {
       const bet = getJackpotBet();
       document.getElementById('jackpotPaytable').innerHTML = JACKPOT_SYMBOLS.slice().reverse().map(s =>
         `<div class="jackpotPaytableRow"><span>${s.icon}${s.icon}${s.icon}</span><span>${s.value * bet} ${JACKPOT_COIN_ICON}</span></div>`
       ).join('') + `<div class="jackpotPaytableRow"><span>any pair</span><span>${2 * bet} ${JACKPOT_COIN_ICON}</span></div>`;
     }
-    function updateJackpotSpinAvailability(){
+    function updateJackpotSpinAvailability() {
       const bet = getJackpotBet();
       jackpotSpinBtn.innerHTML = getJackpotCoins() < bet ? 'FREE REFILL' : `SPIN (${bet} ${JACKPOT_COIN_ICON})`;
     }
     let jackpotSubTab = 'game';
-    function setJackpotSubTab(tab){
+    function setJackpotSubTab(tab) {
       jackpotSubTab = tab;
       document.querySelectorAll('#jackpotTabSwitch .tabBtn').forEach(b => b.classList.toggle('active', b.dataset.jptab === tab));
       document.getElementById('jackpotGameBody').style.display = tab === 'game' ? 'block' : 'none';
       document.getElementById('jackpotLbBody').style.display = tab === 'leaderboard' ? 'block' : 'none';
+      document.getElementById('jackpotShopBody').style.display = tab === 'shop' ? 'block' : 'none';
       if (tab === 'leaderboard') renderJackpotLeaderboard();
+      if (tab === 'shop') renderJackpotShop();
     }
     document.querySelectorAll('#jackpotTabSwitch .tabBtn').forEach(b => {
       b.onclick = () => setJackpotSubTab(b.dataset.jptab);
     });
 
-    function renderJackpotLeaderboard(){
+    function renderJackpotLeaderboard() {
       const rows = allUsers.map(u => ({ id: u.id, name: u.name, photoURL: u.photoURL, coins: coinsOf(u) }))
         .sort((a, b) => b.coins - a.coins || (a.name || '').localeCompare(b.name || ''));
       document.getElementById('jackpotLbHead').textContent = `Coin Standings (${rows.length})`;
       const el = document.getElementById('jackpotLbList');
-      if (!rows.length){
+      if (!rows.length) {
         el.innerHTML = '<div class="empty" style="padding:16px 0">No drinkers yet</div>';
         return;
       }
-      el.innerHTML = rows.map((r, i) => `<div class="leaderboardRow${i < 3 ? ' rank-' + (i + 1) : ''}">
+      el.innerHTML = rows.map((r, i) => {
+        const u = allUsers.find(x => x.id === r.id);
+        return `<div class="leaderboardRow${i < 3 ? ' rank-' + (i + 1) : ''}${skinBgClass(u)}">
         <div class="leaderboardRank">${RANK_MEDALS[i] || (i + 1)}</div>
-        <div class="userAvatar lbProfileLink" data-user="${r.id}">${avatarInner(r.name, r.photoURL)}</div>
+        ${wrapAvatarWithCrown(u, `<div class="userAvatar lbProfileLink${avatarBorderClass(u)}" data-user="${r.id}">${avatarInner(r.name, r.photoURL)}</div>`)}
         <div class="leaderboardInfo">
           <div class="leaderboardName lbProfileLink" data-user="${r.id}">${escapeHtml(r.name || 'Anonymous')}</div>
         </div>
-        ${isAdmin() && r.coins > 0 ? `<button type="button" class="partyMinusBtn" data-user="${r.id}">–</button>` : ''}
         <div class="leaderboardTotal">${r.coins} ${JACKPOT_COIN_ICON}</div>
-        ${isAdmin() ? `<button type="button" class="partyPlusBtn" data-user="${r.id}">+</button>` : ''}
-      </div>`).join('');
-      el.querySelectorAll('.partyPlusBtn').forEach(btn => {
-        btn.onclick = () => adminAdjustJackpotCoins(btn.dataset.user, 10);
-      });
-      el.querySelectorAll('.partyMinusBtn').forEach(btn => {
-        btn.onclick = () => adminAdjustJackpotCoins(btn.dataset.user, -10);
+        ${isAdmin() ? `<button type="button" class="btn ghost editCoinsBtn" data-user="${r.id}" data-name="${escapeHtml(r.name || 'Anonymous')}" data-coins="${r.coins}" style="padding:6px 12px">Edit</button>` : ''}
+      </div>`;
+      }).join('');
+      el.querySelectorAll('.editCoinsBtn').forEach(btn => {
+        btn.onclick = () => openEditCoinsModal(btn.dataset.user, btn.dataset.name, Number(btn.dataset.coins));
       });
       el.querySelectorAll('.lbProfileLink').forEach(a => {
         a.onclick = () => openProfileView(a.dataset.user);
       });
     }
 
-    function showJackpotPage(){
+    function showJackpotPage() {
       jackpotPageOpen = true;
       ensureMyJackpotCoinsInitialized();
       jackpotCoinsEl.textContent = getJackpotCoins();
@@ -4282,6 +5191,7 @@
       jackpotMessageEl.textContent = 'Pull the lever!';
       renderJackpotPaytable();
       updateJackpotSpinAvailability();
+      renderJackpotAdminRow();
       setJackpotSubTab('game');
       document.getElementById('toolbar').style.display = 'none';
       beerList.style.display = 'none';
@@ -4291,40 +5201,328 @@
       document.getElementById('fab').style.display = 'none';
       jackpotPage.style.display = 'block';
     }
-    function openJackpotPage(){
+    function openJackpotPage() {
       pushOverlayState();
       showJackpotPage();
     }
-    function hideJackpotPage(){
+    function hideJackpotPage() {
       jackpotPageOpen = false;
       jackpotPage.style.display = 'none';
       document.getElementById('toolbar').style.display = 'flex';
       setActiveTab(activeTab);
     }
-    function closeJackpotPage(){ history.back(); }
+    function closeJackpotPage() { history.back(); }
+
+    function renderJackpotAdminRow() {
+      const row = document.getElementById('jackpotAdminRow');
+      row.style.display = isAdmin() ? 'flex' : 'none';
+      if (!isAdmin()) return;
+      document.getElementById('jackpotMaxBetLabel').textContent = `Max bet: ${jackpotMaxBetLive}`;
+      document.getElementById('jackpotMaxBetEdit').style.display = 'none';
+    }
+    document.getElementById('jackpotEditMaxBetBtn').onclick = () => {
+      document.getElementById('jackpotMaxBetInput').value = jackpotMaxBetLive;
+      document.getElementById('jackpotMaxBetEdit').style.display = 'flex';
+    };
+    document.getElementById('jackpotMaxBetCancelBtn').onclick = () => {
+      document.getElementById('jackpotMaxBetEdit').style.display = 'none';
+    };
+    document.getElementById('jackpotMaxBetSaveBtn').onclick = async () => {
+      const n = Math.floor(Number(document.getElementById('jackpotMaxBetInput').value));
+      if (!Number.isFinite(n) || n < JACKPOT_MIN_BET) {
+        showToast(`Max bet must be a whole number ≥ ${JACKPOT_MIN_BET}`);
+        return;
+      }
+      try {
+        await configCol.doc('jackpot').set({ maxBet: n }, { merge: true });
+        showToast('Max bet updated');
+        document.getElementById('jackpotMaxBetEdit').style.display = 'none';
+      } catch (err) {
+        showToast('Failed: ' + err.message);
+      }
+    };
+
     jackpotBtn.onclick = openJackpotPage;
     document.getElementById('homeLogoBtn').onclick = () => { if (jackpotPageOpen) closeJackpotPage(); };
 
-    function finishJackpotSpin(results, bet){
+    // ---------- Chip (Žeton) redemption popup ----------
+    const chipPopupOverlay = document.getElementById('chipPopupOverlay');
+    let currentChipId = null;
+    let currentChipOwnerUid = null;
+    let chipPopupPendingPhoto = null;
+    let chipPopupSelectedGiverUid = null;
+
+    function showChipPopup(chipId, ownerUid) {
+      ownerUid = ownerUid || myUid;
+      const owner = allUsers.find(u => u.id === ownerUid);
+      const chip = (owner?.chips || []).find(c => c.id === chipId);
+      if (!chip) return;
+      const redeemed = chip.status === 'redeemed';
+      if (!redeemed && ownerUid !== myUid) return;
+      currentChipId = chipId;
+      currentChipOwnerUid = ownerUid;
+      chipPopupPendingPhoto = null;
+      chipPopupSelectedGiverUid = null;
+      const def = SHOP_CHIPS.find(x => x.type === chip.type);
+      document.getElementById('chipPopupTitle').textContent = def ? def.name : chip.type;
+      document.getElementById('chipPopupPhotoArea').innerHTML = '';
+      if (redeemed) {
+        document.getElementById('chipPopupPhotoField').style.display = 'none';
+        document.getElementById('chipPopupGiverField').style.display = 'none';
+        document.getElementById('chipPopupRedeemBtn').style.display = 'none';
+        const giver = allUsers.find(u => u.id === chip.givenByUid);
+        document.getElementById('chipPopupRedeemedInfo').style.display = 'block';
+        document.getElementById('chipPopupRedeemedInfo').innerHTML =
+          (chip.photoURL ? `<img src="${escapeHtml(chip.photoURL)}" style="width:100%;border-radius:12px;margin-bottom:12px">` : '') +
+          (giver
+            ? `<div class="chipGiverRow">
+                <div class="userAvatar">${avatarInner(giver.name, giver.photoURL)}</div>
+                <div>
+                  <div class="chipGiverName">${escapeHtml(giver.name || 'Anonymous')}</div>
+                  <div class="chipGiverLabel">bought this for you</div>
+                </div>
+              </div>`
+            : `<div class="empty" style="padding:0">Redeemed</div>`);
+      } else {
+        document.getElementById('chipPopupPhotoField').style.display = 'block';
+        document.getElementById('chipPopupGiverField').style.display = 'block';
+        document.getElementById('chipPopupRedeemBtn').style.display = '';
+        document.getElementById('chipPopupRedeemedInfo').style.display = 'none';
+        document.getElementById('chipPopupGiverDisplay').innerHTML = '<button type="button" class="btn ghost" id="chipPopupSpinTriggerBtn">🎡 Spin to pick</button>';
+        document.getElementById('chipPopupSpinTriggerBtn').onclick = openWheelOverlay;
+      }
+      chipPopupOverlay.classList.add('show');
+    }
+    function openChipPopup(chipId, ownerUid) {
+      pushOverlayState();
+      showChipPopup(chipId, ownerUid);
+    }
+    function hideChipPopup() {
+      chipPopupOverlay.classList.remove('show');
+      currentChipId = null;
+      currentChipOwnerUid = null;
+      chipPopupPendingPhoto = null;
+    }
+    function closeChipPopup() { history.back(); }
+    document.getElementById('chipPopupClose').onclick = closeChipPopup;
+    chipPopupOverlay.addEventListener('click', (e) => { if (e.target === chipPopupOverlay) closeChipPopup(); });
+
+    document.getElementById('chipPopupAddPhotoBtn').onclick = () => document.getElementById('chipPopupPhotoInput').click();
+    document.getElementById('chipPopupPhotoInput').onchange = async () => {
+      const input = document.getElementById('chipPopupPhotoInput');
+      const file = input.files[0];
+      input.value = '';
+      if (!file || !currentChipId) return;
+      try {
+        const path = `users/${myUid}/${Date.now()}_chip_${file.name}`;
+        const ref = storage.ref(path);
+        await ref.put(file);
+        const url = await ref.getDownloadURL();
+        chipPopupPendingPhoto = { url, path };
+        document.getElementById('chipPopupPhotoArea').innerHTML = `<img src="${escapeHtml(url)}" style="width:100%;border-radius:12px">`;
+        showToast('Photo added');
+      } catch (err) {
+        showToast('Photo upload failed: ' + err.message);
+      }
+    };
+
+    document.getElementById('chipPopupRedeemBtn').onclick = async () => {
+      if (!currentChipId || currentChipOwnerUid !== myUid) return;
+      const giverUid = chipPopupSelectedGiverUid;
+      const chipId = currentChipId;
+      const photo = chipPopupPendingPhoto;
+      try {
+        const ref = usersCol.doc(myUid);
+        await db.runTransaction(async (tx) => {
+          const snap = await tx.get(ref);
+          const chips = (snap.data()?.chips || []).map(c => {
+            if (c.id !== chipId) return c;
+            return {
+              ...c,
+              status: 'redeemed',
+              photoURL: photo ? photo.url : (c.photoURL || null),
+              photoPath: photo ? photo.path : (c.photoPath || null),
+              givenByUid: giverUid,
+              redeemedAt: Date.now()
+            };
+          });
+          tx.update(ref, { chips });
+        });
+        showToast('Redeemed!');
+        closeChipPopup();
+      } catch (err) {
+        showToast('Failed: ' + err.message);
+      }
+    };
+
+    // ---------- Wheel of "who's here" (random giver picker) ----------
+    const wheelOverlay = document.getElementById('wheelOverlay');
+    const WHEEL_COLORS = ['#ff5e5e', '#ffb347', '#ffe66d', '#6bcf7f', '#4fd1c5', '#5ec8ff', '#8c7cff', '#ff6fb0', '#ffa45e', '#7ee787'];
+    let wheelSegments = [];
+    let wheelSpinning = false;
+
+    function showWheelOverlay() {
+      const list = document.getElementById('wheelUserChecklist');
+      list.innerHTML = allUsers.filter(u => u.id !== myUid).map(u => `
+        <label class="wheelCheckRow">
+          <input type="checkbox" value="${u.id}" checked>
+          <div class="userAvatar">${avatarInner(u.name, u.photoURL)}</div>
+          <span>${escapeHtml(u.name || 'Anonymous')}</span>
+        </label>`).join('');
+      document.getElementById('wheelSelectStep').style.display = 'block';
+      document.getElementById('wheelSpinStep').style.display = 'none';
+      document.getElementById('wheelCanvas').style.transform = 'rotate(0deg)';
+      wheelSpinning = false;
+      wheelOverlay.classList.add('show');
+    }
+    function openWheelOverlay() {
+      pushOverlayState();
+      showWheelOverlay();
+    }
+    function hideWheelOverlay() {
+      wheelOverlay.classList.remove('show');
+    }
+    function closeWheelOverlay() { history.back(); }
+    document.getElementById('wheelClose').onclick = closeWheelOverlay;
+    wheelOverlay.addEventListener('click', (e) => { if (e.target === wheelOverlay) closeWheelOverlay(); });
+
+    document.getElementById('wheelSelectAllBtn').onclick = () => {
+      const boxes = document.querySelectorAll('#wheelUserChecklist input[type="checkbox"]');
+      const allChecked = [...boxes].every(b => b.checked);
+      boxes.forEach(b => { b.checked = !allChecked; });
+    };
+
+    function drawWheel(canvas, segments) {
+      const ctx = canvas.getContext('2d');
+      const size = canvas.width;
+      const cx = size / 2, cy = size / 2, radius = size / 2 - 3;
+      const n = segments.length;
+      const anglePer = (2 * Math.PI) / n;
+      ctx.clearRect(0, 0, size, size);
+      segments.forEach((seg, i) => {
+        const start = i * anglePer;
+        const end = start + anglePer;
+        ctx.beginPath();
+        ctx.moveTo(cx, cy);
+        ctx.arc(cx, cy, radius, start, end);
+        ctx.closePath();
+        ctx.fillStyle = WHEEL_COLORS[i % WHEEL_COLORS.length];
+        ctx.fill();
+        ctx.strokeStyle = '#1c1410';
+        ctx.lineWidth = 2;
+        ctx.stroke();
+        ctx.save();
+        ctx.translate(cx, cy);
+        ctx.rotate(start + anglePer / 2);
+        ctx.textAlign = 'right';
+        ctx.fillStyle = '#1c1410';
+        ctx.font = 'bold 13px Arial, sans-serif';
+        const label = seg.name.length > 12 ? seg.name.slice(0, 11) + '…' : seg.name;
+        ctx.fillText(label, radius - 12, 5);
+        ctx.restore();
+      });
+    }
+
+    document.getElementById('wheelGoBtn').onclick = () => {
+      const checked = [...document.querySelectorAll('#wheelUserChecklist input[type="checkbox"]:checked')].map(b => b.value);
+      if (!checked.length) {
+        showToast('Select at least one person');
+        return;
+      }
+      wheelSegments = checked.map(uid => {
+        const u = allUsers.find(x => x.id === uid);
+        return { uid, name: u?.name || 'Anonymous' };
+      });
+      const canvas = document.getElementById('wheelCanvas');
+      canvas.style.transition = 'none';
+      canvas.style.transform = 'rotate(0deg)';
+      drawWheel(canvas, wheelSegments);
+      document.getElementById('wheelResult').textContent = '';
+      document.getElementById('wheelSelectStep').style.display = 'none';
+      document.getElementById('wheelSpinStep').style.display = 'block';
+      document.getElementById('wheelSpinBtn').style.display = 'flex';
+      document.getElementById('wheelSpinBtn').disabled = false;
+      requestAnimationFrame(() => { canvas.style.transition = ''; });
+    };
+
+    document.getElementById('wheelBackBtn').onclick = () => {
+      document.getElementById('wheelSelectStep').style.display = 'block';
+      document.getElementById('wheelSpinStep').style.display = 'none';
+    };
+
+    document.getElementById('wheelSpinBtn').onclick = () => {
+      if (wheelSpinning || !wheelSegments.length) return;
+      wheelSpinning = true;
+      document.getElementById('wheelSpinBtn').disabled = true;
+      document.getElementById('wheelResult').textContent = '';
+      const n = wheelSegments.length;
+      const seg = 360 / n;
+      const winnerIndex = Math.floor(Math.random() * n);
+      const targetCenter = winnerIndex * seg + seg / 2;
+      const jitter = (Math.random() - 0.5) * (seg * 0.6);
+      const rotation = 360 * 6 - targetCenter - 90 + jitter;
+      const canvas = document.getElementById('wheelCanvas');
+      canvas.style.transform = `rotate(${rotation}deg)`;
+      setTimeout(() => {
+        wheelSpinning = false;
+        const winner = wheelSegments[winnerIndex];
+        document.getElementById('wheelResult').textContent = `🎉 ${winner.name}!`;
+        document.getElementById('wheelSpinBtn').style.display = 'none';
+        const backBtn = document.getElementById('wheelBackBtn');
+        backBtn.textContent = 'Spin Again';
+        backBtn.onclick = () => {
+          backBtn.textContent = 'Back';
+          backBtn.onclick = () => {
+            document.getElementById('wheelSelectStep').style.display = 'block';
+            document.getElementById('wheelSpinStep').style.display = 'none';
+          };
+          document.getElementById('wheelSpinBtn').style.display = 'flex';
+          document.getElementById('wheelSpinBtn').disabled = false;
+          const c2 = document.getElementById('wheelCanvas');
+          c2.style.transition = 'none';
+          c2.style.transform = 'rotate(0deg)';
+          drawWheel(c2, wheelSegments);
+          document.getElementById('wheelResult').textContent = '';
+          requestAnimationFrame(() => { c2.style.transition = ''; });
+        };
+        chipPopupSelectedGiverUid = winner.uid;
+        const u = allUsers.find(x => x.id === winner.uid);
+        document.getElementById('chipPopupGiverDisplay').innerHTML = `
+          <div class="chipGiverRow">
+            <div class="userAvatar">${avatarInner(u?.name, u?.photoURL)}</div>
+            <div>
+              <div class="chipGiverName">${escapeHtml(u?.name || 'Anonymous')}</div>
+              <button type="button" class="btn ghost" id="chipPopupRespinBtn" style="margin-top:4px;padding:4px 10px;font-size:.78rem">Respin</button>
+            </div>
+          </div>`;
+        document.getElementById('chipPopupRespinBtn').onclick = openWheelOverlay;
+      }, 4100);
+    };
+
+    function finishJackpotSpin(results, bet) {
       const [a, b, c] = results;
       let winnings = 0;
       let message = 'No luck, try again!';
-      if (a.icon === b.icon && b.icon === c.icon){
+      let winTierValue = null;
+      if (a.icon === b.icon && b.icon === c.icon) {
         winnings = a.value * bet;
+        winTierValue = a.value;
         message = (a.value >= 100 ? '🎉🎉 JACKPOT! +' : '🎉 Three of a kind! +') + winnings + ' ' + JACKPOT_COIN_ICON;
-      } else if (a.icon === b.icon || b.icon === c.icon || a.icon === c.icon){
+      } else if (a.icon === b.icon || b.icon === c.icon || a.icon === c.icon) {
         winnings = 2 * bet;
+        winTierValue = 2;
         message = 'Nice, a pair! +' + winnings + ' ' + JACKPOT_COIN_ICON;
       }
-      if (winnings > 0){
+      playJackpotWinSound(winTierValue);
+      if (winnings > 0) {
         jackpotCoinsEl.textContent = getJackpotCoins() + winnings;
-        usersCol.doc(myUid).set({ jackpotCoins: firebase.firestore.FieldValue.increment(winnings) }, { merge: true }).catch(() => {});
+        usersCol.doc(myUid).set({ jackpotCoins: firebase.firestore.FieldValue.increment(winnings) }, { merge: true }).catch(() => { });
       }
       jackpotMessageEl.innerHTML = message;
       jackpotSpinning = false;
       jackpotSpinBtn.disabled = false;
       jackpotBetMinusBtn.disabled = getJackpotBet() <= JACKPOT_MIN_BET;
-      jackpotBetPlusBtn.disabled = getJackpotBet() >= JACKPOT_MAX_BET;
+      jackpotBetPlusBtn.disabled = getJackpotBet() >= jackpotMaxBetLive;
       updateJackpotSpinAvailability();
     }
 
@@ -4332,8 +5530,8 @@
       if (jackpotSpinning) return;
       const bet = getJackpotBet();
       const coins = getJackpotCoins();
-      if (coins < bet){
-        usersCol.doc(myUid).set({ jackpotCoins: JACKPOT_START_COINS }, { merge: true }).catch(() => {});
+      if (coins < bet) {
+        usersCol.doc(myUid).set({ jackpotCoins: JACKPOT_START_COINS }, { merge: true }).catch(() => { });
         jackpotCoinsEl.textContent = JACKPOT_START_COINS;
         jackpotMessageEl.innerHTML = `Topped up to ${JACKPOT_START_COINS} ${JACKPOT_COIN_ICON} — good luck!`;
         updateJackpotSpinAvailability();
@@ -4344,13 +5542,14 @@
       jackpotBetMinusBtn.disabled = true;
       jackpotBetPlusBtn.disabled = true;
       jackpotCoinsEl.textContent = coins - bet;
-      usersCol.doc(myUid).set({ jackpotCoins: firebase.firestore.FieldValue.increment(-bet) }, { merge: true }).catch(() => {});
+      usersCol.doc(myUid).set({ jackpotCoins: firebase.firestore.FieldValue.increment(-bet) }, { merge: true }).catch(() => { });
       jackpotMessageEl.textContent = 'Spinning…';
       jackpotReelEls.forEach(el => el.classList.add('spinning'));
 
       const results = [pickWeightedSymbol(), pickWeightedSymbol(), pickWeightedSymbol()];
       const spinTimers = jackpotReelEls.map(el => setInterval(() => {
         el.textContent = pickWeightedSymbol().icon;
+        playJackpotTickSound();
       }, 80));
 
       const stopDelays = [700, 1000, 1300];
@@ -4359,6 +5558,7 @@
           clearInterval(spinTimers[i]);
           jackpotReelEls[i].classList.remove('spinning');
           jackpotReelEls[i].textContent = results[i].icon;
+          playJackpotReelStopSound();
           if (i === stopDelays.length - 1) finishJackpotSpin(results, bet);
         }, delay);
       });
@@ -4381,6 +5581,14 @@
       }
       if (cardPickerOverlay.classList.contains('show')) {
         hideCardPicker();
+        return;
+      }
+      if (wheelOverlay.classList.contains('show')) {
+        hideWheelOverlay();
+        return;
+      }
+      if (chipPopupOverlay.classList.contains('show')) {
+        hideChipPopup();
         return;
       }
       if (formOverlay.classList.contains('show')) {

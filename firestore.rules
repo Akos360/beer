@@ -53,6 +53,11 @@ service cloud.firestore {
       allow write: if true;
     }
 
+    match /config/{docId} {
+      allow read: if true;
+      allow write: if true;
+    }
+
     match /leaderboardArchives/{year} {
       allow read: if true;
       // Immutable once written: creation is open, but an existing
