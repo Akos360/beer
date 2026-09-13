@@ -49,18 +49,20 @@
   select{cursor:pointer}
 
   #beerList{padding:14px;display:grid;grid-template-columns:repeat(auto-fill,minmax(158px,1fr));gap:12px;padding-bottom:90px}
-  .tabSwitch{display:flex;gap:8px;margin-bottom:10px}
+  .tabSwitch{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:10px}
   .tabBtn{flex:1;padding:9px;border-radius:10px;border:1px solid var(--border);background:var(--bg-elev);color:var(--text-dim);font-weight:700;font-size:.85rem;cursor:pointer;transition:filter .1s,transform .1s}
   .tabBtn:active{filter:brightness(0.9);transform:scale(0.97)}
   .tabBtn.active{background:var(--accent);color:#1c1410;border-color:var(--accent)}
   #beerToolbarRows{display:flex;flex-direction:column;gap:8px}
-  #partyList{padding:14px;padding-bottom:90px;display:flex;flex-direction:column;gap:10px}
+  #partyList,#pubList{padding:14px;padding-bottom:90px;display:flex;flex-direction:column;gap:10px}
   .partyRow{display:flex;gap:12px;padding:10px;background:var(--bg-card);border:1px solid var(--border);border-radius:14px;cursor:pointer;align-items:center}
   .partyThumb{width:60px;height:60px;border-radius:10px;overflow:hidden;background:var(--bg-elev);flex:0 0 auto;display:flex;align-items:center;justify-content:center;font-size:1.6rem}
   .partyThumb img{width:100%;height:100%;object-fit:cover}
-  .partyInfo{min-width:0}
+  .partyInfo{flex:1;min-width:0}
   .partyName{font-weight:700;font-size:.95rem}
   .partyMeta{font-size:.8rem;color:var(--text-dim);margin-top:2px}
+  .cityTag{flex:0 0 auto;padding:4px 11px;border:1px solid var(--border);border-radius:999px;font-size:.72rem;color:var(--text-dim);white-space:nowrap}
+  .tagStack{flex:0 0 auto;display:flex;flex-direction:column;gap:4px;align-items:flex-end}
   .partyParticipantRow{display:flex;align-items:center;gap:10px;padding:9px 0;border-bottom:1px solid var(--border)}
   .partyParticipantRow:last-child{border-bottom:none}
   .partyParticipantRow .userName{flex:1;min-width:0}
@@ -73,8 +75,10 @@
   .notJoined{flex:0 0 auto;font-size:.78rem;color:var(--text-dim);font-style:italic}
   .leaderboardYearHead{font-size:1.1rem;font-weight:800;padding:14px 14px 4px}
   #leaderboardList{padding:0 14px}
-  .leaderboardRow{display:flex;align-items:center;gap:10px;padding:10px 0;border-bottom:1px solid var(--border)}
-  .leaderboardRow:last-child{border-bottom:none}
+  .leaderboardRow{display:flex;align-items:center;gap:10px;padding:10px 8px;border-radius:10px;margin-bottom:6px}
+  .leaderboardRow.rank-1{background:rgba(255,215,0,.14)}
+  .leaderboardRow.rank-2{background:rgba(192,192,192,.16)}
+  .leaderboardRow.rank-3{background:rgba(205,127,50,.16)}
   .leaderboardRank{font-weight:800;font-size:1rem;width:26px;text-align:center;color:var(--text-dim);flex:0 0 auto}
   .leaderboardInfo{flex:1;min-width:0}
   .leaderboardName{font-weight:700;font-size:.92rem}
@@ -121,6 +125,8 @@
   .hint.warn{color:var(--danger);font-style:normal;font-weight:600}
   .field{display:flex;flex-direction:column}
   .twoCol{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+  .twoCol .field{min-width:0}
+  .twoCol input{width:100%;min-width:0}
   .threeCol{display:grid;grid-template-columns:0.7fr 1fr 1fr;gap:10px}
   .threeCol .field{min-width:0}
   .threeCol input{width:100%;min-width:0}
@@ -226,6 +232,7 @@
   <div class="tabSwitch" id="tabSwitch">
     <button type="button" class="tabBtn active" data-tab="beers">🍺 Beers</button>
     <button type="button" class="tabBtn" data-tab="parties">🍻 Parties</button>
+    <button type="button" class="tabBtn" data-tab="pubs">🍸 Pubs</button>
     <button type="button" class="tabBtn" data-tab="leaderboard">🏆 Rank</button>
   </div>
   <div id="beerToolbarRows">
@@ -249,6 +256,7 @@
 
 <div id="beerList"></div>
 <div id="partyList" style="display:none"></div>
+<div id="pubList" style="display:none"></div>
 <div id="leaderboardPage" style="display:none">
   <div class="leaderboardYearHead" id="leaderboardYearHead"></div>
   <div id="leaderboardList"></div>
@@ -387,6 +395,7 @@
       <div class="viewTitle"><span id="partyViewName"></span></div>
       <button type="button" class="btn primary viewEditBtnInline" id="partyViewEditBtn">Edit</button>
     </div>
+    <div class="viewMeta" id="partyViewDate"></div>
     <div class="field">
       <label>Drinkers</label>
       <div id="partyParticipants"></div>
@@ -407,10 +416,79 @@
         <label>Name</label>
         <input id="pfName" required placeholder="e.g. Friday Night">
       </div>
+      <div class="twoCol">
+        <div class="field">
+          <label>Date (M/D)</label>
+          <input id="pfDate" placeholder="e.g. 9/11">
+        </div>
+        <div class="field">
+          <label>Year</label>
+          <input id="pfYear" type="number" placeholder="2026">
+        </div>
+      </div>
       <div class="formActions">
         <button type="button" class="btn danger" id="partyDeleteBtn" style="display:none">Delete</button>
         <button type="button" class="btn ghost" id="partyCancelBtn">Cancel</button>
         <button type="submit" class="btn primary" id="partySaveBtn">Add Party</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<div class="overlay" id="pubViewOverlay">
+  <div class="sheet">
+    <div class="sheetHead">
+      <h2>Pub</h2>
+      <button class="closeX" id="pubViewClose">✕</button>
+    </div>
+    <div class="viewCarousel" id="pubViewCarousel"></div>
+    <div class="field" style="margin-top:-4px;margin-bottom:14px">
+      <button type="button" class="btn ghost" id="pubAddPhotoBtn" style="padding:8px 14px">+ Add photo</button>
+      <input type="file" id="pubPhotoInput" accept="image/*" multiple style="display:none">
+    </div>
+    <div class="viewTitleRow">
+      <div class="viewTitle"><span id="pubViewName"></span></div>
+      <button type="button" class="btn primary viewEditBtnInline" id="pubViewEditBtn">Edit</button>
+    </div>
+    <div class="viewMeta" id="pubViewCity"></div>
+    <div class="viewBadges" id="pubViewBadges" style="margin-top:10px"></div>
+    <div class="field" style="margin-top:16px">
+      <label>Your rating</label>
+      <div class="ratingButtons" id="pubRatingButtons"></div>
+    </div>
+    <div class="field" style="margin-top:14px">
+      <label>Write a comment</label>
+      <textarea id="pubCommentInput" placeholder="Say something…"></textarea>
+      <button type="button" class="btn primary" id="pubCommentPostBtn" style="margin-top:8px">Post</button>
+    </div>
+    <div class="field" style="margin-top:14px">
+      <label>Comments</label>
+      <div class="viewReviews" id="pubComments"></div>
+    </div>
+  </div>
+</div>
+
+<div class="overlay" id="pubFormOverlay">
+  <div class="sheet">
+    <div class="sheetHead">
+      <h2 id="pubFormTitle">Add Pub</h2>
+      <button class="closeX" id="pubFormClose">✕</button>
+    </div>
+    <div id="pubPhotoStrip"></div>
+    <input type="file" id="pubFormPhotoInput" accept="image/*" multiple style="display:none">
+    <form id="pubForm">
+      <div class="field">
+        <label>Name</label>
+        <input id="pubfName" required placeholder="e.g. The Golden Tap">
+      </div>
+      <div class="field">
+        <label>City</label>
+        <input id="pubfCity" placeholder="e.g. Bratislava">
+      </div>
+      <div class="formActions">
+        <button type="button" class="btn danger" id="pubDeleteBtn" style="display:none">Delete</button>
+        <button type="button" class="btn ghost" id="pubCancelBtn">Cancel</button>
+        <button type="submit" class="btn primary" id="pubSaveBtn">Add Pub</button>
       </div>
     </form>
   </div>
@@ -443,7 +521,7 @@
       <button type="button" class="btn primary" id="profileViewEditBtn">Edit</button>
     </div>
     <div id="profileViewListWrap">
-      <div class="userListHead">All Drinkers</div>
+      <div class="userListHead" id="userListHead">All Drinkers</div>
       <div id="userList"></div>
     </div>
   </div>
@@ -959,14 +1037,17 @@ function setActiveTab(tab){
   tabSwitch.querySelectorAll('.tabBtn').forEach(b => b.classList.toggle('active', b.dataset.tab === tab));
   const isBeers = tab === 'beers';
   const isParties = tab === 'parties';
+  const isPubs = tab === 'pubs';
   const isLeaderboard = tab === 'leaderboard';
   beerToolbarRows.style.display = isBeers ? 'flex' : 'none';
   beerList.style.display = isBeers ? 'grid' : 'none';
   partyListEl.style.display = isParties ? 'flex' : 'none';
+  document.getElementById('pubList').style.display = isPubs ? 'flex' : 'none';
   document.getElementById('leaderboardPage').style.display = isLeaderboard ? 'block' : 'none';
   document.getElementById('fab').style.display = isLeaderboard ? 'none' : 'flex';
-  document.getElementById('fab').title = isParties ? 'Add party' : 'Add beer';
+  document.getElementById('fab').title = isParties ? 'Add party' : isPubs ? 'Add pub' : 'Add beer';
   if (isParties) renderPartyList();
+  if (isPubs) renderPubList();
   if (isLeaderboard) renderLeaderboard();
 }
 tabSwitch.querySelectorAll('.tabBtn').forEach(b => {
@@ -974,6 +1055,7 @@ tabSwitch.querySelectorAll('.tabBtn').forEach(b => {
 });
 document.getElementById('fab').onclick = () => {
   if (activeTab === 'parties') openPartyForm(null);
+  else if (activeTab === 'pubs') openPubForm(null);
   else openForm(null);
 };
 
@@ -998,6 +1080,10 @@ function renderPartyList(){
         <div class="partyName">${escapeHtml(p.name || 'Unnamed party')}</div>
         <div class="partyMeta">${totals.joined} joined · ${totals.totalBeers} 🍺</div>
       </div>
+      ${(p.date || p.year) ? `<div class="tagStack">
+        ${p.date ? `<span class="cityTag">${escapeHtml(p.date)}</span>` : ''}
+        ${p.year ? `<span class="cityTag">${escapeHtml(String(p.year))}</span>` : ''}
+      </div>` : ''}
     </div>`;
   }).join('');
   partyListEl.querySelectorAll('.partyRow').forEach(row => {
@@ -1013,6 +1099,7 @@ partiesCol.onSnapshot(snap => {
   if (activeTab === 'parties') renderPartyList();
   refreshPartyViewIfOpen();
   allParties.forEach(p => backfillPartyIfNeeded(p));
+  refreshProfileDisplays();
 }, err => showToast('Sync error: ' + err.message));
 
 db.collectionGroup('participants').onSnapshot(snap => {
@@ -1024,6 +1111,7 @@ db.collectionGroup('participants').onSnapshot(snap => {
   });
   if (activeTab === 'parties') renderPartyList();
   refreshPartyViewIfOpen();
+  refreshProfileDisplays();
 }, err => showToast('Sync error: ' + err.message));
 
 // ---------- Party view ----------
@@ -1122,6 +1210,7 @@ function renderPartyViewContent(party){
     img.onclick = () => openLightbox(photos, Number(img.dataset.i));
   });
   partyViewName.textContent = party.name || 'Unnamed party';
+  document.getElementById('partyViewDate').textContent = [party.date, party.year].filter(Boolean).join(' · ');
   const canEdit = party.createdBy === myUid || isAdmin();
   partyViewEditBtn.style.display = canEdit ? 'flex' : 'none';
   renderPartyParticipants(party);
@@ -1240,6 +1329,8 @@ function openPartyForm(party){
   document.getElementById('partySaveBtn').textContent = party ? 'Save' : 'Add Party';
   partyDeleteBtn.style.display = party ? 'block' : 'none';
   document.getElementById('pfName').value = party?.name || '';
+  document.getElementById('pfDate').value = party?.date || '';
+  document.getElementById('pfYear').value = party?.year || '';
   renderPartyPhotoStrip(party);
   partyFormOverlay.classList.add('show');
 }
@@ -1258,12 +1349,14 @@ partyForm.onsubmit = async (e) => {
   const saveBtn = document.getElementById('partySaveBtn');
   saveBtn.disabled = true;
   const name = document.getElementById('pfName').value.trim();
+  const date = document.getElementById('pfDate').value.trim();
+  const year = document.getElementById('pfYear').value === '' ? null : Number(document.getElementById('pfYear').value);
   try {
     if (partyEditingId){
-      await partiesCol.doc(partyEditingId).update({ name });
+      await partiesCol.doc(partyEditingId).update({ name, date, year });
       showToast('Party updated');
     } else {
-      const ref = await partiesCol.add({ name, photos: [], createdBy: myUid, ts: Date.now() });
+      const ref = await partiesCol.add({ name, date, year, photos: [], createdBy: myUid, ts: Date.now() });
       for (const pp of partyPendingPhotos) await uploadPhotoToParty(ref.id, pp.file);
       showToast('Party added');
     }
@@ -1292,6 +1385,353 @@ partyDeleteBtn.onclick = () => {
   const party = allParties.find(p => p.id === partyEditingId);
   if (!party) return;
   confirmDeleteParty(party);
+};
+
+// ---------- Pubs ----------
+const pubsCol = db.collection('pubs');
+let allPubs = [];
+const pubListEl = document.getElementById('pubList');
+
+function renderPubList(){
+  if (!allPubs.length){
+    pubListEl.innerHTML = '<div class="empty">No pubs yet 🍸<br>Tap + to add one.</div>';
+    return;
+  }
+  const sorted = allPubs.slice().sort((a, b) => (b.ts || 0) - (a.ts || 0));
+  pubListEl.innerHTML = sorted.map(p => {
+    const cover = (p.photos && p.photos[0]) ? `<img src="${escapeHtml(p.photos[0].url)}">` : '🍸';
+    return `<div class="partyRow" data-pub="${p.id}">
+      <div class="partyThumb">${cover}</div>
+      <div class="partyInfo">
+        <div class="partyName">${escapeHtml(p.name || 'Unnamed pub')}</div>
+        <div class="partyMeta">${p.avgRating != null ? p.avgRating.toFixed(1) : '–'}/10${p.ratingCount ? ` (${p.ratingCount})` : ''}</div>
+      </div>
+      ${p.city ? `<span class="cityTag">${escapeHtml(p.city)}</span>` : ''}
+    </div>`;
+  }).join('');
+  pubListEl.querySelectorAll('.partyRow').forEach(row => {
+    row.onclick = () => {
+      const pub = allPubs.find(p => p.id === row.dataset.pub);
+      if (pub) openPubView(pub);
+    };
+  });
+}
+
+pubsCol.onSnapshot(snap => {
+  allPubs = snap.docs.map(d => ({ id: d.id, ...d.data() }));
+  if (activeTab === 'pubs') renderPubList();
+  refreshPubViewIfOpen();
+  refreshProfileDisplays();
+}, err => showToast('Sync error: ' + err.message));
+
+async function submitPubRating(pubId, ratingValue){
+  await pubsCol.doc(pubId).collection('ratings').doc(myUid).set(
+    { rating: ratingValue, userId: myUid, ts: Date.now() }, { merge: true }
+  );
+  const snap = await pubsCol.doc(pubId).collection('ratings').get();
+  const ratings = snap.docs.map(d => d.data().rating).filter(r => typeof r === 'number');
+  const count = ratings.length;
+  const avg = count ? ratings.reduce((a, b) => a + b, 0) / count : null;
+  await pubsCol.doc(pubId).update({ avgRating: avg, ratingCount: count });
+  return { avgRating: avg, ratingCount: count };
+}
+async function postPubComment(pubId, text){
+  await pubsCol.doc(pubId).collection('comments').add({ userId: myUid, text: text.trim(), ts: Date.now() });
+}
+
+async function uploadPhotoToPub(pubId, file){
+  const path = `pubs/${pubId}/${Date.now()}_${file.name}`;
+  const ref = storage.ref(path);
+  await ref.put(file);
+  const url = await ref.getDownloadURL();
+  await pubsCol.doc(pubId).update({
+    photos: firebase.firestore.FieldValue.arrayUnion({ url, path, ts: Date.now() })
+  });
+}
+async function removePubPhoto(pubId, photoObj){
+  try { await storage.ref(photoObj.path).delete(); } catch (e) {}
+  await pubsCol.doc(pubId).update({
+    photos: firebase.firestore.FieldValue.arrayRemove(photoObj)
+  });
+  const fresh = allPubs.find(p => p.id === pubId);
+  const updatedPhotos = (fresh?.photos || []).filter(p => p.path !== photoObj.path);
+  renderPubPhotoStrip({ id: pubId, photos: updatedPhotos });
+}
+
+// ---------- Pub view ----------
+const pubViewOverlay = document.getElementById('pubViewOverlay');
+const pubViewCarousel = document.getElementById('pubViewCarousel');
+const pubViewName = document.getElementById('pubViewName');
+const pubViewBadges = document.getElementById('pubViewBadges');
+const pubRatingButtonsEl = document.getElementById('pubRatingButtons');
+const pubCommentsEl = document.getElementById('pubComments');
+const pubCommentInput = document.getElementById('pubCommentInput');
+const pubCommentPostBtn = document.getElementById('pubCommentPostBtn');
+const pubAddPhotoBtn = document.getElementById('pubAddPhotoBtn');
+const pubPhotoInputView = document.getElementById('pubPhotoInput');
+let currentPubViewId = null;
+let myPubRating = null;
+let pubRatingsCache = {};
+let pubCommentsCache = [];
+let pubRatingsUnsub = null;
+let pubCommentsUnsub = null;
+
+function renderPubComments(comments){
+  if (!comments.length){
+    pubCommentsEl.innerHTML = '<div class="empty" style="padding:14px 0">No comments yet</div>';
+    return;
+  }
+  const sorted = comments.slice().sort((a, b) => (b.ts || 0) - (a.ts || 0));
+  pubCommentsEl.innerHTML = sorted.map(c => {
+    const u = allUsers.find(x => x.id === c.userId);
+    const theirRating = pubRatingsCache[c.userId];
+    return `<div class="reviewRow">
+      <div class="userAvatar">${avatarInner(u?.name, u?.photoURL)}</div>
+      <div class="reviewBody">
+        <div class="reviewHead">
+          <span class="userName">${escapeHtml(u?.name || 'Anonymous')}</span>
+          ${theirRating != null ? `<span class="reviewStars">⭐ ${theirRating}/10</span>` : ''}
+        </div>
+        <div class="reviewComment">${escapeHtml(c.text)}</div>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+function renderPubViewBadges(pub){
+  pubViewBadges.innerHTML = `<span style="background:${ratingColor(pub.avgRating || 0)};color:#1c1410">${pub.avgRating != null ? pub.avgRating.toFixed(1) : '–'}/10${pub.ratingCount ? ` (${pub.ratingCount})` : ''}</span>`;
+}
+
+function renderPubRatingButtons(){
+  buildRatingButtons(pubRatingButtonsEl, myPubRating, async (n) => {
+    const pubId = currentPubViewId;
+    myPubRating = n;
+    renderPubRatingButtons();
+    try {
+      const result = await submitPubRating(pubId, n);
+      if (currentPubViewId === pubId){
+        const fresh = allPubs.find(p => p.id === pubId);
+        if (fresh) renderPubViewBadges({ ...fresh, avgRating: result.avgRating, ratingCount: result.ratingCount });
+      }
+    } catch (err) {
+      showToast('Rating failed: ' + err.message);
+    }
+  });
+}
+
+function renderPubViewContent(pub){
+  const photos = pub.photos || [];
+  pubViewCarousel.innerHTML = photos.length
+    ? photos.map((p, i) => `<img src="${escapeHtml(p.url)}" data-i="${i}">`).join('')
+    : '<div class="placeholder">🍸</div>';
+  pubViewCarousel.querySelectorAll('img').forEach(img => {
+    img.onclick = () => openLightbox(photos, Number(img.dataset.i));
+  });
+  pubViewName.textContent = pub.name || 'Unnamed pub';
+  document.getElementById('pubViewCity').textContent = pub.city || '';
+  renderPubViewBadges(pub);
+  const canEdit = pub.createdBy === myUid || isAdmin();
+  document.getElementById('pubViewEditBtn').style.display = canEdit ? 'flex' : 'none';
+}
+
+function refreshPubViewIfOpen(){
+  if (!pubViewOverlay.classList.contains('show') || !currentPubViewId) return;
+  const fresh = allPubs.find(p => p.id === currentPubViewId);
+  if (!fresh) return;
+  renderPubViewContent(fresh);
+}
+
+function showPubView(pub){
+  currentPubViewId = pub.id;
+  renderPubViewContent(pub);
+  myPubRating = null;
+  renderPubRatingButtons();
+  pubCommentInput.value = '';
+  pubCommentsCache = [];
+  pubCommentsEl.innerHTML = '';
+  pubViewOverlay.classList.add('show');
+
+  if (pubRatingsUnsub) { pubRatingsUnsub(); pubRatingsUnsub = null; }
+  if (pubCommentsUnsub) { pubCommentsUnsub(); pubCommentsUnsub = null; }
+
+  pubRatingsUnsub = pubsCol.doc(pub.id).collection('ratings').onSnapshot(snap => {
+    pubRatingsCache = {};
+    snap.docs.forEach(d => { pubRatingsCache[d.id] = d.data().rating; });
+    const mine = snap.docs.find(d => d.id === myUid);
+    myPubRating = mine ? mine.data().rating : null;
+    renderPubRatingButtons();
+    renderPubComments(pubCommentsCache);
+  }, err => showToast('Sync error: ' + err.message));
+
+  pubCommentsUnsub = pubsCol.doc(pub.id).collection('comments').onSnapshot(snap => {
+    pubCommentsCache = snap.docs.map(d => ({ id: d.id, ...d.data() }));
+    renderPubComments(pubCommentsCache);
+  }, err => showToast('Sync error: ' + err.message));
+}
+function openPubView(pub){
+  pushOverlayState();
+  showPubView(pub);
+}
+function hidePubView(){
+  pubViewOverlay.classList.remove('show');
+  currentPubViewId = null;
+  if (pubRatingsUnsub) { pubRatingsUnsub(); pubRatingsUnsub = null; }
+  if (pubCommentsUnsub) { pubCommentsUnsub(); pubCommentsUnsub = null; }
+}
+function closePubView(){ history.back(); }
+document.getElementById('pubViewClose').onclick = closePubView;
+pubViewOverlay.addEventListener('click', (e) => { if (e.target === pubViewOverlay) closePubView(); });
+
+document.getElementById('pubViewEditBtn').onclick = () => {
+  const pub = allPubs.find(p => p.id === currentPubViewId);
+  hidePubView();
+  if (pub) openPubForm(pub);
+};
+
+pubCommentPostBtn.onclick = async () => {
+  const pubId = currentPubViewId;
+  const text = pubCommentInput.value.trim();
+  if (!text) return;
+  try {
+    await postPubComment(pubId, text);
+    pubCommentInput.value = '';
+    showToast('Comment posted');
+  } catch (err) {
+    showToast('Comment failed: ' + err.message);
+  }
+};
+
+pubAddPhotoBtn.onclick = () => pubPhotoInputView.click();
+pubPhotoInputView.onchange = async () => {
+  const files = Array.from(pubPhotoInputView.files || []);
+  pubPhotoInputView.value = '';
+  if (!files.length || !currentPubViewId) return;
+  try {
+    for (const file of files) await uploadPhotoToPub(currentPubViewId, file);
+    showToast('Photo added');
+  } catch (err) {
+    showToast('Photo upload failed: ' + err.message);
+  }
+};
+
+// ---------- Pub add/edit form (owner or admin only) ----------
+const pubFormOverlay = document.getElementById('pubFormOverlay');
+const pubForm = document.getElementById('pubForm');
+const pubFormTitle = document.getElementById('pubFormTitle');
+const pubPhotoStrip = document.getElementById('pubPhotoStrip');
+const pubFormPhotoInput = document.getElementById('pubFormPhotoInput');
+const pubDeleteBtn = document.getElementById('pubDeleteBtn');
+let pubEditingId = null;
+let pubPendingPhotos = [];
+let pubFormOpenedFromId = null;
+
+function renderPubPhotoStrip(pub){
+  pubPhotoStrip.innerHTML = '';
+  const photos = (pub && pub.photos) || [];
+  photos.forEach((p, i) => {
+    const div = document.createElement('div');
+    div.className = 'thumb';
+    div.innerHTML = `<img src="${escapeHtml(p.url)}"><button class="rm" title="Remove">✕</button>`;
+    div.querySelector('img').onclick = () => openLightbox(photos, i);
+    div.querySelector('.rm').onclick = () => removePubPhoto(pub.id, p);
+    pubPhotoStrip.appendChild(div);
+  });
+  pubPendingPhotos.forEach((pp, i) => {
+    const div = document.createElement('div');
+    div.className = 'thumb';
+    div.innerHTML = `<img src="${pp.url}"><button class="rm" title="Remove">✕</button>`;
+    div.querySelector('.rm').onclick = () => { pubPendingPhotos.splice(i, 1); renderPubPhotoStrip(pub); };
+    pubPhotoStrip.appendChild(div);
+  });
+  const addTile = document.createElement('button');
+  addTile.type = 'button';
+  addTile.className = 'addThumb';
+  addTile.textContent = '+';
+  addTile.onclick = () => pubFormPhotoInput.click();
+  pubPhotoStrip.appendChild(addTile);
+}
+
+pubFormPhotoInput.onchange = async () => {
+  const files = Array.from(pubFormPhotoInput.files || []);
+  pubFormPhotoInput.value = '';
+  if (!files.length) return;
+  if (pubEditingId){
+    try {
+      for (const file of files) await uploadPhotoToPub(pubEditingId, file);
+      const fresh = allPubs.find(p => p.id === pubEditingId);
+      renderPubPhotoStrip(fresh);
+    } catch (err) {
+      showToast('Photo upload failed: ' + err.message);
+    }
+  } else {
+    files.forEach(file => pubPendingPhotos.push({ file, url: URL.createObjectURL(file) }));
+    renderPubPhotoStrip(null);
+  }
+};
+
+function openPubForm(pub){
+  pubFormOpenedFromId = pub ? pub.id : null;
+  pushOverlayState();
+  pubEditingId = pub ? pub.id : null;
+  pubPendingPhotos = [];
+  pubFormTitle.textContent = pub ? 'Edit Pub' : 'Add Pub';
+  document.getElementById('pubSaveBtn').textContent = pub ? 'Save' : 'Add Pub';
+  pubDeleteBtn.style.display = pub ? 'block' : 'none';
+  document.getElementById('pubfName').value = pub?.name || '';
+  document.getElementById('pubfCity').value = pub?.city || '';
+  renderPubPhotoStrip(pub);
+  pubFormOverlay.classList.add('show');
+}
+function hidePubForm(){
+  pubFormOverlay.classList.remove('show');
+  pubPendingPhotos = [];
+  pubEditingId = null;
+}
+function closePubForm(){ history.back(); }
+document.getElementById('pubFormClose').onclick = closePubForm;
+document.getElementById('pubCancelBtn').onclick = closePubForm;
+pubFormOverlay.addEventListener('click', (e) => { if (e.target === pubFormOverlay) closePubForm(); });
+
+pubForm.onsubmit = async (e) => {
+  e.preventDefault();
+  const saveBtn = document.getElementById('pubSaveBtn');
+  saveBtn.disabled = true;
+  const name = document.getElementById('pubfName').value.trim();
+  const city = document.getElementById('pubfCity').value.trim();
+  try {
+    if (pubEditingId){
+      await pubsCol.doc(pubEditingId).update({ name, city });
+      showToast('Pub updated');
+    } else {
+      const ref = await pubsCol.add({ name, city, photos: [], createdBy: myUid, ts: Date.now() });
+      for (const pp of pubPendingPhotos) await uploadPhotoToPub(ref.id, pp.file);
+      showToast('Pub added');
+    }
+    closePubForm();
+  } catch (err) {
+    showToast('Save failed: ' + err.message);
+  } finally {
+    saveBtn.disabled = false;
+  }
+};
+
+function confirmDeletePub(pub){
+  askConfirm(`Delete "${pub.name || 'this pub'}"? This removes its photos, ratings and comments.`, async () => {
+    for (const p of (pub.photos || [])){
+      try { await storage.ref(p.path).delete(); } catch (e) {}
+    }
+    const ratingsSnap = await pubsCol.doc(pub.id).collection('ratings').get();
+    for (const doc of ratingsSnap.docs){ try { await doc.ref.delete(); } catch (e) {} }
+    const commentsSnap = await pubsCol.doc(pub.id).collection('comments').get();
+    for (const doc of commentsSnap.docs){ try { await doc.ref.delete(); } catch (e) {} }
+    await pubsCol.doc(pub.id).delete();
+    showToast('Pub deleted');
+  });
+}
+pubDeleteBtn.onclick = () => {
+  const pub = allPubs.find(p => p.id === pubEditingId);
+  if (!pub) return;
+  confirmDeletePub(pub);
 };
 
 // ---------- Leaderboard ----------
@@ -1361,7 +1801,7 @@ function renderLeaderboard(){
   } else {
     listEl.innerHTML = standings.map((s, i) => {
       const canControl = s.id === myUid || isAdmin();
-      return `<div class="leaderboardRow">
+      return `<div class="leaderboardRow${i < 3 ? ' rank-' + (i + 1) : ''}">
         <div class="leaderboardRank">${RANK_MEDALS[i] || (i + 1)}</div>
         <div class="userAvatar">${avatarInner(s.name, s.photoURL)}</div>
         <div class="leaderboardInfo">
@@ -1437,7 +1877,7 @@ function openArchiveView(archive){
   pushOverlayState();
   document.getElementById('archiveViewTitle').textContent = `${archive.year} Final Standings`;
   const listEl = document.getElementById('archiveViewList');
-  listEl.innerHTML = archive.standings.map((s, i) => `<div class="leaderboardRow">
+  listEl.innerHTML = archive.standings.map((s, i) => `<div class="leaderboardRow${i < 3 ? ' rank-' + (i + 1) : ''}">
     <div class="leaderboardRank">${RANK_MEDALS[i] || (i + 1)}</div>
     <div class="userAvatar">${avatarInner(s.name, s.photoURL)}</div>
     <div class="leaderboardInfo">
@@ -1648,13 +2088,22 @@ function getTierForTotal(total){
   return current;
 }
 
+function statsBreakdownText(stats){
+  return `${stats.beersUploaded} beers · ${stats.partiesAdded} parties · ${stats.pubsAdded} pubs · ${stats.partiesJoined} joined · ${stats.ratingsGiven} ratings · ${stats.reviewsWritten} reviews`;
+}
+
 function getUserStats(userId){
   const beersUploaded = allBeers.filter(b => b.createdBy === userId).length;
+  const partiesAdded = allParties.filter(p => p.createdBy === userId).length;
+  const pubsAdded = allPubs.filter(p => p.createdBy === userId).length;
+  const partiesJoined = Object.values(allPartyParticipants).filter(participants => participants.some(p => p.id === userId)).length;
   const mine = allRatings.filter(r => r.userId === userId);
   const ratingsGiven = mine.filter(r => typeof r.rating === 'number').length;
-  const reviewsWritten = mine.filter(r => (r.comment || '').trim().length > 0).length;
-  const total = beersUploaded + ratingsGiven + reviewsWritten;
-  return { beersUploaded, ratingsGiven, reviewsWritten, total, tier: getTierForTotal(total) };
+  const beerReviewsWritten = mine.filter(r => (r.comment || '').trim().length > 0).length;
+  const pubCommentsWritten = allComments.filter(c => c.userId === userId).length;
+  const reviewsWritten = beerReviewsWritten + pubCommentsWritten;
+  const total = beersUploaded + partiesAdded + pubsAdded + partiesJoined + ratingsGiven + reviewsWritten;
+  return { beersUploaded, partiesAdded, pubsAdded, partiesJoined, ratingsGiven, reviewsWritten, total, tier: getTierForTotal(total) };
 }
 
 function getMyUid(){
@@ -1670,6 +2119,7 @@ const ADMIN_UID = 'd1f2adc9-8d6e-4656-930b-b47e71a2cbf9'; // Óki — can edit/d
 function isAdmin(){ return myUid === ADMIN_UID; }
 let allUsers = [];
 let allRatings = [];
+let allComments = [];
 
 const profileViewOverlay = document.getElementById('profileViewOverlay');
 const profileViewAvatar = document.getElementById('profileViewAvatar');
@@ -1699,6 +2149,7 @@ function renderHeaderAvatar(){
 }
 
 function renderUserList(){
+  document.getElementById('userListHead').textContent = `All Drinkers (${allUsers.length})`;
   if (!allUsers.length){
     userListEl.innerHTML = '<div class="empty" style="padding:16px 0">No drinkers yet 🍺</div>';
     return;
@@ -1710,7 +2161,7 @@ function renderUserList(){
       <div>
         <div class="userName">${escapeHtml(u.name || 'Anonymous')}${u.id === ADMIN_UID ? ' <span class="adminTag">Admin</span>' : ''}</div>
         <div class="userBadge">${stats.tier.emoji} ${escapeHtml(stats.tier.label)}</div>
-        <div class="userStats">${stats.beersUploaded} beers · ${stats.ratingsGiven} ratings · ${stats.reviewsWritten} reviews</div>
+        <div class="userStats">${statsBreakdownText(stats)}</div>
       </div>
     </div>`;
   }).join('');
@@ -1723,7 +2174,7 @@ function renderUserList(){
 function renderBadgeLadder(userId){
   const stats = getUserStats(userId);
   badgeLadderEl.innerHTML =
-    `<div class="badgeSummary">Your total: ${stats.total} (${stats.beersUploaded} beers · ${stats.ratingsGiven} ratings · ${stats.reviewsWritten} reviews)</div>` +
+    `<div class="badgeSummary">Your total: ${stats.total} (${statsBreakdownText(stats)})</div>` +
     TIERS.map(t => `<div class="badgeTier ${t.label === stats.tier.label ? 'current' : ''}">
       <span class="badgeTierName">${t.emoji} ${escapeHtml(t.label)}</span>
       <span class="badgeTierReq">${t.min}+</span>
@@ -1735,7 +2186,7 @@ function renderProfileView(userId, u){
   profileViewAvatar.innerHTML = avatarInner(u?.name, u?.photoURL);
   profileViewName.textContent = u?.name || 'Anonymous';
   profileViewBadge.textContent = `${stats.tier.emoji} ${stats.tier.label}`;
-  profileViewStats.textContent = `${stats.beersUploaded} beers · ${stats.ratingsGiven} ratings · ${stats.reviewsWritten} reviews`;
+  profileViewStats.textContent = statsBreakdownText(stats);
 }
 
 function refreshProfileDisplays(){
@@ -1760,6 +2211,11 @@ usersCol.onSnapshot(snap => {
 
 db.collectionGroup('ratings').onSnapshot(snap => {
   allRatings = snap.docs.map(d => ({ id: d.id, beerId: d.ref.parent.parent.id, ...d.data() }));
+  refreshProfileDisplays();
+}, err => showToast('Sync error: ' + err.message));
+
+db.collectionGroup('comments').onSnapshot(snap => {
+  allComments = snap.docs.map(d => ({ id: d.id, ...d.data() }));
   refreshProfileDisplays();
 }, err => showToast('Sync error: ' + err.message));
 
@@ -1864,6 +2320,14 @@ window.addEventListener('popstate', () => {
     }
     return;
   }
+  if (pubFormOverlay.classList.contains('show')){
+    hidePubForm();
+    if (pubFormOpenedFromId){
+      const pub = allPubs.find(p => p.id === pubFormOpenedFromId);
+      if (pub) showPubView(pub);
+    }
+    return;
+  }
   if (profileEditOverlay.classList.contains('show')){
     hideProfileEdit();
     showProfileView(myUid);
@@ -1875,6 +2339,10 @@ window.addEventListener('popstate', () => {
   }
   if (partyViewOverlay.classList.contains('show')){
     hidePartyView();
+    return;
+  }
+  if (pubViewOverlay.classList.contains('show')){
+    hidePubView();
     return;
   }
   if (archiveViewOverlay.classList.contains('show')){

@@ -31,6 +31,23 @@ service cloud.firestore {
       }
     }
 
+    match /pubs/{pubId} {
+      allow read: if true;
+      allow create: if request.resource.data.name is string
+                    && request.resource.data.name.size() > 0
+                    && request.resource.data.name.size() < 200;
+      allow update, delete: if true;
+
+      match /ratings/{userId} {
+        allow read: if true;
+        allow write: if true;
+      }
+      match /comments/{commentId} {
+        allow read: if true;
+        allow write: if true;
+      }
+    }
+
     match /drinkLogs/{logId} {
       allow read: if true;
       allow write: if true;
@@ -54,6 +71,9 @@ service cloud.firestore {
       allow read: if true;
     }
     match /{path=**}/participants/{userId} {
+      allow read: if true;
+    }
+    match /{path=**}/comments/{commentId} {
       allow read: if true;
     }
   }
