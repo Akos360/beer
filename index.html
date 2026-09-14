@@ -160,14 +160,34 @@
       flex-wrap: wrap
     }
 
-    #searchInput,
-    #pubSearchInput {
-      flex: 1 1 140px;
+    #searchInput {
+      flex: 0 1 220px;
       min-width: 0
+    }
+
+    #pubSearchInput {
+      flex: 0 1 220px;
+      min-width: 0
+    }
+
+    .countBadge {
+      flex: 0 0 auto;
+      display: flex;
+      align-items: center;
+      padding: 0 14px;
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      background: var(--bg-elev);
+      color: var(--text-dim);
+      font-weight: 700;
+      font-size: .92rem;
+      white-space: nowrap
     }
 
     #sortSelect,
     #typeSelect,
+    #spiritSortSelect,
+    #spiritTypeSelect,
     #pubSortSelect,
     #pubCityFilter {
       flex: 1;
@@ -189,7 +209,8 @@
       cursor: pointer
     }
 
-    #beerList {
+    #beerList,
+    #spiritList {
       padding: 14px;
       display: grid;
       grid-template-columns: repeat(auto-fill, minmax(158px, 1fr));
@@ -229,6 +250,7 @@
     }
 
     #beerToolbarRows,
+    #spiritToolbarRows,
     #pubToolbarRows {
       display: flex;
       flex-direction: column;
@@ -242,6 +264,10 @@
       display: flex;
       flex-direction: column;
       gap: 10px
+    }
+
+    #partyListHead {
+      padding: 14px 14px 0
     }
 
     .partyRow {
@@ -300,12 +326,61 @@
       white-space: nowrap
     }
 
+    .pubTagBadge {
+      flex: 0 0 auto;
+      padding: 4px 11px;
+      border: 1.5px solid var(--tag-color, var(--border));
+      border-radius: 999px;
+      font-size: .72rem;
+      font-weight: 700;
+      color: var(--tag-color, var(--text-dim));
+      background: transparent;
+      white-space: nowrap
+    }
+
+    .pubTagPicker {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px
+    }
+
+    .pubTagChip {
+      padding: 7px 14px;
+      border-radius: 999px;
+      border: 1.5px solid var(--tag-color, var(--border));
+      background: transparent;
+      color: var(--tag-color, var(--text-dim));
+      font-size: .85rem;
+      font-weight: 700;
+      font-family: inherit;
+      cursor: pointer;
+      transition: background .15s, color .15s;
+      -webkit-tap-highlight-color: transparent
+    }
+
+    .pubTagChip.active {
+      background: var(--tag-color, var(--border));
+      color: #1c1410
+    }
+
     .tagStack {
       flex: 0 0 auto;
       display: flex;
       flex-direction: column;
       gap: 4px;
       align-items: flex-end
+    }
+
+    .pubRow {
+      align-items: flex-start;
+      min-height: 96px
+    }
+
+    .pubTagRow {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+      margin-top: 6px
     }
 
     .partyParticipantRow {
@@ -364,6 +439,22 @@
       transform: scale(0.92)
     }
 
+    .partyCounters,
+    .leaderboardCounters {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+      align-items: flex-end;
+      flex: 0 0 auto
+    }
+
+    .partyCounterLine,
+    .leaderboardCounterLine {
+      display: flex;
+      align-items: center;
+      gap: 8px
+    }
+
     .partyJoinBtn {
       flex: 0 0 auto;
       padding: 6px 14px;
@@ -380,7 +471,27 @@
     .leaderboardYearHead {
       font-size: 1.1rem;
       font-weight: 800;
-      padding: 14px 14px 4px
+      padding: 14px 14px 4px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px
+    }
+
+    .leaderboardYearTotals {
+      display: flex;
+      gap: 6px;
+      font-size: .75rem;
+      font-weight: 700
+    }
+
+    .leaderboardYearTotals span {
+      padding: 3px 9px;
+      border-radius: 999px;
+      border: 1px solid var(--border);
+      background: var(--bg-elev);
+      color: var(--text-dim);
+      white-space: nowrap
     }
 
     #leaderboardList {
@@ -922,6 +1033,7 @@
 
     .viewBadges {
       display: flex;
+      flex-wrap: wrap;
       gap: 8px
     }
 
@@ -1756,40 +1868,93 @@
       }
     }
 
-    /* The crown sits ON TOP of the avatar as a separate floating badge, rather
-       than reshaping/clipping the avatar itself — the wrapper has no
+    /* Hats sit ON TOP of the avatar as a separate floating badge, rather than
+       reshaping/clipping the avatar itself — the wrapper has no
        overflow:hidden of its own, so the badge (a sibling of the avatar, not a
        descendant) can escape upward past the wrapper's top edge freely, while
        the avatar circle underneath stays a normal, uncut circle. */
-    .avatarCrownWrap {
+    .avatarHatWrap {
       position: relative;
       display: inline-flex;
       flex: 0 0 auto
     }
 
-    .avatarCrownBadge {
+    .avatarHatBadge {
       position: absolute;
-      top: -38%;
+      top: -4%;
       left: 50%;
       transform: translateX(-50%) rotate(-4deg);
       width: 72%;
-      height: 46%;
-      background: #ffd23f;
-      clip-path: polygon(0% 40%, 12.5% 0%, 25% 40%, 37.5% 0%, 50% 40%, 62.5% 0%, 75% 40%, 87.5% 0%, 100% 40%, 100% 100%, 0% 100%);
+      height: 42%;
       filter: drop-shadow(0 2px 3px rgba(0, 0, 0, .5));
       pointer-events: none;
       z-index: 2
     }
 
-    /* Shop/inventory swatches show the crown badge alone, centered and larger,
+    /* Shop/inventory swatches show the hat badge alone, centered and larger,
        since there's no real avatar photo to sit on top of there. */
-    .shopPreview .avatarCrownBadge,
-    .invItem .avatarCrownBadge {
+    .shopPreview .avatarHatBadge,
+    .invItem .avatarHatBadge {
       position: static;
       transform: none;
       width: 70%;
       height: 70%;
       margin: 15% auto
+    }
+
+    .hat-hat_crown {
+      background: #ffd23f;
+      clip-path: polygon(0% 40%, 12.5% 0%, 25% 40%, 37.5% 0%, 50% 40%, 62.5% 0%, 75% 40%, 87.5% 0%, 100% 40%, 100% 100%, 0% 100%)
+    }
+
+    .hat-hat_clown {
+      transform: translateX(-50%) rotate(0deg);
+      background:
+        radial-gradient(circle at 50% 6%, #fff 0 9%, transparent 10%),
+        repeating-linear-gradient(90deg, #ff4d6d 0 20%, #4dd0e1 20% 40%, #ffd23f 40% 60%, #7ee787 60% 80%, #a78bfa 80% 100%);
+      clip-path: polygon(50% 0%, 88% 100%, 12% 100%)
+    }
+
+    .hat-hat_tophat {
+      height: 40%;
+      background:
+        linear-gradient(#c0392b, #c0392b) 0 62%/100% 14% no-repeat,
+        #1c1410;
+      clip-path: polygon(28% 0%, 72% 0%, 72% 62%, 100% 62%, 100% 82%, 0% 82%, 0% 62%, 28% 62%)
+    }
+
+    .hat-hat_wizard {
+      height: 46%;
+      background:
+        radial-gradient(circle at 50% 4%, #ffe66d 0 6%, transparent 7%),
+        linear-gradient(200deg, #6b2fb3, #3d1a6b);
+      clip-path: polygon(50% 0%, 78% 78%, 100% 100%, 0% 100%, 22% 78%)
+    }
+
+    .hat-hat_viking {
+      background: linear-gradient(180deg, #d8dde2, #9aa4ad);
+      clip-path: polygon(18% 100%, 12% 45%, 32% 12%, 68% 12%, 88% 45%, 82% 100%)
+    }
+
+    .hat-hat_viking::before,
+    .hat-hat_viking::after {
+      content: '';
+      position: absolute;
+      top: 28%;
+      width: 30%;
+      height: 22%;
+      background: linear-gradient(160deg, #f3e6c8, #cbb27a);
+      border-radius: 50% 50% 50% 0
+    }
+
+    .hat-hat_viking::before {
+      left: -14%;
+      transform: rotate(-40deg)
+    }
+
+    .hat-hat_viking::after {
+      right: -14%;
+      transform: rotate(130deg)
     }
 
     /* ---------- Shop: skins (backgrounds) ---------- */
@@ -1885,6 +2050,7 @@
     }
 
     .shopPreview {
+      position: relative;
       width: 52px;
       height: 52px;
       flex: 0 0 auto
@@ -2228,14 +2394,19 @@
 
   <div id="toolbar">
     <div class="tabSwitch" id="tabSwitch">
-      <button type="button" class="tabBtn active" data-tab="beers">🍺 Beers</button>
+      <button type="button" class="tabBtn active" data-tab="beers">📝 Reviews</button>
       <button type="button" class="tabBtn" data-tab="parties">🍻 Parties</button>
       <button type="button" class="tabBtn" data-tab="pubs">🍸 Pubs</button>
       <button type="button" class="tabBtn" data-tab="leaderboard">🏆 Rank</button>
     </div>
+    <div class="tabSwitch" id="reviewsSubTabSwitch">
+      <button type="button" class="tabBtn active" data-subtab="beer">🍺 Beers</button>
+      <button type="button" class="tabBtn" data-subtab="spirit">🥃 Spirits</button>
+    </div>
     <div id="beerToolbarRows">
       <div class="row">
         <input id="searchInput" type="search" placeholder="Search name, brewery, country, notes…">
+        <span class="countBadge" id="beerCountBadge">0</span>
       </div>
       <div class="row">
         <select id="sortSelect">
@@ -2250,9 +2421,28 @@
         </select>
       </div>
     </div>
+    <div id="spiritToolbarRows" style="display:none">
+      <div class="row">
+        <input id="spiritSearchInput" type="search" placeholder="Search name, brand, country…">
+        <span class="countBadge" id="spiritCountBadge">0</span>
+      </div>
+      <div class="row">
+        <select id="spiritSortSelect">
+          <option value="newest">New -> Old</option>
+          <option value="oldest">Old -> New</option>
+          <option value="name">Name A–Z</option>
+          <option value="rating-desc">Rating high→low</option>
+          <option value="rating-asc">Rating low→high</option>
+        </select>
+        <select id="spiritTypeSelect">
+          <option value="">All types</option>
+        </select>
+      </div>
+    </div>
     <div id="pubToolbarRows" style="display:none">
       <div class="row">
         <input id="pubSearchInput" type="search" placeholder="Search name, city…">
+        <span class="countBadge" id="pubCountBadge">0</span>
       </div>
       <div class="row">
         <select id="pubSortSelect">
@@ -2265,15 +2455,31 @@
         <select id="pubCityFilter">
           <option value="">All cities</option>
         </select>
+        <select id="pubTagFilter">
+          <option value="">All activities</option>
+          <option value="csocso">⚽ Csocsó</option>
+          <option value="billiard">🎱 Billiárd</option>
+          <option value="darts">🎯 Darts</option>
+          <option value="bowling">🎳 Bowling</option>
+          <option value="boxgep">🥊 Box-gép</option>
+          <option value="automat">🎰 Automat</option>
+        </select>
       </div>
     </div>
   </div>
 
   <div id="beerList"></div>
+  <div id="spiritList" style="display:none"></div>
+  <div class="userListHead" id="partyListHead" style="display:none">Parties</div>
   <div id="partyList" style="display:none"></div>
   <div id="pubList" style="display:none"></div>
   <div id="leaderboardPage" style="display:none">
     <div class="leaderboardYearHead" id="leaderboardYearHead"></div>
+    <div class="tabSwitch" id="lbSubTabSwitch" style="grid-template-columns:1fr 1fr 1fr;margin:0 14px 10px">
+      <button type="button" class="tabBtn active" data-lbtab="beer">🍺 Beer</button>
+      <button type="button" class="tabBtn" data-lbtab="shot">🥃 Shots</button>
+      <button type="button" class="tabBtn" data-lbtab="all">🍻 All</button>
+    </div>
     <div id="leaderboardList"></div>
     <div class="userListHead" style="margin:20px 14px 8px">Past Years</div>
     <div id="archivesList" style="padding:0 14px 90px"></div>
@@ -2327,6 +2533,8 @@
       </div>
       <div class="userListHead">Borders</div>
       <div class="shopGrid" id="shopBorderGrid"></div>
+      <div class="userListHead" style="margin-top:22px">Hats</div>
+      <div class="shopGrid" id="shopHatGrid"></div>
       <div class="userListHead" style="margin-top:22px">Skins</div>
       <div class="shopGrid" id="shopSkinGrid"></div>
       <div class="userListHead" style="margin-top:22px">Chips</div>
@@ -2458,6 +2666,97 @@
     </div>
   </div>
 
+  <div class="overlay" id="spiritViewOverlay">
+    <div class="sheet">
+      <div class="sheetHead">
+        <h2>Spirit</h2>
+        <button class="closeX" id="spiritViewClose">✕</button>
+      </div>
+      <div class="viewCarousel" id="spiritViewCarousel"></div>
+      <div class="field" style="margin-top:-4px;margin-bottom:14px">
+        <button type="button" class="btn ghost" id="spiritViewAddPhotoBtn" style="padding:8px 14px">+ Add photo</button>
+        <input type="file" id="spiritViewPhotoInput" accept="image/*" multiple style="display:none">
+      </div>
+      <div class="viewStats" id="spiritViewStats"></div>
+      <div class="field">
+        <label>Your rating</label>
+        <div class="ratingButtons" id="spiritViewRatingButtons"></div>
+      </div>
+      <div class="field" style="margin-top:14px">
+        <label>Your review</label>
+        <textarea id="spiritViewReviewInput" placeholder="What did you think?"></textarea>
+        <button type="button" class="btn primary" id="spiritViewReviewPostBtn" style="margin-top:8px">Post review</button>
+      </div>
+      <div class="field" style="margin-top:14px">
+        <label>Reviews</label>
+        <div class="viewReviews" id="spiritViewReviews"></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="overlay" id="spiritFormOverlay">
+    <div class="sheet">
+      <div class="sheetHead">
+        <h2 id="spiritFormTitle">Add Spirit</h2>
+        <button class="closeX" id="spiritFormClose">✕</button>
+      </div>
+      <div id="spiritPhotoStrip"></div>
+      <input type="file" id="spiritPhotoInput" accept="image/*" multiple style="display:none">
+      <form id="spiritForm">
+        <div class="field">
+          <label>Name</label>
+          <input id="sfName" required placeholder="e.g. Jameson">
+          <span class="hint" id="sfNameDupeHint" style="display:none"></span>
+        </div>
+        <div class="field">
+          <label>Distillery</label>
+          <input id="sfBrand" placeholder="e.g. Jameson Irish Whiskey">
+        </div>
+        <div class="flagCountry">
+          <div class="field">
+            <label>Flag</label>
+            <input id="sfFlag" maxlength="8" placeholder="🏳️">
+          </div>
+          <div class="field">
+            <label>Country</label>
+            <input id="sfCountry" placeholder="e.g. Ireland">
+          </div>
+        </div>
+        <div class="field">
+          <label>Type</label>
+          <input id="sfType" list="spiritTypeList" placeholder="e.g. Whiskey">
+          <datalist id="spiritTypeList"></datalist>
+        </div>
+        <div class="twoCol">
+          <div class="field">
+            <label>ALC %</label>
+            <input id="sfAbv" type="number" step="0.1" min="0" max="100" placeholder="40.0">
+          </div>
+          <div class="field">
+            <label>Price</label>
+            <div class="priceField">
+              <span class="euro">€</span>
+              <input id="sfPrice" type="number" step="0.1" min="0" placeholder="0.00">
+            </div>
+          </div>
+        </div>
+        <div class="field">
+          <label>Your rating</label>
+          <div class="ratingButtons" id="spiritRatingButtons"></div>
+        </div>
+        <div class="field">
+          <label>Comment</label>
+          <textarea id="sfComment" placeholder="Tasting notes…"></textarea>
+        </div>
+        <div class="formActions">
+          <button type="button" class="btn danger" id="spiritDeleteBtn" style="display:none">Delete</button>
+          <button type="button" class="btn ghost" id="spiritCancelBtn">Cancel</button>
+          <button type="submit" class="btn primary" id="spiritSaveBtn">Add Spirit</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
   <div class="overlay" id="partyViewOverlay">
     <div class="sheet">
       <div class="sheetHead">
@@ -2564,6 +2863,10 @@
           <label>City</label>
           <input id="pubfCity" placeholder="e.g. Bratislava">
         </div>
+        <div class="field">
+          <label>Activities</label>
+          <div class="pubTagPicker" id="pubfTagPicker"></div>
+        </div>
         <div class="formActions">
           <button type="button" class="btn danger" id="pubDeleteBtn" style="display:none">Delete</button>
           <button type="button" class="btn ghost" id="pubCancelBtn">Cancel</button>
@@ -2591,7 +2894,7 @@
         <button class="closeX" id="profileViewClose">✕</button>
       </div>
       <div class="profileViewSection" id="profileViewSectionEl">
-        <span class="avatarCrownWrap" id="profileViewAvatarWrap">
+        <span class="avatarHatWrap" id="profileViewAvatarWrap">
           <div id="profileViewAvatar" class="bigAvatarBtn" style="cursor:default"></div>
         </span>
         <div class="profileViewInfo">
@@ -2885,6 +3188,7 @@
 
     function render() {
       const list = filteredSorted();
+      document.getElementById('beerCountBadge').textContent = list.length;
       if (!list.length) {
         beerList.innerHTML = '<div class="empty">No beers yet 🍺<br>Tap + to add the first one.</div>';
         return;
@@ -3214,24 +3518,36 @@
     const beerToolbarRows = document.getElementById('beerToolbarRows');
     const partyListEl = document.getElementById('partyList');
 
-    function setActiveTab(tab) {
-      activeTab = tab;
-      tabSwitch.querySelectorAll('.tabBtn').forEach(b => b.classList.toggle('active', b.dataset.tab === tab));
-      const isBeers = tab === 'beers';
-      const isParties = tab === 'parties';
-      const isPubs = tab === 'pubs';
-      const isLeaderboard = tab === 'leaderboard';
-      beerToolbarRows.style.display = isBeers ? 'flex' : 'none';
+    function applyTabVisibility() {
+      const isBeersTab = activeTab === 'beers';
+      const isParties = activeTab === 'parties';
+      const isPubs = activeTab === 'pubs';
+      const isLeaderboard = activeTab === 'leaderboard';
+      const showBeerSub = isBeersTab && activeReviewsSubTab === 'beer';
+      const showSpiritSub = isBeersTab && activeReviewsSubTab === 'spirit';
+
+      document.getElementById('reviewsSubTabSwitch').style.display = isBeersTab ? 'grid' : 'none';
+      beerToolbarRows.style.display = showBeerSub ? 'flex' : 'none';
+      document.getElementById('spiritToolbarRows').style.display = showSpiritSub ? 'flex' : 'none';
       document.getElementById('pubToolbarRows').style.display = isPubs ? 'flex' : 'none';
-      beerList.style.display = isBeers ? 'grid' : 'none';
+
+      beerList.style.display = showBeerSub ? 'grid' : 'none';
+      document.getElementById('spiritList').style.display = showSpiritSub ? 'grid' : 'none';
+      document.getElementById('partyListHead').style.display = isParties ? 'block' : 'none';
       partyListEl.style.display = isParties ? 'flex' : 'none';
       document.getElementById('pubList').style.display = isPubs ? 'flex' : 'none';
       document.getElementById('leaderboardPage').style.display = isLeaderboard ? 'block' : 'none';
+
       document.getElementById('fab').style.display = isLeaderboard ? 'none' : 'flex';
-      document.getElementById('fab').title = isParties ? 'Add party' : isPubs ? 'Add pub' : 'Add beer';
-      if (isParties) renderPartyList();
-      if (isPubs) renderPubList();
-      if (isLeaderboard) renderLeaderboard();
+      document.getElementById('fab').title = isParties ? 'Add party' : isPubs ? 'Add pub' : showSpiritSub ? 'Add spirit' : 'Add beer';
+    }
+    function setActiveTab(tab) {
+      activeTab = tab;
+      tabSwitch.querySelectorAll('.tabBtn').forEach(b => b.classList.toggle('active', b.dataset.tab === tab));
+      applyTabVisibility();
+      if (activeTab === 'parties') renderPartyList();
+      if (activeTab === 'pubs') renderPubList();
+      if (activeTab === 'leaderboard') renderLeaderboard();
     }
     tabSwitch.querySelectorAll('.tabBtn').forEach(b => {
       b.onclick = () => setActiveTab(b.dataset.tab);
@@ -3239,16 +3555,19 @@
     document.getElementById('fab').onclick = () => {
       if (activeTab === 'parties') openPartyForm(null);
       else if (activeTab === 'pubs') openPubForm(null);
+      else if (activeTab === 'beers' && activeReviewsSubTab === 'spirit') openSpiritForm(null);
       else openForm(null);
     };
 
     function partyTotals(partyId) {
       const participants = allPartyParticipants[partyId] || [];
       const totalBeers = participants.reduce((s, p) => s + (p.count || 0), 0);
-      return { joined: participants.length, totalBeers };
+      const totalShots = participants.reduce((s, p) => s + (p.shotCount || 0), 0);
+      return { joined: participants.length, totalBeers, totalShots };
     }
 
     function renderPartyList() {
+      document.getElementById('partyListHead').textContent = `Parties (${allParties.length})`;
       if (!allParties.length) {
         partyListEl.innerHTML = '<div class="empty">No parties yet 🎉<br>Tap + to start one.</div>';
         return;
@@ -3261,7 +3580,7 @@
       <div class="partyThumb">${cover}</div>
       <div class="partyInfo">
         <div class="partyName">${escapeHtml(p.name || 'Unnamed party')}</div>
-        <div class="partyMeta">${totals.joined} joined · ${totals.totalBeers} 🍺</div>
+        <div class="partyMeta">${totals.joined} joined · ${totals.totalBeers} 🍺 · ${totals.totalShots} 🥃</div>
       </div>
       ${(p.date || p.year) ? `<div class="tagStack">
         ${p.date ? `<span class="cityTag">${escapeHtml(p.date)}</span>` : ''}
@@ -3324,9 +3643,18 @@
         rows.push(`<div class="partyParticipantRow">
       <div class="userAvatar">${avatarInner(u.name, u.photoURL)}</div>
       <div class="userName">${escapeHtml(u.name || 'Anonymous')}</div>
-      ${canIncrement && (p.count || 0) > 0 ? `<button type="button" class="partyMinusBtn" data-user="${u.id}">–</button>` : ''}
-      <div class="partyCount">${p.count || 0} 🍺</div>
-      ${canIncrement ? `<button type="button" class="partyPlusBtn" data-user="${u.id}">+</button>` : ''}
+      <div class="partyCounters">
+        <div class="partyCounterLine">
+          ${canIncrement && (p.count || 0) > 0 ? `<button type="button" class="partyMinusBtn" data-user="${u.id}" data-kind="beer">–</button>` : ''}
+          <div class="partyCount">${p.count || 0} 🍺</div>
+          ${canIncrement ? `<button type="button" class="partyPlusBtn" data-user="${u.id}" data-kind="beer">+</button>` : ''}
+        </div>
+        <div class="partyCounterLine">
+          ${canIncrement && (p.shotCount || 0) > 0 ? `<button type="button" class="partyMinusBtn" data-user="${u.id}" data-kind="shot">–</button>` : ''}
+          <div class="partyCount">${p.shotCount || 0} 🥃</div>
+          ${canIncrement ? `<button type="button" class="partyPlusBtn" data-user="${u.id}" data-kind="shot">+</button>` : ''}
+        </div>
+      </div>
     </div>`);
       });
       notJoined.forEach(u => {
@@ -3347,24 +3675,28 @@
       partyParticipantsEl.querySelectorAll('.partyPlusBtn').forEach(btn => {
         btn.onclick = async () => {
           const userId = btn.dataset.user;
+          const isShot = btn.dataset.kind === 'shot';
+          const field = isShot ? 'shotCount' : 'count';
           try {
             await partiesCol.doc(party.id).collection('participants').doc(userId).set(
-              { count: firebase.firestore.FieldValue.increment(1) }, { merge: true }
+              { [field]: firebase.firestore.FieldValue.increment(1) }, { merge: true }
             );
           } catch (err) {
-            showToast('Could not add beer: ' + err.message);
+            showToast(`Could not add ${isShot ? 'shot' : 'beer'}: ` + err.message);
           }
         };
       });
       partyParticipantsEl.querySelectorAll('.partyMinusBtn').forEach(btn => {
         btn.onclick = async () => {
           const userId = btn.dataset.user;
+          const isShot = btn.dataset.kind === 'shot';
+          const field = isShot ? 'shotCount' : 'count';
           try {
             await partiesCol.doc(party.id).collection('participants').doc(userId).set(
-              { count: firebase.firestore.FieldValue.increment(-1) }, { merge: true }
+              { [field]: firebase.firestore.FieldValue.increment(-1) }, { merge: true }
             );
           } catch (err) {
-            showToast('Could not remove beer: ' + err.message);
+            showToast(`Could not remove ${isShot ? 'shot' : 'beer'}: ` + err.message);
           }
         };
       });
@@ -3396,7 +3728,8 @@
       const totals = partyTotals(party.id);
       document.getElementById('partyViewTotals').innerHTML =
         `<span style="background:var(--bg-elev);color:var(--text);border:1px solid var(--border)">${totals.joined} joined</span>` +
-        `<span style="background:var(--accent);color:#1c1410">${totals.totalBeers} 🍺 total</span>`;
+        `<span style="background:var(--accent);color:#1c1410">${totals.totalBeers} 🍺 total</span>` +
+        `<span style="background:var(--bg-elev);color:var(--text);border:1px solid var(--border)">${totals.totalShots} 🥃 total</span>`;
       const canEdit = party.createdBy === myUid || isAdmin();
       partyViewEditBtn.style.display = canEdit ? 'flex' : 'none';
       renderPartyParticipants(party);
@@ -3591,9 +3924,27 @@
     let allPubs = [];
     const pubListEl = document.getElementById('pubList');
 
+    const PUB_TAGS = [
+      { id: 'csocso', label: '⚽ Csocsó', color: '#ffd23f' },
+      { id: 'billiard', label: '🎱 Billiárd', color: '#7ee787' },
+      { id: 'darts', label: '🎯 Darts', color: '#ff5e5e' },
+      { id: 'bowling', label: '🎳 Bowling', color: '#5ec8ff' },
+      { id: 'boxgep', label: '🥊 Box-gép', color: '#a78bfa' },
+      { id: 'automat', label: '🎰 Automat', color: '#e2a53f' }
+    ];
+    function pubTagsOf(pub) { return pub?.tags || []; }
+    function pubTagDefs(pub) {
+      const tags = pubTagsOf(pub);
+      return PUB_TAGS.filter(t => tags.includes(t.id));
+    }
+    function pubTagBadgeHtml(pub) {
+      return pubTagDefs(pub).map(t => `<span class="pubTagBadge" style="--tag-color:${t.color}">${escapeHtml(t.label)}</span>`).join('');
+    }
+
     const pubSearchInput = document.getElementById('pubSearchInput');
     const pubSortSelect = document.getElementById('pubSortSelect');
     const pubCityFilter = document.getElementById('pubCityFilter');
+    const pubTagFilter = document.getElementById('pubTagFilter');
 
     function distinctPubCities() {
       const set = new Set();
@@ -3611,8 +3962,9 @@
     function filteredSortedPubs() {
       let list = allPubs.slice();
       const q = pubSearchInput.value.trim().toLowerCase();
-      if (q) list = list.filter(p => [p.name, p.city].some(v => (v || '').toLowerCase().includes(q)));
+      if (q) list = list.filter(p => [p.name, p.city, ...pubTagDefs(p).map(t => t.label)].some(v => (v || '').toLowerCase().includes(q)));
       if (pubCityFilter.value) list = list.filter(p => p.city === pubCityFilter.value);
+      if (pubTagFilter.value) list = list.filter(p => pubTagsOf(p).includes(pubTagFilter.value));
       switch (pubSortSelect.value) {
         case 'name': list.sort((a, b) => (a.name || '').localeCompare(b.name || '')); break;
         case 'rating-desc': list.sort((a, b) => (b.avgRating || 0) - (a.avgRating || 0)); break;
@@ -3625,17 +3977,20 @@
 
     function renderPubList() {
       const list = filteredSortedPubs();
+      document.getElementById('pubCountBadge').textContent = list.length;
       if (!list.length) {
         pubListEl.innerHTML = '<div class="empty">No pubs yet 🍸<br>Tap + to add one.</div>';
         return;
       }
       pubListEl.innerHTML = list.map(p => {
         const cover = (p.photos && p.photos[0]) ? `<img src="${escapeHtml(p.photos[0].url)}">` : '🍸';
-        return `<div class="partyRow" data-pub="${p.id}">
+        const activityTags = pubTagBadgeHtml(p);
+        return `<div class="partyRow pubRow" data-pub="${p.id}">
       <div class="partyThumb">${cover}</div>
       <div class="partyInfo">
         <div class="partyName">${escapeHtml(p.name || 'Unnamed pub')}</div>
         <div class="partyMeta">${p.avgRating != null ? p.avgRating.toFixed(1) : '–'}/10${p.ratingCount ? ` (${p.ratingCount})` : ''}</div>
+        ${activityTags ? `<div class="pubTagRow">${activityTags}</div>` : ''}
       </div>
       ${p.city ? `<span class="cityTag">${escapeHtml(p.city)}</span>` : ''}
     </div>`;
@@ -3650,6 +4005,7 @@
     pubSearchInput.oninput = renderPubList;
     pubSortSelect.onchange = renderPubList;
     pubCityFilter.onchange = renderPubList;
+    pubTagFilter.onchange = renderPubList;
 
     pubsCol.onSnapshot(snap => {
       allPubs = snap.docs.map(d => ({ id: d.id, ...d.data() }));
@@ -3734,7 +4090,7 @@
     }
 
     function renderPubViewBadges(pub) {
-      pubViewBadges.innerHTML = `<span style="background:${ratingColor(pub.avgRating || 0)};color:#1c1410">${pub.avgRating != null ? pub.avgRating.toFixed(1) : '–'}/10${pub.ratingCount ? ` (${pub.ratingCount})` : ''}</span>`;
+      pubViewBadges.innerHTML = `<span style="background:${ratingColor(pub.avgRating || 0)};color:#1c1410">${pub.avgRating != null ? pub.avgRating.toFixed(1) : '–'}/10${pub.ratingCount ? ` (${pub.ratingCount})` : ''}</span>${pubTagBadgeHtml(pub)}`;
     }
 
     function renderPubRatingButtons() {
@@ -3904,6 +4260,21 @@
       }
     };
 
+    let pubFormSelectedTags = [];
+    function renderPubTagPicker() {
+      const el = document.getElementById('pubfTagPicker');
+      el.innerHTML = PUB_TAGS.map(t => `<button type="button" class="pubTagChip${pubFormSelectedTags.includes(t.id) ? ' active' : ''}" data-id="${t.id}" style="--tag-color:${t.color}">${escapeHtml(t.label)}</button>`).join('');
+      el.querySelectorAll('.pubTagChip').forEach(btn => {
+        btn.onclick = () => {
+          const id = btn.dataset.id;
+          pubFormSelectedTags = pubFormSelectedTags.includes(id)
+            ? pubFormSelectedTags.filter(x => x !== id)
+            : [...pubFormSelectedTags, id];
+          renderPubTagPicker();
+        };
+      });
+    }
+
     function openPubForm(pub) {
       pubFormOpenedFromId = pub ? pub.id : null;
       pushOverlayState();
@@ -3914,6 +4285,8 @@
       pubDeleteBtn.style.display = pub ? 'block' : 'none';
       document.getElementById('pubfName').value = pub?.name || '';
       document.getElementById('pubfCity').value = pub?.city || '';
+      pubFormSelectedTags = pubTagsOf(pub).slice();
+      renderPubTagPicker();
       renderPubPhotoStrip(pub);
       pubFormOverlay.classList.add('show');
     }
@@ -3933,12 +4306,13 @@
       saveBtn.disabled = true;
       const name = document.getElementById('pubfName').value.trim();
       const city = document.getElementById('pubfCity').value.trim();
+      const tags = pubFormSelectedTags.slice();
       try {
         if (pubEditingId) {
-          await pubsCol.doc(pubEditingId).update({ name, city });
+          await pubsCol.doc(pubEditingId).update({ name, city, tags });
           showToast('Pub updated');
         } else {
-          const ref = await pubsCol.add({ name, city, photos: [], createdBy: myUid, ts: Date.now() });
+          const ref = await pubsCol.add({ name, city, tags, photos: [], createdBy: myUid, ts: Date.now() });
           for (const pp of pubPendingPhotos) await uploadPhotoToPub(ref.id, pp.file);
           showToast('Pub added');
         }
@@ -3972,7 +4346,10 @@
     // ---------- Leaderboard ----------
     const CURRENT_YEAR = new Date().getFullYear();
     const drinkLogsCol = db.collection('drinkLogs');
+    const shotLogsCol = db.collection('shotLogs');
     let currentYearLogs = [];
+    let currentYearShotLogs = [];
+    let activeLbSubTab = 'beer';
     const RANK_MEDALS = ['🥇', '🥈', '🥉'];
 
     function dateKeyFromTs(ts) {
@@ -3991,20 +4368,31 @@
       }, { merge: true });
     }
 
-    // Party beer counts are never copied into drinkLogs — they live only on each
-    // party's participant doc. The leaderboard total is party contributions (summed
-    // live from allPartyParticipants, for parties created in the target year) PLUS
-    // whatever's been logged directly on the leaderboard (manual, in drinkLogs).
-    // This keeps the two sources fully independent: the leaderboard's minus button
-    // only ever removes manual drinkLogs beers, never a party's counted beers.
-    function livePartyContributionsForYear(year) {
+    async function logShot(userId, delta, dateKey) {
+      const key = dateKey || todayKey();
+      await shotLogsCol.doc(`${userId}_${key}`).set({
+        userId,
+        date: key,
+        year: Number(key.slice(0, 4)),
+        count: firebase.firestore.FieldValue.increment(delta)
+      }, { merge: true });
+    }
+
+    // Party beer/shot counts are never copied into drinkLogs/shotLogs — they live
+    // only on each party's participant doc. The leaderboard total is party
+    // contributions (summed live from allPartyParticipants, for parties created in
+    // the target year) PLUS whatever's been logged directly on the leaderboard
+    // (manual, in drinkLogs/shotLogs). This keeps the two sources fully
+    // independent: the leaderboard's minus button only ever removes manual
+    // logged beers/shots, never a party's counted ones.
+    function livePartyContributionsForYear(year, field) {
       const map = {};
       allParties.forEach(party => {
         const dateKey = dateKeyFromTs(party.ts || Date.now());
         if (Number(dateKey.slice(0, 4)) !== year) return;
         const participants = allPartyParticipants[party.id] || [];
         participants.forEach(p => {
-          const count = p.count || 0;
+          const count = p[field] || 0;
           if (count <= 0) return;
           if (!map[p.id]) map[p.id] = { total: 0, dates: new Set() };
           map[p.id].total += count;
@@ -4033,61 +4421,103 @@
       return map;
     }
 
-    function computeStandings(manualLogs, usersList, partyMap) {
+    function computeStandings(manualLogs, manualShotLogs, usersList, partyMap, partyShotMap) {
       const byUser = {};
       manualLogs.forEach(log => {
-        if (!byUser[log.userId]) byUser[log.userId] = { manualTotal: 0, days: new Set() };
+        if (!byUser[log.userId]) byUser[log.userId] = { manualTotal: 0, manualShotTotal: 0, days: new Set() };
         byUser[log.userId].manualTotal += (log.count || 0);
         if ((log.count || 0) > 0) byUser[log.userId].days.add(log.date);
       });
-      const ids = new Set([...usersList.map(u => u.id), ...Object.keys(byUser), ...Object.keys(partyMap), myUid]);
+      manualShotLogs.forEach(log => {
+        if (!byUser[log.userId]) byUser[log.userId] = { manualTotal: 0, manualShotTotal: 0, days: new Set() };
+        byUser[log.userId].manualShotTotal += (log.count || 0);
+        if ((log.count || 0) > 0) byUser[log.userId].days.add(log.date);
+      });
+      const ids = new Set([...usersList.map(u => u.id), ...Object.keys(byUser), ...Object.keys(partyMap), ...Object.keys(partyShotMap), myUid]);
       const standings = [...ids].map(id => {
         const u = usersList.find(x => x.id === id);
-        const manual = byUser[id] || { manualTotal: 0, days: new Set() };
+        const manual = byUser[id] || { manualTotal: 0, manualShotTotal: 0, days: new Set() };
         const party = partyMap[id] || { total: 0, dates: new Set() };
+        const partyShots = partyShotMap[id] || { total: 0, dates: new Set() };
         return {
           id,
           name: u?.name || null,
           photoURL: u?.photoURL || null,
           totalBeers: manual.manualTotal + party.total,
-          totalDays: new Set([...manual.days, ...party.dates]).size,
-          manualTotal: manual.manualTotal
+          totalShots: manual.manualShotTotal + partyShots.total,
+          totalDays: new Set([...manual.days, ...party.dates, ...partyShots.dates]).size,
+          manualTotal: manual.manualTotal,
+          manualShotTotal: manual.manualShotTotal
         };
       });
-      standings.sort((a, b) => b.totalBeers - a.totalBeers || (a.name || '').localeCompare(b.name || ''));
       return standings;
     }
 
+    function setLbSubTab(tab) {
+      activeLbSubTab = tab;
+      document.querySelectorAll('#lbSubTabSwitch .tabBtn').forEach(b => b.classList.toggle('active', b.dataset.lbtab === tab));
+      renderLeaderboard();
+    }
+    document.querySelectorAll('#lbSubTabSwitch .tabBtn').forEach(b => {
+      b.onclick = () => setLbSubTab(b.dataset.lbtab);
+    });
+
     function renderLeaderboard() {
-      document.getElementById('leaderboardYearHead').textContent = `${CURRENT_YEAR} Leaderboard`;
-      const standings = computeStandings(currentYearLogs, allUsers, livePartyContributionsForYear(CURRENT_YEAR));
+      const mode = activeLbSubTab;
+      const standings = computeStandings(
+        currentYearLogs, currentYearShotLogs, allUsers,
+        livePartyContributionsForYear(CURRENT_YEAR, 'count'),
+        livePartyContributionsForYear(CURRENT_YEAR, 'shotCount')
+      );
+      const grandBeers = standings.reduce((s, x) => s + x.totalBeers, 0);
+      const grandShots = standings.reduce((s, x) => s + x.totalShots, 0);
+      document.getElementById('leaderboardYearHead').innerHTML =
+        `<span>${CURRENT_YEAR} Leaderboard</span>` +
+        `<span class="leaderboardYearTotals"><span>${grandBeers} 🍺</span><span>${grandShots} 🥃</span></span>`;
+      standings.sort((a, b) => {
+        const av = mode === 'shot' ? a.totalShots : mode === 'all' ? a.totalBeers + a.totalShots : a.totalBeers;
+        const bv = mode === 'shot' ? b.totalShots : mode === 'all' ? b.totalBeers + b.totalShots : b.totalBeers;
+        return bv - av || (a.name || '').localeCompare(b.name || '');
+      });
       const listEl = document.getElementById('leaderboardList');
       if (!standings.length) {
-        listEl.innerHTML = '<div class="empty">No beers logged yet this year</div>';
+        listEl.innerHTML = `<div class="empty">No ${mode === 'shot' ? 'shots' : mode === 'all' ? 'drinks' : 'beers'} logged yet this year</div>`;
       } else {
+        const showBeer = mode === 'beer' || mode === 'all';
+        const showShot = mode === 'shot' || mode === 'all';
         listEl.innerHTML = standings.map((s, i) => {
           const canControl = s.id === myUid || isAdmin();
           const u = allUsers.find(x => x.id === s.id);
+          const beerLine = showBeer ? `<div class="leaderboardCounterLine">
+          ${canControl && s.manualTotal > 0 ? `<button type="button" class="partyMinusBtn" data-user="${s.id}" data-kind="beer">–</button>` : ''}
+          <div class="leaderboardTotal">${s.totalBeers} 🍺</div>
+          ${canControl ? `<button type="button" class="partyPlusBtn" data-user="${s.id}" data-kind="beer">+</button>` : ''}
+        </div>` : '';
+          const shotLine = showShot ? `<div class="leaderboardCounterLine">
+          ${canControl && s.manualShotTotal > 0 ? `<button type="button" class="partyMinusBtn" data-user="${s.id}" data-kind="shot">–</button>` : ''}
+          <div class="leaderboardTotal">${s.totalShots} 🥃</div>
+          ${canControl ? `<button type="button" class="partyPlusBtn" data-user="${s.id}" data-kind="shot">+</button>` : ''}
+        </div>` : '';
           return `<div class="leaderboardRow${i < 3 ? ' rank-' + (i + 1) : ''}${skinBgClass(u)}">
         <div class="leaderboardRank">${RANK_MEDALS[i] || (i + 1)}</div>
-        ${wrapAvatarWithCrown(u, `<div class="userAvatar lbProfileLink${avatarBorderClass(u)}" data-user="${s.id}">${avatarInner(s.name, s.photoURL)}</div>`)}
+        ${wrapAvatarWithHat(u, `<div class="userAvatar lbProfileLink${avatarBorderClass(u)}" data-user="${s.id}">${avatarInner(s.name, s.photoURL)}</div>`)}
         <div class="leaderboardInfo">
           <div class="leaderboardName lbProfileLink" data-user="${s.id}">${escapeHtml(s.name || 'Anonymous')}</div>
           <div class="leaderboardMeta">${s.totalDays} day${s.totalDays === 1 ? '' : 's'}</div>
         </div>
-        ${canControl && s.manualTotal > 0 ? `<button type="button" class="partyMinusBtn" data-user="${s.id}">–</button>` : ''}
-        <div class="leaderboardTotal">${s.totalBeers} 🍺</div>
-        ${canControl ? `<button type="button" class="partyPlusBtn" data-user="${s.id}">+</button>` : ''}
+        <div class="leaderboardCounters">${beerLine}${shotLine}</div>
       </div>`;
         }).join('');
         listEl.querySelectorAll('.partyPlusBtn').forEach(btn => {
           btn.onclick = async () => {
-            try { await logDrink(btn.dataset.user, 1); } catch (err) { showToast('Could not add beer: ' + err.message); }
+            const isShot = btn.dataset.kind === 'shot';
+            try { await (isShot ? logShot : logDrink)(btn.dataset.user, 1); } catch (err) { showToast(`Could not add ${isShot ? 'shot' : 'beer'}: ` + err.message); }
           };
         });
         listEl.querySelectorAll('.partyMinusBtn').forEach(btn => {
           btn.onclick = async () => {
-            try { await logDrink(btn.dataset.user, -1); } catch (err) { showToast('Could not remove beer: ' + err.message); }
+            const isShot = btn.dataset.kind === 'shot';
+            try { await (isShot ? logShot : logDrink)(btn.dataset.user, -1); } catch (err) { showToast(`Could not remove ${isShot ? 'shot' : 'beer'}: ` + err.message); }
           };
         });
         listEl.querySelectorAll('.lbProfileLink').forEach(el => {
@@ -4099,6 +4529,11 @@
 
     drinkLogsCol.where('year', '==', CURRENT_YEAR).onSnapshot(snap => {
       currentYearLogs = snap.docs.map(d => d.data());
+      if (activeTab === 'leaderboard') renderLeaderboard();
+    }, err => showToast('Sync error: ' + err.message));
+
+    shotLogsCol.where('year', '==', CURRENT_YEAR).onSnapshot(snap => {
+      currentYearShotLogs = snap.docs.map(d => d.data());
       if (activeTab === 'leaderboard') renderLeaderboard();
     }, err => showToast('Sync error: ' + err.message));
 
@@ -4357,6 +4792,503 @@
       if (beer) openForm(beer);
     });
 
+    // ---------- Spirits ----------
+    const spiritsCol = db.collection('spirits');
+    let allSpirits = [];
+    let spiritEditingId = null;
+    let spiritPendingPhotos = [];
+
+    const spiritListEl = document.getElementById('spiritList');
+    const spiritSearchInput = document.getElementById('spiritSearchInput');
+    const spiritSortSelect = document.getElementById('spiritSortSelect');
+    const spiritTypeSelect = document.getElementById('spiritTypeSelect');
+    const spiritTypeListEl = document.getElementById('spiritTypeList');
+
+    const COMMON_SPIRIT_TYPES = ['Vodka', 'Pálinka', 'Whiskey', 'Rum', 'Gin', 'Tequila', 'Brandy', 'Cognac', 'Liqueur', 'Other'];
+
+    function distinctSpiritTypes() {
+      const set = new Set(COMMON_SPIRIT_TYPES);
+      allSpirits.forEach(s => { if (s.spiritType) set.add(s.spiritType); });
+      return [...set].sort();
+    }
+    function renderSpiritFilters() {
+      const curType = spiritTypeSelect.value;
+      spiritTypeSelect.innerHTML = '<option value="">All types</option>' +
+        distinctSpiritTypes().map(t => `<option value="${escapeHtml(t)}">${escapeHtml(t)}</option>`).join('');
+      spiritTypeSelect.value = curType;
+      spiritTypeListEl.innerHTML = distinctSpiritTypes().map(t => `<option value="${escapeHtml(t)}">`).join('');
+    }
+
+    function filteredSortedSpirits() {
+      let list = allSpirits.slice();
+      const q = spiritSearchInput.value.trim().toLowerCase();
+      if (q) list = list.filter(s => [s.name, s.brand, s.country, s.comment].some(v => (v || '').toLowerCase().includes(q)));
+      if (spiritTypeSelect.value) list = list.filter(s => s.spiritType === spiritTypeSelect.value);
+      switch (spiritSortSelect.value) {
+        case 'name': list.sort((a, b) => (a.name || '').localeCompare(b.name || '')); break;
+        case 'rating-desc': list.sort((a, b) => (b.avgRating || 0) - (a.avgRating || 0)); break;
+        case 'rating-asc': list.sort((a, b) => (a.avgRating || 0) - (b.avgRating || 0)); break;
+        case 'oldest': list.sort((a, b) => (a.ts || 0) - (b.ts || 0)); break;
+        default: list.sort((a, b) => (b.ts || 0) - (a.ts || 0));
+      }
+      return list;
+    }
+
+    function renderSpiritList() {
+      const list = filteredSortedSpirits();
+      document.getElementById('spiritCountBadge').textContent = list.length;
+      if (!list.length) {
+        spiritListEl.innerHTML = '<div class="empty">No spirits yet 🥃<br>Tap + to add the first one.</div>';
+        return;
+      }
+      spiritListEl.innerHTML = list.map(s => {
+        const cover = (s.photos && s.photos[0]) ? `<img src="${escapeHtml(s.photos[0].url)}" alt="">` : '🥃';
+        return `
+    <div class="card" data-id="${s.id}">
+      <div class="cover">
+        ${cover}
+        <span class="badge rating" style="background:${ratingColor(s.avgRating || 0)}">${s.avgRating != null ? s.avgRating.toFixed(1) : '–'}/10</span>
+        ${s.abv != null ? `<span class="badge abv">${s.abv}%</span>` : ''}
+      </div>
+      <div class="body">
+        <div class="name-row">
+          <span class="flag" contenteditable="true" spellcheck="false" data-flag="${s.id}">${escapeHtml(s.flag || '🏳️')}</span>
+          <span class="name">${escapeHtml(s.name || 'Unnamed')}</span>
+        </div>
+        <div class="meta">${escapeHtml(s.country || '')}${s.country && s.spiritType ? ' · ' : ''}${escapeHtml(s.spiritType || '')}</div>
+      </div>
+    </div>`;
+      }).join('');
+
+      spiritListEl.querySelectorAll('.card').forEach(card => {
+        card.addEventListener('click', (e) => {
+          if (e.target.closest('.flag')) return;
+          const spirit = allSpirits.find(s => s.id === card.dataset.id);
+          if (spirit) openSpiritView(spirit);
+        });
+      });
+    }
+
+    spiritListEl.addEventListener('focusin', (e) => {
+      const el = e.target.closest('.flag');
+      if (el) selectFlagContents(el);
+    });
+    spiritListEl.addEventListener('focusout', async (e) => {
+      const el = e.target.closest('.flag');
+      if (!el) return;
+      const id = el.dataset.flag;
+      const val = el.textContent.trim() || '🏳️';
+      try { await spiritsCol.doc(id).update({ flag: val }); } catch (err) { showToast('Could not save flag'); }
+    });
+    spiritListEl.addEventListener('keydown', (e) => {
+      if (e.target.closest('.flag') && e.key === 'Enter') { e.preventDefault(); e.target.blur(); }
+    });
+    spiritListEl.addEventListener('click', (e) => {
+      const el = e.target.closest('.flag');
+      if (el) {
+        e.stopPropagation();
+        setTimeout(() => selectFlagContents(el), 0);
+      }
+    });
+
+    spiritSearchInput.oninput = renderSpiritList;
+    spiritSortSelect.onchange = renderSpiritList;
+    spiritTypeSelect.onchange = renderSpiritList;
+
+    spiritsCol.onSnapshot(snap => {
+      allSpirits = snap.docs.map(d => ({ id: d.id, ...d.data() }));
+      renderSpiritFilters();
+      renderSpiritList();
+      refreshSpiritViewIfOpen();
+      refreshProfileDisplays();
+    }, err => showToast('Sync error: ' + err.message));
+
+    async function submitMySpiritRating(spiritId, ratingValue) {
+      await spiritsCol.doc(spiritId).collection('ratings').doc(myUid).set(
+        { rating: ratingValue, userId: myUid, ts: Date.now() }, { merge: true }
+      );
+      const snap = await spiritsCol.doc(spiritId).collection('ratings').get();
+      const ratings = snap.docs.map(d => d.data().rating).filter(r => typeof r === 'number');
+      const count = ratings.length;
+      const avg = count ? ratings.reduce((a, b) => a + b, 0) / count : null;
+      await spiritsCol.doc(spiritId).update({ avgRating: avg, ratingCount: count });
+      return { avgRating: avg, ratingCount: count };
+    }
+    async function getMyRatingForSpirit(spiritId) {
+      try {
+        const doc = await spiritsCol.doc(spiritId).collection('ratings').doc(myUid).get();
+        return doc.exists ? doc.data().rating : null;
+      } catch (e) { return null; }
+    }
+    async function submitMySpiritReview(spiritId, commentText) {
+      await spiritsCol.doc(spiritId).collection('ratings').doc(myUid).set(
+        { comment: commentText, userId: myUid, ts: Date.now() }, { merge: true }
+      );
+    }
+
+    // ---------- Spirit add/edit form ----------
+    const spiritFormOverlay = document.getElementById('spiritFormOverlay');
+    const spiritForm = document.getElementById('spiritForm');
+    const spiritFormTitle = document.getElementById('spiritFormTitle');
+    const spiritPhotoStrip = document.getElementById('spiritPhotoStrip');
+    const spiritPhotoInput = document.getElementById('spiritPhotoInput');
+    const spiritRatingButtonsEl = document.getElementById('spiritRatingButtons');
+    const spiritDeleteBtn = document.getElementById('spiritDeleteBtn');
+    let spiritFormRating = null;
+
+    const sfNameEl = document.getElementById('sfName');
+    const sfNameDupeHint = document.getElementById('sfNameDupeHint');
+    sfNameEl.addEventListener('input', () => {
+      const name = sfNameEl.value.trim().toLowerCase();
+      const dupe = name && allSpirits.find(s => s.id !== spiritEditingId && (s.name || '').trim().toLowerCase() === name);
+      if (dupe) {
+        sfNameDupeHint.textContent = `A spirit named "${dupe.name}" already exists`;
+        sfNameDupeHint.className = 'hint warn';
+        sfNameDupeHint.style.display = 'block';
+      } else {
+        sfNameDupeHint.style.display = 'none';
+      }
+    });
+
+    function renderSpiritRatingButtons() {
+      buildRatingButtons(spiritRatingButtonsEl, spiritFormRating, async (n) => {
+        spiritFormRating = n;
+        renderSpiritRatingButtons();
+        if (spiritEditingId) {
+          try {
+            await submitMySpiritRating(spiritEditingId, n);
+          } catch (err) {
+            showToast('Rating failed: ' + err.message);
+          }
+        }
+      });
+    }
+
+    function renderSpiritPhotoStrip(spirit) {
+      spiritPhotoStrip.innerHTML = '';
+      const photos = (spirit && spirit.photos) || [];
+      photos.forEach((p, i) => {
+        const div = document.createElement('div');
+        div.className = 'thumb';
+        div.innerHTML = `<img src="${escapeHtml(p.url)}"><button class="rm" title="Remove">✕</button>`;
+        div.querySelector('img').onclick = () => openLightbox(photos, i);
+        div.querySelector('.rm').onclick = () => removeExistingSpiritPhoto(spirit.id, p);
+        spiritPhotoStrip.appendChild(div);
+      });
+      spiritPendingPhotos.forEach((pp, i) => {
+        const div = document.createElement('div');
+        div.className = 'thumb';
+        div.innerHTML = `<img src="${pp.url}"><button class="rm" title="Remove">✕</button>`;
+        div.querySelector('.rm').onclick = () => { spiritPendingPhotos.splice(i, 1); renderSpiritPhotoStrip(spirit); };
+        spiritPhotoStrip.appendChild(div);
+      });
+      const addTile = document.createElement('button');
+      addTile.type = 'button';
+      addTile.className = 'addThumb';
+      addTile.textContent = '+';
+      addTile.onclick = () => spiritPhotoInput.click();
+      spiritPhotoStrip.appendChild(addTile);
+    }
+
+    spiritPhotoInput.onchange = async () => {
+      const files = Array.from(spiritPhotoInput.files || []);
+      spiritPhotoInput.value = '';
+      if (!files.length) return;
+      if (spiritEditingId) {
+        try {
+          for (const file of files) await uploadPhotoToSpirit(spiritEditingId, file);
+          const fresh = allSpirits.find(s => s.id === spiritEditingId);
+          renderSpiritPhotoStrip(fresh);
+        } catch (err) {
+          showToast('Photo upload failed: ' + err.message);
+        }
+      } else {
+        files.forEach(file => spiritPendingPhotos.push({ file, url: URL.createObjectURL(file) }));
+        renderSpiritPhotoStrip(null);
+      }
+    };
+
+    async function uploadPhotoToSpirit(spiritId, file) {
+      const path = `spirits/${spiritId}/${Date.now()}_${file.name}`;
+      const ref = storage.ref(path);
+      await ref.put(file);
+      const url = await ref.getDownloadURL();
+      await spiritsCol.doc(spiritId).update({
+        photos: firebase.firestore.FieldValue.arrayUnion({ url, path, ts: Date.now() })
+      });
+    }
+
+    async function removeExistingSpiritPhoto(spiritId, photoObj) {
+      try {
+        await storage.ref(photoObj.path).delete();
+      } catch (e) { /* file may already be gone */ }
+      await spiritsCol.doc(spiritId).update({
+        photos: firebase.firestore.FieldValue.arrayRemove(photoObj)
+      });
+      const fresh = allSpirits.find(s => s.id === spiritId);
+      const updatedPhotos = (fresh.photos || []).filter(p => p.path !== photoObj.path);
+      renderSpiritPhotoStrip({ id: spiritId, photos: updatedPhotos });
+    }
+
+    let spiritFormOpenedId = null;
+    async function openSpiritForm(spirit) {
+      spiritFormOpenedId = spirit ? spirit.id : null;
+      pushOverlayState();
+      spiritEditingId = spirit ? spirit.id : null;
+      spiritPendingPhotos = [];
+      spiritFormTitle.textContent = spirit ? 'Edit Spirit' : 'Add Spirit';
+      document.getElementById('spiritSaveBtn').textContent = spirit ? 'Save' : 'Add Spirit';
+      spiritDeleteBtn.style.display = spirit ? 'block' : 'none';
+
+      document.getElementById('sfName').value = spirit?.name || '';
+      sfNameDupeHint.style.display = 'none';
+      document.getElementById('sfBrand').value = spirit?.brand || '';
+      document.getElementById('sfFlag').value = spirit?.flag || '';
+      document.getElementById('sfCountry').value = spirit?.country || '';
+      document.getElementById('sfType').value = spirit?.spiritType || '';
+      document.getElementById('sfAbv').value = spirit?.abv ?? '';
+      document.getElementById('sfPrice').value = spirit?.price ?? '';
+      spiritFormRating = null;
+      renderSpiritRatingButtons();
+      document.getElementById('sfComment').value = spirit?.comment || '';
+      renderSpiritPhotoStrip(spirit);
+
+      spiritFormOverlay.classList.add('show');
+
+      if (spirit) {
+        const mine = await getMyRatingForSpirit(spirit.id);
+        if (spiritEditingId === spirit.id) {
+          spiritFormRating = mine;
+          renderSpiritRatingButtons();
+        }
+      }
+    }
+    function hideSpiritForm() {
+      spiritFormOverlay.classList.remove('show');
+      spiritPendingPhotos = [];
+      spiritEditingId = null;
+    }
+    function closeSpiritForm() { history.back(); }
+    document.getElementById('spiritFormClose').onclick = closeSpiritForm;
+    document.getElementById('spiritCancelBtn').onclick = closeSpiritForm;
+    spiritFormOverlay.addEventListener('click', (e) => { if (e.target === spiritFormOverlay) closeSpiritForm(); });
+
+    spiritForm.onsubmit = async (e) => {
+      e.preventDefault();
+      const saveBtn = document.getElementById('spiritSaveBtn');
+      saveBtn.disabled = true;
+      const data = {
+        name: document.getElementById('sfName').value.trim(),
+        brand: document.getElementById('sfBrand').value.trim(),
+        flag: document.getElementById('sfFlag').value.trim() || '🏳️',
+        country: document.getElementById('sfCountry').value.trim(),
+        spiritType: document.getElementById('sfType').value.trim(),
+        abv: document.getElementById('sfAbv').value === '' ? null : Number(document.getElementById('sfAbv').value),
+        price: document.getElementById('sfPrice').value === '' ? null : Number(document.getElementById('sfPrice').value),
+        comment: document.getElementById('sfComment').value.trim()
+      };
+      try {
+        if (spiritEditingId) {
+          await spiritsCol.doc(spiritEditingId).update(data);
+          showToast('Spirit updated');
+        } else {
+          data.photos = [];
+          data.ts = Date.now();
+          data.createdBy = myUid;
+          const ref = await spiritsCol.add(data);
+          for (const pp of spiritPendingPhotos) await uploadPhotoToSpirit(ref.id, pp.file);
+          if (spiritFormRating != null) await submitMySpiritRating(ref.id, spiritFormRating);
+          showToast('Spirit added');
+        }
+        closeSpiritForm();
+      } catch (err) {
+        showToast('Save failed: ' + err.message);
+      } finally {
+        saveBtn.disabled = false;
+      }
+    };
+
+    // ---------- Delete spirit ----------
+    function confirmDeleteSpirit(spirit) {
+      askConfirm(`Delete "${spirit.name || 'this spirit'}"? Its photos will be removed too.`, async () => {
+        for (const p of (spirit.photos || [])) {
+          try { await storage.ref(p.path).delete(); } catch (e) { }
+        }
+        const ratingsSnap = await spiritsCol.doc(spirit.id).collection('ratings').get();
+        for (const doc of ratingsSnap.docs) {
+          try { await doc.ref.delete(); } catch (e) { }
+        }
+        await spiritsCol.doc(spirit.id).delete();
+        showToast('Spirit deleted');
+      });
+    }
+    spiritDeleteBtn.onclick = () => {
+      const spirit = allSpirits.find(s => s.id === spiritEditingId);
+      if (!spirit) return;
+      confirmDeleteSpirit(spirit);
+    };
+
+    // ---------- Spirit view ----------
+    const spiritViewOverlay = document.getElementById('spiritViewOverlay');
+    const spiritViewCarousel = document.getElementById('spiritViewCarousel');
+    const spiritViewStatsEl = document.getElementById('spiritViewStats');
+    const spiritViewRatingButtonsEl = document.getElementById('spiritViewRatingButtons');
+    const spiritViewReviewsEl = document.getElementById('spiritViewReviews');
+    const spiritViewReviewInput = document.getElementById('spiritViewReviewInput');
+    const spiritViewReviewPostBtn = document.getElementById('spiritViewReviewPostBtn');
+    let currentSpiritViewId = null;
+    let currentSpiritViewBeer = null;
+    let mySpiritViewRating = null;
+    let spiritViewRatingsUnsub = null;
+    let spiritViewReviewInputTouched = false;
+
+    function renderSpiritReviewsList(ratingsDocs) {
+      const reviews = ratingsDocs.filter(r => (r.comment || '').trim().length > 0);
+      if (!reviews.length) {
+        spiritViewReviewsEl.innerHTML = '<div class="empty" style="padding:14px 0">No reviews yet</div>';
+        return;
+      }
+      reviews.sort((a, b) => (b.ts || 0) - (a.ts || 0));
+      spiritViewReviewsEl.innerHTML = reviews.map(r => {
+        const u = allUsers.find(x => x.id === r.userId);
+        return `<div class="reviewRow">
+      <div class="userAvatar">${avatarInner(u?.name, u?.photoURL)}</div>
+      <div class="reviewBody">
+        <div class="reviewHead">
+          <span class="userName">${escapeHtml(u?.name || 'Anonymous')}</span>
+          ${r.rating != null ? `<span class="reviewStars">⭐ ${r.rating}/10</span>` : ''}
+        </div>
+        <div class="reviewComment">${escapeHtml(r.comment)}</div>
+      </div>
+    </div>`;
+      }).join('');
+    }
+
+    function renderSpiritViewStats(spirit) {
+      const canEdit = !spirit.createdBy || spirit.createdBy === myUid || isAdmin();
+      spiritViewStatsEl.innerHTML = `
+    <div class="viewTitleRow">
+      <div class="viewTitle"><span>${escapeHtml(spirit.flag || '🏳️')}</span><span>${escapeHtml(spirit.name || 'Unnamed')}</span></div>
+      ${canEdit ? `<button type="button" class="btn primary viewEditBtnInline" id="spiritViewEditBtnInline">Edit</button>` : ''}
+    </div>
+    <div class="viewMeta">${[escapeHtml(spirit.brand || ''), escapeHtml(spirit.country || ''), escapeHtml(spirit.spiritType || '')].filter(Boolean).join(' · ')}</div>
+    <div class="viewBadges">
+      <span style="background:${ratingColor(spirit.avgRating || 0)};color:#1c1410">${spirit.avgRating != null ? spirit.avgRating.toFixed(1) : '–'}/10${spirit.ratingCount ? ` (${spirit.ratingCount})` : ''}</span>
+      ${spirit.abv != null ? `<span style="background:var(--bg-elev);color:var(--text);border:1px solid var(--border)">${spirit.abv}% ALC</span>` : ''}
+      ${spirit.price != null ? `<span style="background:var(--bg-elev);color:var(--text);border:1px solid var(--border)">€${spirit.price}</span>` : ''}
+    </div>
+    ${spirit.comment ? `<div class="viewComment">${escapeHtml(spirit.comment)}</div>` : ''}
+  `;
+    }
+
+    function refreshSpiritViewIfOpen() {
+      if (!spiritViewOverlay.classList.contains('show') || !currentSpiritViewId) return;
+      const fresh = allSpirits.find(s => s.id === currentSpiritViewId);
+      if (!fresh) return;
+      currentSpiritViewBeer = fresh;
+      renderSpiritViewStats(fresh);
+    }
+
+    function renderSpiritViewRatingButtons() {
+      buildRatingButtons(spiritViewRatingButtonsEl, mySpiritViewRating, async (n) => {
+        const spiritId = currentSpiritViewId;
+        mySpiritViewRating = n;
+        renderSpiritViewRatingButtons();
+        try {
+          const result = await submitMySpiritRating(spiritId, n);
+          if (currentSpiritViewId === spiritId && currentSpiritViewBeer) {
+            currentSpiritViewBeer = { ...currentSpiritViewBeer, avgRating: result.avgRating, ratingCount: result.ratingCount };
+            renderSpiritViewStats(currentSpiritViewBeer);
+          }
+        } catch (err) {
+          showToast('Rating failed: ' + err.message);
+        }
+      });
+    }
+
+    async function showSpiritView(spirit) {
+      currentSpiritViewId = spirit.id;
+      currentSpiritViewBeer = spirit;
+      const photos = spirit.photos || [];
+      spiritViewCarousel.innerHTML = photos.length
+        ? photos.map((p, i) => `<img src="${escapeHtml(p.url)}" data-i="${i}">`).join('')
+        : '<div class="placeholder">🥃</div>';
+      spiritViewCarousel.querySelectorAll('img').forEach(img => {
+        img.onclick = () => openLightbox(photos, Number(img.dataset.i));
+      });
+      renderSpiritViewStats(spirit);
+      mySpiritViewRating = null;
+      renderSpiritViewRatingButtons();
+      spiritViewReviewInput.value = '';
+      spiritViewReviewInputTouched = false;
+      spiritViewReviewsEl.innerHTML = '';
+      spiritViewOverlay.classList.add('show');
+
+      if (spiritViewRatingsUnsub) { spiritViewRatingsUnsub(); spiritViewRatingsUnsub = null; }
+      spiritViewRatingsUnsub = spiritsCol.doc(spirit.id).collection('ratings').onSnapshot(snap => {
+        const docs = snap.docs.map(d => ({ id: d.id, ...d.data() }));
+        renderSpiritReviewsList(docs);
+        const mine = docs.find(d => d.id === myUid);
+        mySpiritViewRating = mine?.rating ?? null;
+        renderSpiritViewRatingButtons();
+        if (!spiritViewReviewInputTouched) spiritViewReviewInput.value = mine?.comment || '';
+      }, err => showToast('Sync error: ' + err.message));
+    }
+    function openSpiritView(spirit) {
+      pushOverlayState();
+      return showSpiritView(spirit);
+    }
+    function hideSpiritView() {
+      spiritViewOverlay.classList.remove('show');
+      currentSpiritViewId = null;
+      currentSpiritViewBeer = null;
+      if (spiritViewRatingsUnsub) { spiritViewRatingsUnsub(); spiritViewRatingsUnsub = null; }
+    }
+    function closeSpiritView() { history.back(); }
+    spiritViewReviewInput.addEventListener('input', () => { spiritViewReviewInputTouched = true; });
+    spiritViewReviewPostBtn.onclick = async () => {
+      const spiritId = currentSpiritViewId;
+      try {
+        await submitMySpiritReview(spiritId, spiritViewReviewInput.value.trim());
+        spiritViewReviewInputTouched = false;
+        showToast('Review posted');
+      } catch (err) {
+        showToast('Review failed: ' + err.message);
+      }
+    };
+    document.getElementById('spiritViewClose').onclick = closeSpiritView;
+    spiritViewOverlay.addEventListener('click', (e) => { if (e.target === spiritViewOverlay) closeSpiritView(); });
+    document.getElementById('spiritViewAddPhotoBtn').onclick = () => document.getElementById('spiritViewPhotoInput').click();
+    document.getElementById('spiritViewPhotoInput').onchange = async () => {
+      const input = document.getElementById('spiritViewPhotoInput');
+      const files = Array.from(input.files || []);
+      input.value = '';
+      if (!files.length || !currentSpiritViewId) return;
+      try {
+        for (const file of files) await uploadPhotoToSpirit(currentSpiritViewId, file);
+        showToast('Photo added');
+      } catch (err) {
+        showToast('Photo upload failed: ' + err.message);
+      }
+    };
+    spiritViewStatsEl.addEventListener('click', (e) => {
+      if (!e.target.closest('#spiritViewEditBtnInline')) return;
+      const spirit = allSpirits.find(s => s.id === currentSpiritViewId);
+      hideSpiritView();
+      if (spirit) openSpiritForm(spirit);
+    });
+
+    // ---------- Reviews sub-tab (Beers / Spirits) ----------
+    let activeReviewsSubTab = 'beer';
+    function setReviewsSubTab(sub) {
+      activeReviewsSubTab = sub;
+      document.querySelectorAll('#reviewsSubTabSwitch .tabBtn').forEach(b => b.classList.toggle('active', b.dataset.subtab === sub));
+      applyTabVisibility();
+    }
+    document.querySelectorAll('#reviewsSubTabSwitch .tabBtn').forEach(b => {
+      b.onclick = () => setReviewsSubTab(b.dataset.subtab);
+    });
+
     // ---------- Users / Profile ----------
     const usersCol = db.collection('users');
     const TIERS = [
@@ -4383,6 +5315,7 @@
     function statsBreakdownItems(stats) {
       return [
         `${stats.beersUploaded} beers`,
+        `${stats.spiritsUploaded} spirits`,
         `${stats.partiesAdded} parties`,
         `${stats.pubsAdded} pubs`,
         `${stats.partiesJoined} joined`,
@@ -4448,6 +5381,7 @@
 
     function getUserStats(userId) {
       const beersUploaded = allBeers.filter(b => b.createdBy === userId).length;
+      const spiritsUploaded = allSpirits.filter(s => s.createdBy === userId).length;
       const partiesAdded = allParties.filter(p => p.createdBy === userId).length;
       const pubsAdded = allPubs.filter(p => p.createdBy === userId).length;
       const partiesJoined = Object.values(allPartyParticipants).filter(participants => participants.some(p => p.id === userId)).length;
@@ -4456,8 +5390,8 @@
       const beerReviewsWritten = mine.filter(r => (r.comment || '').trim().length > 0).length;
       const pubCommentsWritten = allComments.filter(c => c.userId === userId).length;
       const reviewsWritten = beerReviewsWritten + pubCommentsWritten;
-      const total = beersUploaded + partiesAdded + pubsAdded + partiesJoined + ratingsGiven + reviewsWritten;
-      return { beersUploaded, partiesAdded, pubsAdded, partiesJoined, ratingsGiven, reviewsWritten, total, tier: getTierForTotal(total) };
+      const total = beersUploaded + spiritsUploaded + partiesAdded + pubsAdded + partiesJoined + ratingsGiven + reviewsWritten;
+      return { beersUploaded, spiritsUploaded, partiesAdded, pubsAdded, partiesJoined, ratingsGiven, reviewsWritten, total, tier: getTierForTotal(total) };
     }
 
     function getMyUid() {
@@ -4549,9 +5483,11 @@
       setExclusiveClass(profileViewAvatar, 'uBorder-', avatarBorderClass(u).trim());
       setExclusiveClass(document.getElementById('profileViewSectionEl'), 'uSkin-', skinBgClass(u).trim());
       const wrapEl = document.getElementById('profileViewAvatarWrap');
-      const existingBadge = wrapEl.querySelector('.avatarCrownBadge');
-      if (u?.equippedBorder === 'border_crown') {
-        if (!existingBadge) wrapEl.insertAdjacentHTML('beforeend', '<div class="avatarCrownBadge"></div>');
+      const existingBadge = wrapEl.querySelector('.avatarHatBadge');
+      const hatItem = SHOP_HATS.find(h => h.id === u?.equippedHat);
+      if (hatItem) {
+        if (existingBadge) existingBadge.className = `avatarHatBadge hat-${hatItem.id}`;
+        else wrapEl.insertAdjacentHTML('beforeend', `<div class="avatarHatBadge hat-${hatItem.id}"></div>`);
       } else if (existingBadge) {
         existingBadge.remove();
       }
@@ -4832,8 +5768,14 @@
       { id: 'border_silver', name: 'Silver Ring', price: 15000 },
       { id: 'border_gold', name: 'Gold Ring', price: 30000 },
       { id: 'border_ice', name: 'Ice Ring', price: 60000 },
-      { id: 'border_rainbow', name: 'Rainbow Ring', price: 120000 },
-      { id: 'border_crown', name: 'KTNBOTP', price: 200000 }
+      { id: 'border_rainbow', name: 'Rainbow Ring', price: 120000 }
+    ];
+    const SHOP_HATS = [
+      { id: 'hat_clown', name: 'Clown Hat', price: 12000 },
+      { id: 'hat_tophat', name: 'Top Hat', price: 25000 },
+      { id: 'hat_wizard', name: 'Wizard Hat', price: 55000 },
+      { id: 'hat_viking', name: 'Viking Helmet', price: 90000 },
+      { id: 'hat_crown', name: 'KTNBOTP', price: 200000 }
     ];
     const SHOP_SKINS = [
       { id: 'skin_sunset', name: 'Sunset', price: 10000 },
@@ -4858,12 +5800,12 @@
     }
     function avatarBorderClass(u) {
       const item = SHOP_BORDERS.find(b => b.id === u?.equippedBorder);
-      if (!item || item.id === 'border_crown') return '';
-      return ` uBorder-${item.id}`;
+      return item ? ` uBorder-${item.id}` : '';
     }
-    function wrapAvatarWithCrown(u, avatarDivHtml) {
-      if (u?.equippedBorder !== 'border_crown') return avatarDivHtml;
-      return `<span class="avatarCrownWrap">${avatarDivHtml}<div class="avatarCrownBadge"></div></span>`;
+    function wrapAvatarWithHat(u, avatarDivHtml) {
+      const item = SHOP_HATS.find(h => h.id === u?.equippedHat);
+      if (!item) return avatarDivHtml;
+      return `<span class="avatarHatWrap">${avatarDivHtml}<div class="avatarHatBadge hat-${item.id}"></div></span>`;
     }
     function skinBgClass(u) {
       const item = SHOP_SKINS.find(s => s.id === u?.equippedSkin);
@@ -4895,7 +5837,7 @@
       }
     }
     async function equipShopItem(type, itemId) {
-      const field = type === 'border' ? 'equippedBorder' : 'equippedSkin';
+      const field = type === 'border' ? 'equippedBorder' : type === 'hat' ? 'equippedHat' : 'equippedSkin';
       try {
         await usersCol.doc(myUid).set({ [field]: itemId ? itemId : firebase.firestore.FieldValue.delete() }, { merge: true });
       } catch (err) {
@@ -4910,9 +5852,9 @@
         return items.map(it => {
           const owned = inv.includes(it.id);
           const equipped = me[equippedField] === it.id;
-          const isCrown = it.id === 'border_crown';
-          const previewClass = isCrown ? '' : (type === 'border' ? `uBorder-${it.id}` : `uSkin-${it.id}`);
-          const previewHtml = isCrown ? '<div class="avatarCrownBadge"></div>' : '';
+          const isHat = type === 'hat';
+          const previewClass = isHat ? '' : (type === 'border' ? `uBorder-${it.id}` : `uSkin-${it.id}`);
+          const previewHtml = isHat ? `<div class="avatarHatBadge hat-${it.id}"></div>` : '';
           const action = equipped
             ? `<span class="shopEquippedTag" data-id="${it.id}" data-type="${type}">Equipped ✕</span>`
             : owned
@@ -4926,6 +5868,7 @@
         }).join('');
       }
       document.getElementById('shopBorderGrid').innerHTML = renderGroup(SHOP_BORDERS, 'border', 'equippedBorder', 'shopPreviewCircle');
+      document.getElementById('shopHatGrid').innerHTML = renderGroup(SHOP_HATS, 'hat', 'equippedHat', 'shopPreviewCircle');
       document.getElementById('shopSkinGrid').innerHTML = renderGroup(SHOP_SKINS, 'skin', 'equippedSkin', 'shopPreviewSquare');
       document.getElementById('shopChipsGrid').innerHTML = SHOP_CHIPS.map(it => `<div class="shopItem">
         <div class="shopPreview shopPreviewChip chip-${it.type}">${it.label}</div>
@@ -4978,15 +5921,15 @@
       if (!inv.length) {
         el.innerHTML = '<div class="empty" style="padding:6px 0;font-size:.8rem">No items yet</div>';
       } else {
-        const allItems = SHOP_BORDERS.map(b => ({ ...b, type: 'border' })).concat(SHOP_SKINS.map(s => ({ ...s, type: 'skin' })));
+        const allItems = SHOP_BORDERS.map(b => ({ ...b, type: 'border' })).concat(SHOP_HATS.map(h => ({ ...h, type: 'hat' }))).concat(SHOP_SKINS.map(s => ({ ...s, type: 'skin' })));
         el.innerHTML = inv.map(id => {
           const it = allItems.find(x => x.id === id);
           if (!it) return '';
-          const equipped = (it.type === 'border' ? u.equippedBorder : u.equippedSkin) === id;
-          const isCrown = id === 'border_crown';
-          const shape = it.type === 'border' ? 'shopPreviewCircle' : 'shopPreviewSquare';
-          const cls = isCrown ? '' : (it.type === 'border' ? `uBorder-${id}` : `uSkin-${id}`);
-          const inner = isCrown ? '<div class="avatarCrownBadge"></div>' : '';
+          const equipped = (it.type === 'border' ? u.equippedBorder : it.type === 'hat' ? u.equippedHat : u.equippedSkin) === id;
+          const isHat = it.type === 'hat';
+          const shape = it.type === 'skin' ? 'shopPreviewSquare' : 'shopPreviewCircle';
+          const cls = isHat ? '' : (it.type === 'border' ? `uBorder-${id}` : `uSkin-${id}`);
+          const inner = isHat ? `<div class="avatarHatBadge hat-${id}"></div>` : '';
           return `<div class="invItem ${equipped ? 'equipped' : ''}" data-id="${id}" data-type="${it.type}" title="${escapeHtml(it.name)}">
             <div class="shopPreview ${shape} ${cls}">${inner}</div>
             <div class="invItemPrice">${abbreviatePrice(it.price)} ${JACKPOT_COIN_ICON}</div>
@@ -5167,7 +6110,7 @@
         const u = allUsers.find(x => x.id === r.id);
         return `<div class="leaderboardRow${i < 3 ? ' rank-' + (i + 1) : ''}${skinBgClass(u)}">
         <div class="leaderboardRank">${RANK_MEDALS[i] || (i + 1)}</div>
-        ${wrapAvatarWithCrown(u, `<div class="userAvatar lbProfileLink${avatarBorderClass(u)}" data-user="${r.id}">${avatarInner(r.name, r.photoURL)}</div>`)}
+        ${wrapAvatarWithHat(u, `<div class="userAvatar lbProfileLink${avatarBorderClass(u)}" data-user="${r.id}">${avatarInner(r.name, r.photoURL)}</div>`)}
         <div class="leaderboardInfo">
           <div class="leaderboardName lbProfileLink" data-user="${r.id}">${escapeHtml(r.name || 'Anonymous')}</div>
         </div>
@@ -5599,6 +6542,14 @@
         }
         return;
       }
+      if (spiritFormOverlay.classList.contains('show')) {
+        hideSpiritForm();
+        if (spiritFormOpenedId) {
+          const spirit = allSpirits.find(s => s.id === spiritFormOpenedId);
+          if (spirit) showSpiritView(spirit);
+        }
+        return;
+      }
       if (partyFormOverlay.classList.contains('show')) {
         hidePartyForm();
         if (partyFormOpenedFromId) {
@@ -5622,6 +6573,10 @@
       }
       if (viewOverlay.classList.contains('show')) {
         hideView();
+        return;
+      }
+      if (spiritViewOverlay.classList.contains('show')) {
+        hideSpiritView();
         return;
       }
       if (partyViewOverlay.classList.contains('show')) {

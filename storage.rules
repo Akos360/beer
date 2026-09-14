@@ -7,6 +7,12 @@ service firebase.storage {
                    && request.resource.contentType.matches('image/.*');
       allow delete: if true;
     }
+    match /spirits/{spiritId}/{fileName} {
+      allow read: if true;
+      allow create, update: if request.resource.size < 10 * 1024 * 1024
+                   && request.resource.contentType.matches('image/.*');
+      allow delete: if true;
+    }
     match /users/{userId}/{fileName} {
       allow read: if true;
       allow create, update: if request.resource.size < 10 * 1024 * 1024
