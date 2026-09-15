@@ -47,19 +47,22 @@ Live app: https://beer-dca5c.web.app
 ## Casino
 
 - Everyone starts with coins; earn more by climbing the leaderboard
-- **Jackpot**: slot machine with a paytable, adjustable max bet, and a coin leaderboard
+- A dropdown at the top of the Game tab picks which game to play; every game shares the same coin balance and the same Leaderboard/Shop tabs
+- **Jackpot**: slot machine with a paytable, adjustable max bet, and a coin leaderboard — always open
+- **Blackjack**: standard Hit/Stand rules (dealer stands on 17, blackjack pays 3:2), persists an in-progress hand so a refresh doesn't strand a paid bet
+- New games launch closed by default — hidden from the dropdown for everyone except admin, who can test them freely and flip a per-game Open/Close switch when ready
 - **Shop**: Borders, Hats, Skins (profile backgrounds), and Beer/Shot chips — equip one of each category; admin can edit any item's price live
 - Skins stay readable in any theme (forced white text + shadow over the skin art) everywhere a skin shows: leaderboard rows, profile header, user list
 
 ## Admin
 
-One hardcoded device ID (`ADMIN_UID` in `index.html`) can, in addition to normal permissions: edit/delete anyone's beer, spirit, party, or pub; edit shop prices; remove any chip from any user's inventory. All enforcement is client-side — there's no real auth, consistent with the app's open trust model for a small group.
+One hardcoded device ID (`ADMIN_UID` in `index.html`) can, in addition to normal permissions: edit/delete anyone's beer, spirit, party, or pub; edit shop prices; remove any chip from any user's inventory; open/close casino games. All enforcement is client-side — there's no real auth, consistent with the app's open trust model for a small group.
 
 ## Tech
 
 Single static `index.html`, no build step, Firebase compat SDK via CDN:
 
-- **Firestore**: `beers`, `spirits`, `parties` (+ `participants` subcollection with `count`/`shotCount`), `pubs` (+ `ratings`/`comments`), `users` (profile, inventory, equipped cosmetics, chips array, coins), `drinkLogs`/`shotLogs` (manual leaderboard taps), `leaderboardArchives` (immutable once created), `config/jackpot` (max bet, shop price overrides)
+- **Firestore**: `beers`, `spirits`, `parties` (+ `participants` subcollection with `count`/`shotCount`), `pubs` (+ `ratings`/`comments`), `users` (profile, inventory, equipped cosmetics, chips array, coins, in-progress `blackjackHand`), `drinkLogs`/`shotLogs` (manual leaderboard taps), `leaderboardArchives` (immutable once created), `config/jackpot` (max bet, shop price overrides), `config/games` (per-game open/closed flags)
 - **Storage**: photos under `{collection}/{id}/{timestamp}_{filename}`
 - **Hosting** serves the static files; installable as a PWA (`manifest.json`, `sw.js`)
 - Back button navigates screen-to-screen via a `pushOverlayState()`/`popstate` history stack instead of exiting the app

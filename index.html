@@ -1724,10 +1724,36 @@
     }
 
     .jackpotBetValue {
+      width: 52px;
       min-width: 30px;
       text-align: center;
       font-weight: 800;
-      font-size: 1.1rem
+      font-size: 1.1rem;
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      background: var(--bg-elev);
+      color: var(--text);
+      font-family: inherit;
+      padding: 5px 2px;
+      appearance: textfield;
+      -moz-appearance: textfield
+    }
+
+    .jackpotBetValue::-webkit-outer-spin-button,
+    .jackpotBetValue::-webkit-inner-spin-button {
+      -webkit-appearance: none;
+      margin: 0
+    }
+
+    .jackpotBetValue:disabled {
+      opacity: .6
+    }
+
+    .jackpotBetMaxLabel {
+      flex-basis: 100%;
+      text-align: center;
+      font-size: .78rem;
+      color: var(--text-dim)
     }
 
     .jackpotReels {
@@ -1843,6 +1869,99 @@
 
     .jackpotMaxBetEdit input {
       width: 80px
+    }
+
+    .casinoGameSelectRow {
+      margin-bottom: 14px
+    }
+
+    .casinoGameSelect {
+      width: 100%;
+      padding: 10px 12px;
+      border-radius: 10px;
+      border: 1px solid var(--border);
+      background: var(--bg-elev);
+      color: var(--text);
+      font-weight: 700;
+      font-size: .95rem
+    }
+
+    .bjTable {
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+      margin-top: 18px;
+      margin-bottom: 18px;
+      padding: 16px 14px 20px;
+      border-radius: 22px;
+      background: radial-gradient(ellipse at 50% 0%, #1a6e83, #0d4a5c 60%, #093544 100%);
+      border: 4px solid #caa43d;
+      box-shadow: inset 0 0 26px rgba(0, 0, 0, .5), 0 0 22px rgba(20, 130, 160, .25)
+    }
+
+    .bjHandLabel {
+      font-weight: 700;
+      font-size: .85rem;
+      color: #cfeaf0;
+      display: flex;
+      gap: 6px;
+      align-items: baseline;
+      margin-bottom: 8px;
+      text-shadow: 0 1px 2px rgba(0, 0, 0, .6)
+    }
+
+    .bjHand {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+      min-height: 78px
+    }
+
+    .cardMini.cardBack {
+      background: repeating-linear-gradient(45deg, #2a4d8f, #2a4d8f 6px, #3a63b5 6px, #3a63b5 12px);
+      border: 1px solid rgba(0, 0, 0, .3)
+    }
+
+    .bjActionRow {
+      display: flex;
+      gap: 10px;
+      margin-bottom: 16px
+    }
+
+    .bjActionRow .btn {
+      flex: 1;
+      padding: 13px
+    }
+
+    .btn.bjHitBtn,
+    .btn.bjStandBtn {
+      font-weight: 800;
+      letter-spacing: .02em;
+      border: none;
+      color: #fff;
+      text-shadow: 0 1px 2px rgba(0, 0, 0, .35);
+      box-shadow: 0 3px 0 rgba(0, 0, 0, .35), 0 6px 12px rgba(0, 0, 0, .3);
+      transition: transform .08s, box-shadow .08s
+    }
+
+    .btn.bjHitBtn {
+      background: linear-gradient(180deg, #3fd0d8, #1f8f96)
+    }
+
+    .btn.bjStandBtn {
+      background: linear-gradient(180deg, #ff7a59, #d8492e)
+    }
+
+    .btn.bjHitBtn:active,
+    .btn.bjStandBtn:active {
+      transform: translateY(2px);
+      box-shadow: 0 1px 0 rgba(0, 0, 0, .35), 0 3px 6px rgba(0, 0, 0, .3)
+    }
+
+    .btn.bjHitBtn:disabled,
+    .btn.bjStandBtn:disabled {
+      opacity: .5;
+      cursor: not-allowed
     }
 
     #jackpotTabSwitch {
@@ -2619,29 +2738,76 @@
         <span id="jackpotCoinIcon"></span> <span id="jackpotCoins">50</span>
         <button type="button" id="jackpotSoundBtn" class="jackpotSoundBtn" title="Toggle sound">🔊</button>
       </div>
-      <div class="jackpotReels" id="jackpotReels">
-        <div class="jackpotReel" id="jackpotReel1">🍒</div>
-        <div class="jackpotReel" id="jackpotReel2">🍒</div>
-        <div class="jackpotReel" id="jackpotReel3">🍒</div>
+      <div class="casinoGameSelectRow">
+        <select class="casinoGameSelect" id="casinoGameSelect"></select>
       </div>
-      <div class="jackpotMessage" id="jackpotMessage">Pull the lever!</div>
-      <div class="jackpotBetRow">
-        <img src="img/rshpmhry181e1.gif" alt="" class="jackpotBetDeco" loading="lazy">
-        <span class="jackpotBetLabel">Bet</span>
-        <button type="button" class="jackpotBetBtn" id="jackpotBetMinus">−</button>
-        <span class="jackpotBetValue" id="jackpotBetValue">1</span>
-        <button type="button" class="jackpotBetBtn" id="jackpotBetPlus">+</button>
-        <img src="img/diamond.jpg" alt="" class="jackpotBetDeco" loading="lazy">
+      <div class="jackpotAdminRow" id="casinoGameStatusRow" style="display:none">
+        <span id="casinoGameStatusLabel"></span>
+        <button type="button" class="btn ghost" id="casinoGameStatusToggleBtn"></button>
       </div>
-      <button type="button" class="btn primary jackpotSpinBtn" id="jackpotSpinBtn">SPIN</button>
-      <div class="jackpotPaytable" id="jackpotPaytable"></div>
-      <div class="jackpotAdminRow" id="jackpotAdminRow" style="display:none">
-        <span id="jackpotMaxBetLabel"></span>
-        <button type="button" class="btn ghost" id="jackpotEditMaxBetBtn">Edit Max Bet</button>
-        <div class="jackpotMaxBetEdit" id="jackpotMaxBetEdit" style="display:none">
-          <input type="number" id="jackpotMaxBetInput" min="1" step="1">
-          <button type="button" class="btn primary" id="jackpotMaxBetSaveBtn">Save</button>
-          <button type="button" class="btn ghost" id="jackpotMaxBetCancelBtn">Cancel</button>
+      <div class="empty" id="casinoGameClosedNotice" style="display:none;padding:30px 0"></div>
+
+      <div id="slotGameBody">
+        <div class="jackpotReels" id="jackpotReels">
+          <div class="jackpotReel" id="jackpotReel1">🍒</div>
+          <div class="jackpotReel" id="jackpotReel2">🍒</div>
+          <div class="jackpotReel" id="jackpotReel3">🍒</div>
+        </div>
+        <div class="jackpotMessage" id="jackpotMessage">Pull the lever!</div>
+        <div class="jackpotBetRow">
+          <img src="img/rshpmhry181e1.gif" alt="" class="jackpotBetDeco" loading="lazy">
+          <span class="jackpotBetLabel">Bet</span>
+          <button type="button" class="jackpotBetBtn" id="jackpotBetMinus">−</button>
+          <input type="number" inputmode="numeric" class="jackpotBetValue" id="jackpotBetValue" value="1" min="1" step="1">
+          <button type="button" class="jackpotBetBtn" id="jackpotBetPlus">+</button>
+          <img src="img/diamond.jpg" alt="" class="jackpotBetDeco" loading="lazy">
+          <span class="jackpotBetMaxLabel" id="jackpotBetMaxLabel"></span>
+        </div>
+        <button type="button" class="btn primary jackpotSpinBtn" id="jackpotSpinBtn">SPIN</button>
+        <div class="jackpotPaytable" id="jackpotPaytable"></div>
+        <div class="jackpotAdminRow" id="jackpotAdminRow" style="display:none">
+          <span id="jackpotMaxBetLabel"></span>
+          <button type="button" class="btn ghost" id="jackpotEditMaxBetBtn">Edit Max Bet</button>
+          <div class="jackpotMaxBetEdit" id="jackpotMaxBetEdit" style="display:none">
+            <input type="number" id="jackpotMaxBetInput" min="1" step="1">
+            <button type="button" class="btn primary" id="jackpotMaxBetSaveBtn">Save</button>
+            <button type="button" class="btn ghost" id="jackpotMaxBetCancelBtn">Cancel</button>
+          </div>
+        </div>
+      </div>
+
+      <div id="blackjackGameBody" style="display:none">
+        <div class="bjTable">
+          <div>
+            <div class="bjHandLabel">Dealer <span id="bjDealerTotal"></span></div>
+            <div class="bjHand" id="bjDealerHand"></div>
+          </div>
+          <div>
+            <div class="bjHandLabel">You <span id="bjPlayerTotal"></span></div>
+            <div class="bjHand" id="bjPlayerHand"></div>
+          </div>
+        </div>
+        <div class="jackpotMessage" id="bjMessage">Place your bet!</div>
+        <div class="jackpotBetRow" id="bjBetRow">
+          <span class="jackpotBetLabel">Bet</span>
+          <button type="button" class="jackpotBetBtn" id="bjBetMinus">−</button>
+          <input type="number" inputmode="numeric" class="jackpotBetValue" id="bjBetValue" value="1" min="1" step="1">
+          <button type="button" class="jackpotBetBtn" id="bjBetPlus">+</button>
+          <span class="jackpotBetMaxLabel" id="bjBetMaxLabel"></span>
+        </div>
+        <button type="button" class="btn primary jackpotSpinBtn" id="bjDealBtn">DEAL</button>
+        <div class="bjActionRow" id="bjActionRow" style="display:none">
+          <button type="button" class="btn bjHitBtn" id="bjHitBtn">Hit</button>
+          <button type="button" class="btn bjStandBtn" id="bjStandBtn">Stand</button>
+        </div>
+        <div class="jackpotAdminRow" id="bjAdminRow" style="display:none">
+          <span id="bjMaxBetLabel"></span>
+          <button type="button" class="btn ghost" id="bjEditMaxBetBtn">Edit Max Bet</button>
+          <div class="jackpotMaxBetEdit" id="bjMaxBetEdit" style="display:none">
+            <input type="number" id="bjMaxBetInput" min="1" step="1">
+            <button type="button" class="btn primary" id="bjMaxBetSaveBtn">Save</button>
+            <button type="button" class="btn ghost" id="bjMaxBetCancelBtn">Cancel</button>
+          </div>
         </div>
       </div>
     </div>
@@ -6268,6 +6434,74 @@
     let jackpotSpinning = false;
     let jackpotPageOpen = false;
 
+    // ---------- Casino: multiple games, admin-gated open/close ----------
+    const CASINO_GAMES = [
+      { id: 'jackpot', name: '🎰 Jackpot', alwaysOpen: true },
+      { id: 'blackjack', name: '🃏 Blackjack', alwaysOpen: false }
+    ];
+    let gamesOpenState = {};
+    let casinoActiveGame = localStorage.getItem('sor-casino-game') || 'jackpot';
+    function isGameOpen(id) {
+      const g = CASINO_GAMES.find(x => x.id === id);
+      if (!g) return false;
+      return g.alwaysOpen || !!gamesOpenState[id];
+    }
+    function visibleCasinoGames() {
+      return CASINO_GAMES.filter(g => isAdmin() || isGameOpen(g.id));
+    }
+    configCol.doc('games').onSnapshot(snap => {
+      gamesOpenState = snap.data() || {};
+      if (jackpotPageOpen && jackpotSubTab === 'game') {
+        renderCasinoGameSelect();
+        renderCasinoGameStatusRow();
+        // Only force a game switch if the current selection just became
+        // invalid for this viewer (e.g. a non-admin's open game got closed).
+        // Never unconditionally re-init here — that would reset an
+        // in-progress Blackjack hand's UI every time this doc changes for
+        // any reason, even unrelated to the game currently being played.
+        if (!visibleCasinoGames().some(g => g.id === casinoActiveGame)) {
+          setCasinoGame('jackpot');
+        }
+      }
+    }, err => showToast('Sync error: ' + err.message));
+    function renderCasinoGameSelect() {
+      const sel = document.getElementById('casinoGameSelect');
+      sel.innerHTML = visibleCasinoGames().map(g =>
+        `<option value="${g.id}"${g.id === casinoActiveGame ? ' selected' : ''}>${g.name}${!isGameOpen(g.id) ? ' (closed)' : ''}</option>`
+      ).join('');
+    }
+    function renderCasinoGameStatusRow() {
+      const row = document.getElementById('casinoGameStatusRow');
+      const game = CASINO_GAMES.find(g => g.id === casinoActiveGame);
+      if (!isAdmin() || !game || game.alwaysOpen) { row.style.display = 'none'; return; }
+      row.style.display = 'flex';
+      const open = isGameOpen(game.id);
+      document.getElementById('casinoGameStatusLabel').textContent = open ? 'Open to everyone' : 'Closed — testing only';
+      const btn = document.getElementById('casinoGameStatusToggleBtn');
+      btn.textContent = open ? 'Close game' : 'Open game';
+      btn.onclick = async () => {
+        try {
+          await configCol.doc('games').set({ [game.id]: !open }, { merge: true });
+          showToast(open ? 'Game closed to players' : 'Game opened to everyone');
+        } catch (err) { showToast('Failed: ' + err.message); }
+      };
+    }
+    function setCasinoGame(id) {
+      if (!visibleCasinoGames().some(g => g.id === id)) id = 'jackpot';
+      casinoActiveGame = id;
+      localStorage.setItem('sor-casino-game', id);
+      const closed = !isAdmin() && !isGameOpen(id);
+      document.getElementById('slotGameBody').style.display = (id === 'jackpot' && !closed) ? 'block' : 'none';
+      document.getElementById('blackjackGameBody').style.display = (id === 'blackjack' && !closed) ? 'block' : 'none';
+      const notice = document.getElementById('casinoGameClosedNotice');
+      notice.style.display = closed ? 'block' : 'none';
+      if (closed) notice.textContent = `${CASINO_GAMES.find(g => g.id === id)?.name || 'This game'} isn't open yet — check back soon!`;
+      renderCasinoGameSelect();
+      renderCasinoGameStatusRow();
+      if (id === 'blackjack' && !closed) initBlackjackUi();
+    }
+    document.getElementById('casinoGameSelect').onchange = (e) => setCasinoGame(e.target.value);
+
     function coinsOf(u) {
       return typeof u?.jackpotCoins === 'number' ? u.jackpotCoins : JACKPOT_START_COINS;
     }
@@ -6367,19 +6601,23 @@
     function getJackpotBet() {
       const stored = localStorage.getItem('sor-jackpot-bet');
       const n = stored === null ? JACKPOT_MIN_BET : Number(stored);
-      return Math.min(jackpotMaxBetLive, Math.max(JACKPOT_MIN_BET, n));
+      return Math.min(jackpotMaxBetLive, Math.max(JACKPOT_MIN_BET, Number.isFinite(n) ? n : JACKPOT_MIN_BET));
     }
     function setJackpotBet(n) {
-      n = Math.min(jackpotMaxBetLive, Math.max(JACKPOT_MIN_BET, n));
+      if (!Number.isFinite(n)) n = JACKPOT_MIN_BET;
+      n = Math.min(jackpotMaxBetLive, Math.max(JACKPOT_MIN_BET, Math.round(n)));
       localStorage.setItem('sor-jackpot-bet', String(n));
-      jackpotBetValueEl.textContent = n;
+      jackpotBetValueEl.value = n;
+      document.getElementById('jackpotBetMaxLabel').textContent = `Max ${jackpotMaxBetLive}`;
       jackpotBetMinusBtn.disabled = jackpotSpinning || n <= JACKPOT_MIN_BET;
       jackpotBetPlusBtn.disabled = jackpotSpinning || n >= jackpotMaxBetLive;
+      jackpotBetValueEl.disabled = jackpotSpinning;
       renderJackpotPaytable();
       updateJackpotSpinAvailability();
     }
     jackpotBetMinusBtn.onclick = () => { if (!jackpotSpinning) setJackpotBet(getJackpotBet() - 1); };
     jackpotBetPlusBtn.onclick = () => { if (!jackpotSpinning) setJackpotBet(getJackpotBet() + 1); };
+    jackpotBetValueEl.addEventListener('change', () => { if (!jackpotSpinning) setJackpotBet(Number(jackpotBetValueEl.value)); });
     function pickWeightedSymbol() {
       const total = JACKPOT_SYMBOLS.reduce((s, x) => s + x.weight, 0);
       let r = Math.random() * total;
@@ -6452,6 +6690,7 @@
       updateJackpotSpinAvailability();
       renderJackpotAdminRow();
       setJackpotSubTab('game');
+      setCasinoGame(casinoActiveGame);
       document.getElementById('toolbar').style.display = 'none';
       beerList.style.display = 'none';
       partyListEl.style.display = 'none';
@@ -6864,51 +7103,60 @@
       jackpotSpinBtn.disabled = false;
       jackpotBetMinusBtn.disabled = getJackpotBet() <= JACKPOT_MIN_BET;
       jackpotBetPlusBtn.disabled = getJackpotBet() >= jackpotMaxBetLive;
+      jackpotBetValueEl.disabled = false;
       updateJackpotSpinAvailability();
     }
 
     jackpotSpinBtn.onclick = async () => {
       if (jackpotSpinning) return;
       const bet = getJackpotBet();
-      const coins = getJackpotCoins();
-      if (coins < bet) {
-        // The local allUsers cache can be stale or briefly empty (e.g. right
-        // after a page refresh), so `coins` here might be wrong. Before ever
-        // resetting anyone's balance, re-check the REAL server value inside a
-        // transaction and only top up if it's genuinely below the bet — this
-        // is what previously wiped real balances (sometimes thousands of
-        // coins) back down to the starting amount whenever the local cache
-        // hadn't caught up yet.
-        jackpotSpinBtn.disabled = true;
-        try {
-          const ref = usersCol.doc(myUid);
-          const toppedUp = await db.runTransaction(async (tx) => {
-            const snap = await tx.get(ref);
-            const serverCoins = coinsOf(snap.data());
-            if (serverCoins >= bet) return false;
-            tx.set(ref, { jackpotCoins: JACKPOT_START_COINS }, { merge: true });
-            return true;
-          });
-          if (toppedUp) {
-            jackpotCoinsEl.textContent = JACKPOT_START_COINS;
-            jackpotMessageEl.innerHTML = `Topped up to ${JACKPOT_START_COINS} ${JACKPOT_COIN_ICON} — good luck!`;
-          } else {
-            jackpotCoinsEl.textContent = getJackpotCoins();
-            jackpotMessageEl.textContent = 'Your balance just synced — try spinning again!';
-          }
-        } catch (err) {
-          showToast('Could not check balance: ' + err.message);
-        }
-        jackpotSpinBtn.disabled = false;
-        updateJackpotSpinAvailability();
-        return;
-      }
-      jackpotSpinning = true;
       jackpotSpinBtn.disabled = true;
       jackpotBetMinusBtn.disabled = true;
       jackpotBetPlusBtn.disabled = true;
-      jackpotCoinsEl.textContent = coins - bet;
-      usersCol.doc(myUid).set({ jackpotCoins: firebase.firestore.FieldValue.increment(-bet) }, { merge: true }).catch(() => { });
+      jackpotBetValueEl.disabled = true;
+      // The bet is always debited inside a transaction against the REAL
+      // server balance, never the local allUsers cache — that cache can be
+      // stale or briefly empty (e.g. right after a page refresh), and
+      // trusting it for the go/no-go decision is what previously let a
+      // stale-low read wipe a real balance back to the starting amount, and
+      // could in principle let a stale-high read spend more than someone
+      // actually has. A transaction closes both directions at once.
+      let outcome;
+      try {
+        const ref = usersCol.doc(myUid);
+        outcome = await db.runTransaction(async (tx) => {
+          const snap = await tx.get(ref);
+          const serverCoins = coinsOf(snap.exists ? snap.data() : null);
+          if (serverCoins < bet) {
+            tx.set(ref, { jackpotCoins: JACKPOT_START_COINS }, { merge: true });
+            return { status: 'toppedUp', coins: JACKPOT_START_COINS };
+          }
+          const newBalance = serverCoins - bet;
+          tx.set(ref, { jackpotCoins: newBalance }, { merge: true });
+          return { status: 'ok', coins: newBalance };
+        });
+      } catch (err) {
+        showToast('Could not spin: ' + err.message);
+        jackpotSpinBtn.disabled = false;
+        jackpotBetMinusBtn.disabled = getJackpotBet() <= JACKPOT_MIN_BET;
+        jackpotBetPlusBtn.disabled = getJackpotBet() >= jackpotMaxBetLive;
+        jackpotBetValueEl.disabled = false;
+        return;
+      }
+
+      if (outcome.status === 'toppedUp') {
+        jackpotCoinsEl.textContent = outcome.coins;
+        jackpotMessageEl.innerHTML = `Topped up to ${JACKPOT_START_COINS} ${JACKPOT_COIN_ICON} — good luck!`;
+        jackpotSpinBtn.disabled = false;
+        jackpotBetMinusBtn.disabled = getJackpotBet() <= JACKPOT_MIN_BET;
+        jackpotBetPlusBtn.disabled = getJackpotBet() >= jackpotMaxBetLive;
+        jackpotBetValueEl.disabled = false;
+        updateJackpotSpinAvailability();
+        return;
+      }
+
+      jackpotSpinning = true;
+      jackpotCoinsEl.textContent = outcome.coins;
       jackpotMessageEl.textContent = 'Spinning…';
       jackpotReelEls.forEach(el => el.classList.add('spinning'));
 
@@ -6928,6 +7176,241 @@
           if (i === stopDelays.length - 1) finishJackpotSpin(results, bet);
         }, delay);
       });
+    };
+
+    // ---------- Blackjack ----------
+    const BJ_MIN_BET = 1;
+    const BJ_DEFAULT_MAX_BET = 50;
+    let bjMaxBetLive = BJ_DEFAULT_MAX_BET;
+    configCol.doc('blackjack').onSnapshot(snap => {
+      const v = snap.data()?.maxBet;
+      bjMaxBetLive = typeof v === 'number' && v >= BJ_MIN_BET ? v : BJ_DEFAULT_MAX_BET;
+      if (jackpotPageOpen && casinoActiveGame === 'blackjack') {
+        setBjBet(getBjBet());
+        renderBjAdminRow();
+      }
+    }, err => showToast('Sync error: ' + err.message));
+    function renderBjAdminRow() {
+      const row = document.getElementById('bjAdminRow');
+      row.style.display = isAdmin() ? 'flex' : 'none';
+      if (!isAdmin()) return;
+      document.getElementById('bjMaxBetLabel').textContent = `Max bet: ${bjMaxBetLive}`;
+      document.getElementById('bjMaxBetEdit').style.display = 'none';
+    }
+    document.getElementById('bjEditMaxBetBtn').onclick = () => {
+      document.getElementById('bjMaxBetInput').value = bjMaxBetLive;
+      document.getElementById('bjMaxBetEdit').style.display = 'flex';
+    };
+    document.getElementById('bjMaxBetCancelBtn').onclick = () => {
+      document.getElementById('bjMaxBetEdit').style.display = 'none';
+    };
+    document.getElementById('bjMaxBetSaveBtn').onclick = async () => {
+      const n = Math.floor(Number(document.getElementById('bjMaxBetInput').value));
+      if (!Number.isFinite(n) || n < BJ_MIN_BET) {
+        showToast(`Max bet must be a whole number ≥ ${BJ_MIN_BET}`);
+        return;
+      }
+      try {
+        await configCol.doc('blackjack').set({ maxBet: n }, { merge: true });
+        showToast('Max bet updated');
+        document.getElementById('bjMaxBetEdit').style.display = 'none';
+      } catch (err) {
+        showToast('Failed: ' + err.message);
+      }
+    };
+    let bjDisplayCoins = null; // tracks coins through an active hand so a fast Hit/Stand can't race the Firestore listener
+    function bjFreshDeck() {
+      const deck = POKER_CARDS.filter(c => !c.isJoker).map(c => c.id);
+      for (let i = deck.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [deck[i], deck[j]] = [deck[j], deck[i]];
+      }
+      return deck;
+    }
+    function bjRankOf(id) { return id.slice(0, -1); }
+    function bjHandValue(cardIds) {
+      let total = 0, aces = 0;
+      cardIds.forEach(id => {
+        const rank = bjRankOf(id);
+        const v = rank === 'A' ? 11 : (['J', 'Q', 'K'].includes(rank) ? 10 : parseInt(rank, 10));
+        if (rank === 'A') aces++;
+        total += v;
+      });
+      while (total > 21 && aces > 0) { total -= 10; aces--; }
+      return total;
+    }
+    function bjIsBlackjack(cardIds) { return cardIds.length === 2 && bjHandValue(cardIds) === 21; }
+    const bjBetValueEl = document.getElementById('bjBetValue');
+    function getBjBet() {
+      const stored = localStorage.getItem('sor-bj-bet');
+      const n = stored === null ? BJ_MIN_BET : Number(stored);
+      return Math.min(bjMaxBetLive, Math.max(BJ_MIN_BET, Number.isFinite(n) ? n : BJ_MIN_BET));
+    }
+    function setBjBet(n) {
+      if (!Number.isFinite(n)) n = BJ_MIN_BET;
+      n = Math.min(bjMaxBetLive, Math.max(BJ_MIN_BET, Math.round(n)));
+      localStorage.setItem('sor-bj-bet', String(n));
+      bjBetValueEl.value = n;
+      document.getElementById('bjBetMaxLabel').textContent = `Max ${bjMaxBetLive}`;
+      document.getElementById('bjBetMinus').disabled = n <= BJ_MIN_BET;
+      document.getElementById('bjBetPlus').disabled = n >= bjMaxBetLive;
+    }
+    document.getElementById('bjBetMinus').onclick = () => setBjBet(getBjBet() - 1);
+    document.getElementById('bjBetPlus').onclick = () => setBjBet(getBjBet() + 1);
+    bjBetValueEl.addEventListener('change', () => setBjBet(Number(bjBetValueEl.value)));
+    // The active hand lives in this local variable, not re-derived from the
+    // Firestore-backed allUsers cache on every click — that cache only
+    // updates once its listener round-trips, so a fast Hit/Stand right after
+    // Deal could otherwise read stale data and silently no-op, and every
+    // render would lag behind the click waiting on a network round-trip.
+    // Firestore's copy of blackjackHand exists only so a mid-hand refresh
+    // can resume the game; it's never read back into the live UI otherwise.
+    let bjActiveHand = null;
+    function bjCardHtml(id, faceDown) {
+      if (faceDown) return '<div class="cardMini cardBack"></div>';
+      return cardMiniHtml(POKER_CARDS.find(x => x.id === id));
+    }
+    function renderBjHands(hand, opts) {
+      opts = opts || {};
+      document.getElementById('bjDealerHand').innerHTML = hand.dealerCards.map((id, i) => bjCardHtml(id, opts.dealerHideHole && i === 1)).join('');
+      document.getElementById('bjPlayerHand').innerHTML = hand.playerCards.map(id => bjCardHtml(id, false)).join('');
+      document.getElementById('bjDealerTotal').textContent = opts.dealerHideHole ? '' : `(${bjHandValue(hand.dealerCards)})`;
+      document.getElementById('bjPlayerTotal').textContent = `(${bjHandValue(hand.playerCards)})`;
+    }
+    function bjShowIdleState() {
+      document.getElementById('bjDealerHand').innerHTML = '';
+      document.getElementById('bjPlayerHand').innerHTML = '';
+      document.getElementById('bjDealerTotal').textContent = '';
+      document.getElementById('bjPlayerTotal').textContent = '';
+      document.getElementById('bjMessage').textContent = 'Place your bet!';
+      document.getElementById('bjDealBtn').style.display = 'block';
+      document.getElementById('bjActionRow').style.display = 'none';
+      document.getElementById('bjBetRow').style.display = 'flex';
+    }
+    function bjShowPlayingState() {
+      renderBjHands(bjActiveHand, { dealerHideHole: true });
+      document.getElementById('bjMessage').textContent = 'Your move';
+      document.getElementById('bjDealBtn').style.display = 'none';
+      document.getElementById('bjActionRow').style.display = 'flex';
+      document.getElementById('bjBetRow').style.display = 'none';
+    }
+    function initBlackjackUi() {
+      setBjBet(getBjBet());
+      renderBjAdminRow();
+      if (bjActiveHand) { bjShowPlayingState(); return; }
+      // No hand in this session yet — check whether one was persisted before
+      // a reload, so refreshing mid-hand doesn't strand an already-paid bet.
+      const persisted = allUsers.find(x => x.id === myUid)?.blackjackHand || null;
+      if (persisted && persisted.status === 'player-turn') {
+        bjActiveHand = persisted;
+        bjShowPlayingState();
+      } else {
+        bjShowIdleState();
+      }
+    }
+    function bjResolve(resultText, payout) {
+      bjActiveHand = null;
+      const updates = { blackjackHand: firebase.firestore.FieldValue.delete() };
+      if (payout > 0) updates.jackpotCoins = firebase.firestore.FieldValue.increment(payout);
+      usersCol.doc(myUid).set(updates, { merge: true }).catch(() => { });
+      document.getElementById('bjMessage').innerHTML = resultText;
+      document.getElementById('bjActionRow').style.display = 'none';
+      document.getElementById('bjDealBtn').style.display = 'block';
+      document.getElementById('bjBetRow').style.display = 'flex';
+      if (bjDisplayCoins !== null) {
+        bjDisplayCoins += payout;
+        jackpotCoinsEl.textContent = bjDisplayCoins;
+        bjDisplayCoins = null;
+      }
+    }
+    document.getElementById('bjDealBtn').onclick = async () => {
+      if (bjActiveHand) return;
+      const bet = getBjBet();
+      const dealBtn = document.getElementById('bjDealBtn');
+      dealBtn.disabled = true;
+      // Debit inside a transaction against the REAL server balance, never
+      // the local allUsers cache — see the identical reasoning on the
+      // jackpot spin handler. This is what keeps a stale-cache read from
+      // ever letting a bet drive someone's real balance negative.
+      let outcome;
+      try {
+        const ref = usersCol.doc(myUid);
+        outcome = await db.runTransaction(async (tx) => {
+          const snap = await tx.get(ref);
+          const serverCoins = coinsOf(snap.exists ? snap.data() : null);
+          if (serverCoins < bet) return { status: 'insufficient', coins: serverCoins };
+          const newBalance = serverCoins - bet;
+          tx.set(ref, { jackpotCoins: newBalance }, { merge: true });
+          return { status: 'ok', coins: newBalance };
+        });
+      } catch (err) {
+        showToast('Could not deal: ' + err.message);
+        dealBtn.disabled = false;
+        return;
+      }
+      dealBtn.disabled = false;
+      if (outcome.status === 'insufficient') {
+        jackpotCoinsEl.textContent = outcome.coins;
+        showToast('Not enough coins for that bet');
+        return;
+      }
+      bjDisplayCoins = outcome.coins;
+      jackpotCoinsEl.textContent = bjDisplayCoins;
+
+      const deck = bjFreshDeck();
+      const playerCards = [deck.pop(), deck.pop()];
+      const dealerCards = [deck.pop(), deck.pop()];
+      const playerBJ = bjIsBlackjack(playerCards);
+      const dealerBJ = bjIsBlackjack(dealerCards);
+
+      if (playerBJ || dealerBJ) {
+        renderBjHands({ playerCards, dealerCards }, { dealerHideHole: false });
+        if (playerBJ && dealerBJ) { bjResolve('Push — both blackjack! Bet returned.', bet); }
+        else if (playerBJ) { const payout = bet + Math.floor(bet * 1.5); bjResolve(`Blackjack! You win ${payout} ${JACKPOT_COIN_ICON}`, payout); }
+        else { bjResolve('Dealer has blackjack — you lose.', 0); }
+        return;
+      }
+
+      bjActiveHand = { bet, deck, playerCards, dealerCards, status: 'player-turn' };
+      usersCol.doc(myUid).set({ blackjackHand: bjActiveHand }, { merge: true }).catch(() => { });
+      bjShowPlayingState();
+    };
+    document.getElementById('bjHitBtn').onclick = () => {
+      if (!bjActiveHand) return;
+      const deck = bjActiveHand.deck.slice();
+      const playerCards = bjActiveHand.playerCards.concat([deck.pop()]);
+      const total = bjHandValue(playerCards);
+      bjActiveHand = { ...bjActiveHand, deck, playerCards };
+      renderBjHands(bjActiveHand, { dealerHideHole: true });
+      if (total > 21) {
+        bjResolve(`Bust at ${total} — you lose.`, 0);
+        return;
+      }
+      usersCol.doc(myUid).set({ blackjackHand: bjActiveHand }, { merge: true }).catch(() => { });
+    };
+    document.getElementById('bjStandBtn').onclick = async () => {
+      if (!bjActiveHand) return;
+      const hand = bjActiveHand;
+      document.getElementById('bjHitBtn').disabled = true;
+      document.getElementById('bjStandBtn').disabled = true;
+      let deck = hand.deck.slice();
+      let dealerCards = hand.dealerCards.slice();
+      renderBjHands({ ...hand, dealerCards }, { dealerHideHole: false });
+      while (bjHandValue(dealerCards) < 17) {
+        await new Promise(r => setTimeout(r, 500));
+        dealerCards = dealerCards.concat([deck.pop()]);
+        renderBjHands({ ...hand, dealerCards }, { dealerHideHole: false });
+      }
+      const playerTotal = bjHandValue(hand.playerCards);
+      const dealerTotal = bjHandValue(dealerCards);
+      document.getElementById('bjHitBtn').disabled = false;
+      document.getElementById('bjStandBtn').disabled = false;
+      let resultText, payout;
+      if (dealerTotal > 21) { resultText = `Dealer busts at ${dealerTotal} — you win!`; payout = hand.bet * 2; }
+      else if (dealerTotal > playerTotal) { resultText = `Dealer ${dealerTotal} beats your ${playerTotal} — you lose.`; payout = 0; }
+      else if (dealerTotal < playerTotal) { resultText = `You win, ${playerTotal} vs ${dealerTotal}!`; payout = hand.bet * 2; }
+      else { resultText = `Push — both ${playerTotal}. Bet returned.`; payout = hand.bet; }
+      bjResolve(resultText, payout);
     };
 
     // ---------- Back button navigation ----------
