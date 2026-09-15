@@ -278,7 +278,37 @@
       border: 1px solid var(--border);
       border-radius: 14px;
       cursor: pointer;
-      align-items: center
+      align-items: flex-start;
+      min-height: 96px
+    }
+
+    .partyChipsRow {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 5px;
+      margin-top: 6px
+    }
+
+    .shopPreviewChip.partyChipMini {
+      width: 16px;
+      height: 16px;
+      border-width: 3px
+    }
+
+    .shopPreviewChip.partyChipViewBadge {
+      width: 40px;
+      height: 40px;
+      border-width: 8px;
+      flex: 0 0 auto
+    }
+
+    .partyChipPhotoThumb {
+      width: 44px;
+      height: 44px;
+      border-radius: 8px;
+      object-fit: cover;
+      flex: 0 0 auto;
+      cursor: pointer
     }
 
     .partyThumb {
@@ -992,6 +1022,14 @@
       height: 340px;
       object-fit: cover;
       cursor: pointer
+    }
+
+    .chipPhotoPreview {
+      width: 100%;
+      height: 340px;
+      object-fit: cover;
+      border-radius: 12px;
+      display: block
     }
 
     .viewCarousel .placeholder {
@@ -2014,11 +2052,47 @@
       }
     }
 
+    /* Skins are fixed, colorful backgrounds that don't change with the
+       light/dark theme toggle, so relying on the theme's normal text color
+       (var(--text)) can leave name/stats unreadable against some skins in
+       some themes. Force a theme-independent readable text treatment
+       (white with a dark shadow) on exactly the plain-text pieces that sit
+       directly against a skinned container's background, everywhere skins
+       can appear: leaderboards (beer + casino), the profile header, and the
+       All Drinkers list. */
+    .leaderboardRow[class*="uSkin-"] .leaderboardRank,
+    .leaderboardRow[class*="uSkin-"] .leaderboardName,
+    .leaderboardRow[class*="uSkin-"] .leaderboardMeta,
+    .leaderboardRow[class*="uSkin-"] .leaderboardTotal,
+    .profileViewSection[class*="uSkin-"] .profileViewName,
+    .profileViewSection[class*="uSkin-"] .profileViewBadge,
+    .profileViewSection[class*="uSkin-"] .profileViewStats,
+    .profileViewSection[class*="uSkin-"] .profileViewCoins,
+    .userRow[class*="uSkin-"] .userName,
+    .userRow[class*="uSkin-"] .userBadge,
+    .userRow[class*="uSkin-"] .userStats {
+      color: #fff !important;
+      text-shadow: 0 1px 2px rgba(0, 0, 0, .9), 0 0 6px rgba(0, 0, 0, .7) !important
+    }
+
+    .profileViewSection[class*="uSkin-"] {
+      border-radius: 16px;
+      padding: 14px
+    }
+
     /* ---------- Shop grid + inventory ---------- */
     .shopCoinsRow {
       display: flex;
       justify-content: flex-end;
       margin-bottom: 6px
+    }
+
+    .shopSection {
+      background: var(--bg-elev);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      padding: 14px;
+      margin-bottom: 16px
     }
 
     .shopCoinsBadge {
@@ -2058,7 +2132,16 @@
 
     .shopPreviewCircle {
       border-radius: 50%;
-      background: var(--bg-elev)
+      background: var(--bg-elev);
+      display: flex;
+      align-items: center;
+      justify-content: center
+    }
+
+    .shopBorderPlaceholderIcon {
+      width: 55%;
+      height: 55%;
+      color: var(--text-dim)
     }
 
     .shopPreviewSquare {
@@ -2085,6 +2168,17 @@
       cursor: pointer
     }
 
+    .shopEditPriceBtn {
+      background: none;
+      border: none;
+      color: var(--text-dim);
+      font-size: .68rem;
+      text-decoration: underline;
+      cursor: pointer;
+      padding: 0;
+      margin-top: 2px
+    }
+
     .profileViewInventory {
       display: flex;
       flex-wrap: wrap;
@@ -2099,6 +2193,25 @@
       flex-direction: column;
       align-items: center;
       gap: 4px
+    }
+
+    .invItemRemoveBtn {
+      position: absolute;
+      top: -6px;
+      right: -6px;
+      width: 18px;
+      height: 18px;
+      border-radius: 50%;
+      border: none;
+      background: var(--danger);
+      color: #fff;
+      font-size: .62rem;
+      font-weight: 800;
+      line-height: 18px;
+      text-align: center;
+      cursor: pointer;
+      padding: 0;
+      z-index: 2
     }
 
     .invItemPrice {
@@ -2122,12 +2235,20 @@
       color: #1c1c1c
     }
 
+    .chip-beer,
+    .chip-shot {
+      border: 9px solid transparent;
+      background:
+        linear-gradient(#fff, #fff) content-box,
+        repeating-conic-gradient(var(--chip-stripe-color) 0deg 22.5deg, #fff 22.5deg 45deg) border-box
+    }
+
     .chip-beer {
-      border: 5px solid #2fae4e
+      --chip-stripe-color: #2fae4e
     }
 
     .chip-shot {
-      border: 5px solid #d6362f
+      --chip-stripe-color: #d6362f
     }
 
     .shopPreviewChip.redeemed {
@@ -2296,7 +2417,8 @@
       display: flex;
       align-items: center;
       gap: 10px;
-      padding: 9px 0;
+      padding: 9px 10px;
+      border-radius: 10px;
       border-bottom: 1px solid var(--border)
     }
 
@@ -2531,14 +2653,22 @@
       <div class="shopCoinsRow">
         <span class="shopCoinsBadge"><span id="shopCoinIcon"></span> <span id="shopCoinsValue">50</span></span>
       </div>
-      <div class="userListHead">Borders</div>
-      <div class="shopGrid" id="shopBorderGrid"></div>
-      <div class="userListHead" style="margin-top:22px">Hats</div>
-      <div class="shopGrid" id="shopHatGrid"></div>
-      <div class="userListHead" style="margin-top:22px">Skins</div>
-      <div class="shopGrid" id="shopSkinGrid"></div>
-      <div class="userListHead" style="margin-top:22px">Chips</div>
-      <div class="shopGrid" id="shopChipsGrid"></div>
+      <div class="shopSection">
+        <div class="userListHead">Borders</div>
+        <div class="shopGrid" id="shopBorderGrid"></div>
+      </div>
+      <div class="shopSection">
+        <div class="userListHead">Hats</div>
+        <div class="shopGrid" id="shopHatGrid"></div>
+      </div>
+      <div class="shopSection">
+        <div class="userListHead">Skins</div>
+        <div class="shopGrid" id="shopSkinGrid"></div>
+      </div>
+      <div class="shopSection">
+        <div class="userListHead">Chips</div>
+        <div class="shopGrid" id="shopChipsGrid"></div>
+      </div>
     </div>
   </div>
   <button id="uacFab" title="UAC">UAC</button>
@@ -2778,6 +2908,10 @@
         <label>Drinkers</label>
         <div id="partyParticipants"></div>
       </div>
+      <div class="field" style="margin-top:16px" id="partyViewChipsSection">
+        <label>Chips redeemed here</label>
+        <div id="partyViewChips"></div>
+      </div>
     </div>
   </div>
 
@@ -2977,7 +3111,7 @@
       </div>
       <div id="chipPopupPhotoArea"></div>
       <div class="field" id="chipPopupPhotoField">
-        <label>Photo (optional)</label>
+        <label>Photo</label>
         <button type="button" class="btn ghost" id="chipPopupAddPhotoBtn" style="margin-top:6px">+ Add photo</button>
         <input type="file" id="chipPopupPhotoInput" accept="image/*" style="display:none">
       </div>
@@ -2987,10 +3121,26 @@
           <button type="button" class="btn ghost" id="chipPopupSpinTriggerBtn">🎡 Spin to pick</button>
         </div>
       </div>
+      <div class="field" style="margin-top:14px" id="chipPopupPartyField">
+        <label>Which party was this at?</label>
+        <div id="chipPopupPartyDisplay">
+          <button type="button" class="btn ghost" id="chipPopupPartyTriggerBtn">🎉 Choose a party</button>
+        </div>
+      </div>
       <div id="chipPopupRedeemedInfo" style="display:none"></div>
       <div class="formActions">
         <button type="button" class="btn primary" id="chipPopupRedeemBtn">Redeem</button>
       </div>
+    </div>
+  </div>
+
+  <div class="overlay" id="chipPartyPickerOverlay">
+    <div class="sheet">
+      <div class="sheetHead">
+        <h2>Choose a Party</h2>
+        <button class="closeX" id="chipPartyPickerClose">✕</button>
+      </div>
+      <div id="chipPartyPickerList"></div>
     </div>
   </div>
 
@@ -3007,6 +3157,23 @@
       <div class="formActions">
         <button type="button" class="btn ghost" id="editCoinsCancelBtn">Cancel</button>
         <button type="button" class="btn primary" id="editCoinsSaveBtn">Save</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="overlay" id="editShopPriceModal">
+    <div class="sheet">
+      <div class="sheetHead">
+        <h2>Edit Price</h2>
+        <button class="closeX" id="editShopPriceClose">✕</button>
+      </div>
+      <div class="field">
+        <label id="editShopPriceLabel">Set price for</label>
+        <input type="number" id="editShopPriceInput" min="0" step="1">
+      </div>
+      <div class="formActions">
+        <button type="button" class="btn ghost" id="editShopPriceCancelBtn">Cancel</button>
+        <button type="button" class="btn primary" id="editShopPriceSaveBtn">Save</button>
       </div>
     </div>
   </div>
@@ -3036,6 +3203,7 @@
         <div class="formActions">
           <button type="button" class="btn ghost" id="wheelBackBtn">Back</button>
           <button type="button" class="btn primary" id="wheelSpinBtn">SPIN</button>
+          <button type="button" class="btn primary" id="wheelAcceptBtn" style="display:none">Accept ✓</button>
         </div>
       </div>
     </div>
@@ -3201,7 +3369,7 @@
     <div class="card" data-id="${b.id}">
       <div class="cover">
         ${cover}
-        <span class="badge rating" style="background:${ratingColor(b.avgRating || 0)}">${b.avgRating != null ? b.avgRating.toFixed(1) : '–'}/10</span>
+        <span class="badge rating" style="background:${ratingColor(b.avgRating || 0)}">${b.avgRating != null ? b.avgRating.toFixed(1) : '–'}/10${b.ratingCount ? ` (${b.ratingCount})` : ''}</span>
         ${b.abv != null ? `<span class="badge abv">${b.abv}%</span>` : ''}
       </div>
       <div class="body">
@@ -3494,18 +3662,21 @@
     // ---------- Confirm modal ----------
     const confirmModal = document.getElementById('confirmModal');
     const confirmText = document.getElementById('confirmText');
-    function askConfirm(msg, fn) {
+    let pendingDeleteCloseAfter = true;
+    function askConfirm(msg, fn, closeOverlayAfter = true) {
       confirmText.textContent = msg;
       pendingDelete = fn;
+      pendingDeleteCloseAfter = closeOverlayAfter;
       confirmModal.classList.add('show');
     }
     document.getElementById('confirmCancel').onclick = () => { confirmModal.classList.remove('show'); pendingDelete = null; };
     document.getElementById('confirmOk').onclick = async () => {
       const fn = pendingDelete;
+      const closeAfter = pendingDeleteCloseAfter;
       confirmModal.classList.remove('show');
       pendingDelete = null;
       if (fn) await fn();
-      history.back();
+      if (closeAfter) history.back();
     };
 
     // ---------- Parties ----------
@@ -3566,6 +3737,23 @@
       return { joined: participants.length, totalBeers, totalShots };
     }
 
+    function chipsForParty(partyId) {
+      const result = [];
+      allUsers.forEach(u => {
+        (u.chips || []).forEach(c => {
+          if (c.status === 'redeemed' && c.partyId === partyId) {
+            result.push({ ...c, owner: u });
+          }
+        });
+      });
+      result.sort((a, b) => (a.redeemedAt || 0) - (b.redeemedAt || 0));
+      return result;
+    }
+    function partyChipBadgeHtml(chip) {
+      const label = chip.type === 'shot' ? 'Shot' : 'Beer';
+      return `<span class="shopPreviewChip chip-${chip.type} partyChipMini" title="${escapeHtml(chip.owner?.name || 'Anonymous')} · ${label}"></span>`;
+    }
+
     function renderPartyList() {
       document.getElementById('partyListHead').textContent = `Parties (${allParties.length})`;
       if (!allParties.length) {
@@ -3576,11 +3764,14 @@
       partyListEl.innerHTML = sorted.map(p => {
         const totals = partyTotals(p.id);
         const cover = (p.photos && p.photos[0]) ? `<img src="${escapeHtml(p.photos[0].url)}">` : '🎉';
+        const chips = chipsForParty(p.id);
+        const chipsHtml = chips.map(partyChipBadgeHtml).join('');
         return `<div class="partyRow" data-party="${p.id}">
       <div class="partyThumb">${cover}</div>
       <div class="partyInfo">
         <div class="partyName">${escapeHtml(p.name || 'Unnamed party')}</div>
         <div class="partyMeta">${totals.joined} joined · ${totals.totalBeers} 🍺 · ${totals.totalShots} 🥃</div>
+        ${chipsHtml ? `<div class="partyChipsRow">${chipsHtml}</div>` : ''}
       </div>
       ${(p.date || p.year) ? `<div class="tagStack">
         ${p.date ? `<span class="cityTag">${escapeHtml(p.date)}</span>` : ''}
@@ -3733,6 +3924,36 @@
       const canEdit = party.createdBy === myUid || isAdmin();
       partyViewEditBtn.style.display = canEdit ? 'flex' : 'none';
       renderPartyParticipants(party);
+      renderPartyViewChips(party);
+    }
+
+    function renderPartyViewChips(party) {
+      const chips = chipsForParty(party.id);
+      const el = document.getElementById('partyViewChips');
+      if (!chips.length) {
+        el.innerHTML = '<div class="empty" style="padding:14px 0">No chips redeemed here yet</div>';
+        return;
+      }
+      el.innerHTML = chips.map((chip, i) => {
+        const giver = allUsers.find(u => u.id === chip.givenByUid);
+        return `<div class="reviewRow">
+      <span class="shopPreviewChip chip-${chip.type} partyChipViewBadge"></span>
+      <div class="userAvatar">${avatarInner(chip.owner?.name, chip.owner?.photoURL)}</div>
+      <div class="reviewBody">
+        <div class="reviewHead">
+          <span class="userName">${escapeHtml(chip.owner?.name || 'Anonymous')}</span>
+        </div>
+        <div class="reviewComment">${giver ? `bought by ${escapeHtml(giver.name || 'Anonymous')}` : ''}</div>
+      </div>
+      ${chip.photoURL ? `<img src="${escapeHtml(chip.photoURL)}" class="partyChipPhotoThumb" data-i="${i}">` : ''}
+    </div>`;
+      }).join('');
+      const photos = chips.filter(c => c.photoURL).map(c => ({ url: c.photoURL }));
+      el.querySelectorAll('.partyChipPhotoThumb').forEach(img => {
+        const chip = chips[Number(img.dataset.i)];
+        const photoIndex = photos.findIndex(p => p.url === chip.photoURL);
+        img.onclick = () => openLightbox(photos, photoIndex);
+      });
     }
 
     function refreshPartyViewIfOpen() {
@@ -4847,7 +5068,7 @@
     <div class="card" data-id="${s.id}">
       <div class="cover">
         ${cover}
-        <span class="badge rating" style="background:${ratingColor(s.avgRating || 0)}">${s.avgRating != null ? s.avgRating.toFixed(1) : '–'}/10</span>
+        <span class="badge rating" style="background:${ratingColor(s.avgRating || 0)}">${s.avgRating != null ? s.avgRating.toFixed(1) : '–'}/10${s.ratingCount ? ` (${s.ratingCount})` : ''}</span>
         ${s.abv != null ? `<span class="badge abv">${s.abv}%</span>` : ''}
       </div>
       <div class="body">
@@ -5445,7 +5666,7 @@
       }
       userListEl.innerHTML = allUsers.map(u => {
         const stats = getUserStats(u.id);
-        return `<div class="userRow" data-user="${u.id}">
+        return `<div class="userRow${skinBgClass(u)}" data-user="${u.id}">
       <div class="userAvatar">${avatarInner(u.name, u.photoURL)}</div>
       <div>
         <div class="userName">${escapeHtml(u.name || 'Anonymous')}${u.id === ADMIN_UID ? ' <span class="adminTag">Admin</span>' : ''}</div>
@@ -5524,6 +5745,8 @@
       refreshProfileDisplays();
       updateUacFabVisibility();
       refreshJackpotIfOpen();
+      if (activeTab === 'parties') renderPartyList();
+      refreshPartyViewIfOpen();
     }, err => showToast('Sync error: ' + err.message));
 
     db.collectionGroup('ratings').onSnapshot(snap => {
@@ -5763,6 +5986,7 @@
     const JACKPOT_START_COINS = 50;
 
     // ---------- Shop (borders + skins, bought with UAC coins) ----------
+    const SHOP_BORDER_PLACEHOLDER_ICON = '<svg class="shopBorderPlaceholderIcon" viewBox="0 0 24 24"><circle cx="12" cy="8" r="4" fill="currentColor"/><path d="M4 21c0-4.4 3.6-7.5 8-7.5s8 3.1 8 7.5" fill="currentColor"/></svg>';
     const SHOP_BORDERS = [
       { id: 'border_bronze', name: 'Bronze Ring', price: 8000 },
       { id: 'border_silver', name: 'Silver Ring', price: 15000 },
@@ -5848,33 +6072,42 @@
       const me = allUsers.find(u => u.id === myUid) || {};
       const inv = me.inventory || [];
       document.getElementById('shopCoinsValue').textContent = coinsOf(me);
+      function editBtnHtml(id, name, price) {
+        return isAdmin() ? `<button type="button" class="shopEditPriceBtn" data-id="${id}" data-name="${escapeHtml(name)}" data-price="${price}">Edit price</button>` : '';
+      }
       function renderGroup(items, type, equippedField, shapeClass) {
         return items.map(it => {
+          const price = shopPriceFor(it);
           const owned = inv.includes(it.id);
           const equipped = me[equippedField] === it.id;
           const isHat = type === 'hat';
           const previewClass = isHat ? '' : (type === 'border' ? `uBorder-${it.id}` : `uSkin-${it.id}`);
-          const previewHtml = isHat ? `<div class="avatarHatBadge hat-${it.id}"></div>` : '';
+          const previewHtml = isHat ? `<div class="avatarHatBadge hat-${it.id}"></div>` : (type === 'border' ? SHOP_BORDER_PLACEHOLDER_ICON : '');
           const action = equipped
             ? `<span class="shopEquippedTag" data-id="${it.id}" data-type="${type}">Equipped ✕</span>`
             : owned
               ? `<button type="button" class="btn ghost shopEquipBtn" data-id="${it.id}" data-type="${type}">Equip</button>`
-              : `<button type="button" class="btn primary shopBuyBtn" data-id="${it.id}" data-type="${type}" data-price="${it.price}">${it.price} ${JACKPOT_COIN_ICON}</button>`;
+              : `<button type="button" class="btn primary shopBuyBtn" data-id="${it.id}" data-type="${type}" data-price="${price}">${price} ${JACKPOT_COIN_ICON}</button>`;
           return `<div class="shopItem ${equipped ? 'equipped' : ''}">
             <div class="shopPreview ${shapeClass} ${previewClass}">${previewHtml}</div>
             <div class="shopItemName">${escapeHtml(it.name)}</div>
             <div class="shopItemAction">${action}</div>
+            ${editBtnHtml(it.id, it.name, price)}
           </div>`;
         }).join('');
       }
       document.getElementById('shopBorderGrid').innerHTML = renderGroup(SHOP_BORDERS, 'border', 'equippedBorder', 'shopPreviewCircle');
       document.getElementById('shopHatGrid').innerHTML = renderGroup(SHOP_HATS, 'hat', 'equippedHat', 'shopPreviewCircle');
       document.getElementById('shopSkinGrid').innerHTML = renderGroup(SHOP_SKINS, 'skin', 'equippedSkin', 'shopPreviewSquare');
-      document.getElementById('shopChipsGrid').innerHTML = SHOP_CHIPS.map(it => `<div class="shopItem">
+      document.getElementById('shopChipsGrid').innerHTML = SHOP_CHIPS.map(it => {
+        const price = shopPriceFor(it);
+        return `<div class="shopItem">
         <div class="shopPreview shopPreviewChip chip-${it.type}">${it.label}</div>
         <div class="shopItemName">${escapeHtml(it.name)}</div>
-        <div class="shopItemAction"><button type="button" class="btn primary shopBuyChipBtn" data-type="${it.type}" data-price="${it.price}">${it.price} ${JACKPOT_COIN_ICON}</button></div>
-      </div>`).join('');
+        <div class="shopItemAction"><button type="button" class="btn primary shopBuyChipBtn" data-type="${it.type}" data-price="${price}">${price} ${JACKPOT_COIN_ICON}</button></div>
+        ${editBtnHtml(it.id, it.name, price)}
+      </div>`;
+      }).join('');
       document.querySelectorAll('.shopBuyBtn').forEach(btn => {
         btn.onclick = () => buyShopItem(btn.dataset.id, Number(btn.dataset.price));
       });
@@ -5886,6 +6119,9 @@
       });
       document.querySelectorAll('.shopBuyChipBtn').forEach(btn => {
         btn.onclick = () => buyChip(btn.dataset.type, Number(btn.dataset.price));
+      });
+      document.querySelectorAll('.shopEditPriceBtn').forEach(btn => {
+        btn.onclick = () => openEditShopPriceModal(btn.dataset.id, btn.dataset.name, Number(btn.dataset.price));
       });
     }
     async function buyChip(chipType, price) {
@@ -5929,7 +6165,7 @@
           const isHat = it.type === 'hat';
           const shape = it.type === 'skin' ? 'shopPreviewSquare' : 'shopPreviewCircle';
           const cls = isHat ? '' : (it.type === 'border' ? `uBorder-${id}` : `uSkin-${id}`);
-          const inner = isHat ? `<div class="avatarHatBadge hat-${id}"></div>` : '';
+          const inner = isHat ? `<div class="avatarHatBadge hat-${id}"></div>` : (it.type === 'border' ? SHOP_BORDER_PLACEHOLDER_ICON : '');
           return `<div class="invItem ${equipped ? 'equipped' : ''}" data-id="${id}" data-type="${it.type}" title="${escapeHtml(it.name)}">
             <div class="shopPreview ${shape} ${cls}">${inner}</div>
             <div class="invItemPrice">${abbreviatePrice(it.price)} ${JACKPOT_COIN_ICON}</div>
@@ -5955,7 +6191,9 @@
         chipsEl.innerHTML = chips.slice().sort((a, b) => (b.ts || 0) - (a.ts || 0)).map(c => {
           const def = SHOP_CHIPS.find(x => x.type === c.type);
           const redeemed = c.status === 'redeemed';
+          const removeBtn = isAdmin() ? `<button type="button" class="invItemRemoveBtn" data-chip-id="${c.id}" title="Remove chip">✕</button>` : '';
           return `<div class="invItem" data-chip-id="${c.id}" title="${def ? escapeHtml(def.name) : ''}">
+            ${removeBtn}
             <div class="shopPreview shopPreviewChip chip-${c.type}${redeemed ? ' redeemed' : ''}">${def ? def.label : ''}</div>
             <div class="invItemPrice">${abbreviatePrice(def ? def.price : null)} ${JACKPOT_COIN_ICON}</div>
           </div>`;
@@ -5976,19 +6214,55 @@
             }
           });
         }
+        if (isAdmin()) {
+          chipsEl.querySelectorAll('.invItemRemoveBtn').forEach(btn => {
+            btn.onclick = (e) => {
+              e.stopPropagation();
+              const chipId = btn.dataset.chipId;
+              askConfirm('Remove this chip? This cannot be undone.', async () => {
+                await adminDeleteChip(u.id, chipId);
+              }, false);
+            };
+          });
+        }
+      }
+    }
+
+    async function adminDeleteChip(ownerUid, chipId) {
+      try {
+        const ref = usersCol.doc(ownerUid);
+        let photoPath = null;
+        await db.runTransaction(async (tx) => {
+          const snap = await tx.get(ref);
+          const chips = snap.data()?.chips || [];
+          const chip = chips.find(c => c.id === chipId);
+          photoPath = chip?.photoPath || null;
+          tx.update(ref, { chips: chips.filter(c => c.id !== chipId) });
+        });
+        if (photoPath) { try { await storage.ref(photoPath).delete(); } catch (e) { } }
+        showToast('Chip removed');
+      } catch (err) {
+        showToast('Failed: ' + err.message);
       }
     }
 
     const JACKPOT_MIN_BET = 1;
     const JACKPOT_DEFAULT_MAX_BET = 10;
     let jackpotMaxBetLive = JACKPOT_DEFAULT_MAX_BET;
+    let shopPriceOverrides = {};
+    function shopPriceFor(item) {
+      const override = shopPriceOverrides[item.id];
+      return typeof override === 'number' ? override : item.price;
+    }
     const configCol = db.collection('config');
     configCol.doc('jackpot').onSnapshot(snap => {
       const v = snap.data()?.maxBet;
       jackpotMaxBetLive = typeof v === 'number' && v >= JACKPOT_MIN_BET ? v : JACKPOT_DEFAULT_MAX_BET;
+      shopPriceOverrides = snap.data()?.shopPrices || {};
       if (jackpotPageOpen) {
         setJackpotBet(getJackpotBet());
         renderJackpotAdminRow();
+        if (jackpotSubTab === 'shop') renderJackpotShop();
       }
     }, err => showToast('Sync error: ' + err.message));
     let jackpotSpinning = false;
@@ -6000,11 +6274,20 @@
     function getJackpotCoins() {
       return coinsOf(allUsers.find(u => u.id === myUid));
     }
-    function ensureMyJackpotCoinsInitialized() {
-      const me = allUsers.find(u => u.id === myUid);
-      if (!me || typeof me.jackpotCoins !== 'number') {
-        usersCol.doc(myUid).set({ jackpotCoins: JACKPOT_START_COINS }, { merge: true }).catch(() => { });
-      }
+    async function ensureMyJackpotCoinsInitialized() {
+      // Reads the real server value directly rather than trusting the local
+      // allUsers cache, which can still be empty/stale right after a page
+      // refresh (e.g. if the jackpot page is opened before the users
+      // collection's first snapshot arrives) — trusting the cache here
+      // previously caused real balances to be wiped back to the starting
+      // amount whenever that race happened.
+      try {
+        const ref = usersCol.doc(myUid);
+        const snap = await ref.get();
+        if (!snap.exists || typeof snap.data().jackpotCoins !== 'number') {
+          await ref.set({ jackpotCoins: JACKPOT_START_COINS }, { merge: true });
+        }
+      } catch (e) { /* ignore, next open will retry */ }
     }
     async function adminSetJackpotCoins(userId, exactValue) {
       try {
@@ -6040,6 +6323,39 @@
       const userId = editCoinsUserId;
       closeEditCoinsModal();
       if (userId) await adminSetJackpotCoins(userId, n);
+    };
+
+    // ---------- Admin: edit a shop item's price ----------
+    const editShopPriceModal = document.getElementById('editShopPriceModal');
+    let editShopPriceItemId = null;
+    function openEditShopPriceModal(itemId, itemName, currentPrice) {
+      editShopPriceItemId = itemId;
+      document.getElementById('editShopPriceLabel').textContent = `Set price for ${itemName}`;
+      document.getElementById('editShopPriceInput').value = currentPrice;
+      editShopPriceModal.classList.add('show');
+    }
+    function closeEditShopPriceModal() {
+      editShopPriceModal.classList.remove('show');
+      editShopPriceItemId = null;
+    }
+    document.getElementById('editShopPriceClose').onclick = closeEditShopPriceModal;
+    document.getElementById('editShopPriceCancelBtn').onclick = closeEditShopPriceModal;
+    editShopPriceModal.addEventListener('click', (e) => { if (e.target === editShopPriceModal) closeEditShopPriceModal(); });
+    document.getElementById('editShopPriceSaveBtn').onclick = async () => {
+      const n = Math.floor(Number(document.getElementById('editShopPriceInput').value));
+      if (!Number.isFinite(n) || n < 0) {
+        showToast('Enter a whole number, 0 or more');
+        return;
+      }
+      const itemId = editShopPriceItemId;
+      closeEditShopPriceModal();
+      if (!itemId) return;
+      try {
+        await configCol.doc('jackpot').set({ shopPrices: { [itemId]: n } }, { merge: true });
+        showToast('Price updated');
+      } catch (err) {
+        showToast('Failed: ' + err.message);
+      }
     };
     function refreshJackpotIfOpen() {
       if (!jackpotPageOpen) return;
@@ -6194,6 +6510,7 @@
     let currentChipOwnerUid = null;
     let chipPopupPendingPhoto = null;
     let chipPopupSelectedGiverUid = null;
+    let chipPopupSelectedPartyId = null;
 
     function showChipPopup(chipId, ownerUid) {
       ownerUid = ownerUid || myUid;
@@ -6206,17 +6523,20 @@
       currentChipOwnerUid = ownerUid;
       chipPopupPendingPhoto = null;
       chipPopupSelectedGiverUid = null;
+      chipPopupSelectedPartyId = null;
       const def = SHOP_CHIPS.find(x => x.type === chip.type);
       document.getElementById('chipPopupTitle').textContent = def ? def.name : chip.type;
       document.getElementById('chipPopupPhotoArea').innerHTML = '';
       if (redeemed) {
         document.getElementById('chipPopupPhotoField').style.display = 'none';
         document.getElementById('chipPopupGiverField').style.display = 'none';
+        document.getElementById('chipPopupPartyField').style.display = 'none';
         document.getElementById('chipPopupRedeemBtn').style.display = 'none';
         const giver = allUsers.find(u => u.id === chip.givenByUid);
+        const party = allParties.find(p => p.id === chip.partyId);
         document.getElementById('chipPopupRedeemedInfo').style.display = 'block';
         document.getElementById('chipPopupRedeemedInfo').innerHTML =
-          (chip.photoURL ? `<img src="${escapeHtml(chip.photoURL)}" style="width:100%;border-radius:12px;margin-bottom:12px">` : '') +
+          (chip.photoURL ? `<img src="${escapeHtml(chip.photoURL)}" class="chipPhotoPreview" style="margin-bottom:12px">` : '') +
           (giver
             ? `<div class="chipGiverRow">
                 <div class="userAvatar">${avatarInner(giver.name, giver.photoURL)}</div>
@@ -6225,14 +6545,18 @@
                   <div class="chipGiverLabel">bought this for you</div>
                 </div>
               </div>`
-            : `<div class="empty" style="padding:0">Redeemed</div>`);
+            : `<div class="empty" style="padding:0">Redeemed</div>`) +
+          (party ? `<div class="chipGiverLabel" style="margin-top:8px">🎉 at ${escapeHtml(party.name || 'Unnamed party')}</div>` : '');
       } else {
         document.getElementById('chipPopupPhotoField').style.display = 'block';
         document.getElementById('chipPopupGiverField').style.display = 'block';
+        document.getElementById('chipPopupPartyField').style.display = 'block';
         document.getElementById('chipPopupRedeemBtn').style.display = '';
         document.getElementById('chipPopupRedeemedInfo').style.display = 'none';
         document.getElementById('chipPopupGiverDisplay').innerHTML = '<button type="button" class="btn ghost" id="chipPopupSpinTriggerBtn">🎡 Spin to pick</button>';
         document.getElementById('chipPopupSpinTriggerBtn').onclick = openWheelOverlay;
+        document.getElementById('chipPopupPartyDisplay').innerHTML = '<button type="button" class="btn ghost" id="chipPopupPartyTriggerBtn">🎉 Choose a party</button>';
+        document.getElementById('chipPopupPartyTriggerBtn').onclick = openChipPartyPicker;
       }
       chipPopupOverlay.classList.add('show');
     }
@@ -6262,7 +6586,7 @@
         await ref.put(file);
         const url = await ref.getDownloadURL();
         chipPopupPendingPhoto = { url, path };
-        document.getElementById('chipPopupPhotoArea').innerHTML = `<img src="${escapeHtml(url)}" style="width:100%;border-radius:12px">`;
+        document.getElementById('chipPopupPhotoArea').innerHTML = `<img src="${escapeHtml(url)}" class="chipPhotoPreview">`;
         showToast('Photo added');
       } catch (err) {
         showToast('Photo upload failed: ' + err.message);
@@ -6271,14 +6595,31 @@
 
     document.getElementById('chipPopupRedeemBtn').onclick = async () => {
       if (!currentChipId || currentChipOwnerUid !== myUid) return;
+      const missing = [];
+      if (!chipPopupPendingPhoto) missing.push('a photo');
+      if (!chipPopupSelectedGiverUid) missing.push('who bought it (spin the wheel)');
+      if (!chipPopupSelectedPartyId) missing.push('which party this was at');
+      if (missing.length) {
+        showToast('Still need: ' + missing.join(', '));
+        return;
+      }
       const giverUid = chipPopupSelectedGiverUid;
+      const partyId = chipPopupSelectedPartyId;
       const chipId = currentChipId;
       const photo = chipPopupPendingPhoto;
       try {
         const ref = usersCol.doc(myUid);
         await db.runTransaction(async (tx) => {
           const snap = await tx.get(ref);
-          const chips = (snap.data()?.chips || []).map(c => {
+          const existingChips = snap.data()?.chips || [];
+          const thisChip = existingChips.find(c => c.id === chipId);
+          const alreadyRedeemedSameKind = existingChips.some(c =>
+            c.id !== chipId && c.status === 'redeemed' && c.type === thisChip?.type && c.partyId === partyId
+          );
+          if (alreadyRedeemedSameKind) {
+            throw new Error(`You already redeemed a ${thisChip.type === 'shot' ? 'shot' : 'beer'} chip for this party`);
+          }
+          const chips = existingChips.map(c => {
             if (c.id !== chipId) return c;
             return {
               ...c,
@@ -6286,6 +6627,7 @@
               photoURL: photo ? photo.url : (c.photoURL || null),
               photoPath: photo ? photo.path : (c.photoPath || null),
               givenByUid: giverUid,
+              partyId,
               redeemedAt: Date.now()
             };
           });
@@ -6294,9 +6636,60 @@
         showToast('Redeemed!');
         closeChipPopup();
       } catch (err) {
-        showToast('Failed: ' + err.message);
+        showToast(err.message.startsWith('You already redeemed') ? err.message : 'Failed: ' + err.message);
       }
     };
+
+    // ---------- Chip party picker ----------
+    const chipPartyPickerOverlay = document.getElementById('chipPartyPickerOverlay');
+    function renderChipPartyPickerList() {
+      const list = document.getElementById('chipPartyPickerList');
+      if (!allParties.length) {
+        list.innerHTML = '<div class="empty" style="padding:14px 0">No parties yet — create one first</div>';
+        return;
+      }
+      const sorted = allParties.slice().sort((a, b) => (b.ts || 0) - (a.ts || 0));
+      list.innerHTML = sorted.map(p => {
+        const cover = (p.photos && p.photos[0]) ? `<img src="${escapeHtml(p.photos[0].url)}">` : '🎉';
+        return `<div class="partyRow" data-party="${p.id}">
+      <div class="partyThumb">${cover}</div>
+      <div class="partyInfo">
+        <div class="partyName">${escapeHtml(p.name || 'Unnamed party')}</div>
+        <div class="partyMeta">${[p.date, p.year].filter(Boolean).join(' · ')}</div>
+      </div>
+    </div>`;
+      }).join('');
+      list.querySelectorAll('.partyRow').forEach(row => {
+        row.onclick = () => selectChipParty(row.dataset.party);
+      });
+    }
+    function selectChipParty(partyId) {
+      chipPopupSelectedPartyId = partyId;
+      const party = allParties.find(p => p.id === partyId);
+      const cover = (party?.photos && party.photos[0]) ? `<img src="${escapeHtml(party.photos[0].url)}">` : '🎉';
+      document.getElementById('chipPopupPartyDisplay').innerHTML = `
+        <div class="chipGiverRow">
+          <div class="partyThumb" style="width:40px;height:40px;font-size:1.1rem;flex:0 0 auto">${cover}</div>
+          <div>
+            <div class="chipGiverName">${escapeHtml(party?.name || 'Unnamed party')}</div>
+            <button type="button" class="btn ghost" id="chipPopupChangePartyBtn" style="margin-top:4px;padding:4px 10px;font-size:.78rem">Change</button>
+          </div>
+        </div>`;
+      document.getElementById('chipPopupChangePartyBtn').onclick = openChipPartyPicker;
+      closeChipPartyPicker();
+    }
+    function showChipPartyPicker() {
+      renderChipPartyPickerList();
+      chipPartyPickerOverlay.classList.add('show');
+    }
+    function openChipPartyPicker() {
+      pushOverlayState();
+      showChipPartyPicker();
+    }
+    function hideChipPartyPicker() { chipPartyPickerOverlay.classList.remove('show'); }
+    function closeChipPartyPicker() { history.back(); }
+    document.getElementById('chipPartyPickerClose').onclick = closeChipPartyPicker;
+    chipPartyPickerOverlay.addEventListener('click', (e) => { if (e.target === chipPartyPickerOverlay) closeChipPartyPicker(); });
 
     // ---------- Wheel of "who's here" (random giver picker) ----------
     const wheelOverlay = document.getElementById('wheelOverlay');
@@ -6385,6 +6778,7 @@
       document.getElementById('wheelSpinStep').style.display = 'block';
       document.getElementById('wheelSpinBtn').style.display = 'flex';
       document.getElementById('wheelSpinBtn').disabled = false;
+      document.getElementById('wheelAcceptBtn').style.display = 'none';
       requestAnimationFrame(() => { canvas.style.transition = ''; });
     };
 
@@ -6412,13 +6806,15 @@
         document.getElementById('wheelResult').textContent = `🎉 ${winner.name}!`;
         document.getElementById('wheelSpinBtn').style.display = 'none';
         const backBtn = document.getElementById('wheelBackBtn');
-        backBtn.textContent = 'Spin Again';
+        const acceptBtn = document.getElementById('wheelAcceptBtn');
+        backBtn.textContent = 'Respin';
         backBtn.onclick = () => {
           backBtn.textContent = 'Back';
           backBtn.onclick = () => {
             document.getElementById('wheelSelectStep').style.display = 'block';
             document.getElementById('wheelSpinStep').style.display = 'none';
           };
+          acceptBtn.style.display = 'none';
           document.getElementById('wheelSpinBtn').style.display = 'flex';
           document.getElementById('wheelSpinBtn').disabled = false;
           const c2 = document.getElementById('wheelCanvas');
@@ -6428,6 +6824,8 @@
           document.getElementById('wheelResult').textContent = '';
           requestAnimationFrame(() => { c2.style.transition = ''; });
         };
+        acceptBtn.style.display = 'flex';
+        acceptBtn.onclick = closeWheelOverlay;
         chipPopupSelectedGiverUid = winner.uid;
         const u = allUsers.find(x => x.id === winner.uid);
         document.getElementById('chipPopupGiverDisplay').innerHTML = `
@@ -6469,14 +6867,39 @@
       updateJackpotSpinAvailability();
     }
 
-    jackpotSpinBtn.onclick = () => {
+    jackpotSpinBtn.onclick = async () => {
       if (jackpotSpinning) return;
       const bet = getJackpotBet();
       const coins = getJackpotCoins();
       if (coins < bet) {
-        usersCol.doc(myUid).set({ jackpotCoins: JACKPOT_START_COINS }, { merge: true }).catch(() => { });
-        jackpotCoinsEl.textContent = JACKPOT_START_COINS;
-        jackpotMessageEl.innerHTML = `Topped up to ${JACKPOT_START_COINS} ${JACKPOT_COIN_ICON} — good luck!`;
+        // The local allUsers cache can be stale or briefly empty (e.g. right
+        // after a page refresh), so `coins` here might be wrong. Before ever
+        // resetting anyone's balance, re-check the REAL server value inside a
+        // transaction and only top up if it's genuinely below the bet — this
+        // is what previously wiped real balances (sometimes thousands of
+        // coins) back down to the starting amount whenever the local cache
+        // hadn't caught up yet.
+        jackpotSpinBtn.disabled = true;
+        try {
+          const ref = usersCol.doc(myUid);
+          const toppedUp = await db.runTransaction(async (tx) => {
+            const snap = await tx.get(ref);
+            const serverCoins = coinsOf(snap.data());
+            if (serverCoins >= bet) return false;
+            tx.set(ref, { jackpotCoins: JACKPOT_START_COINS }, { merge: true });
+            return true;
+          });
+          if (toppedUp) {
+            jackpotCoinsEl.textContent = JACKPOT_START_COINS;
+            jackpotMessageEl.innerHTML = `Topped up to ${JACKPOT_START_COINS} ${JACKPOT_COIN_ICON} — good luck!`;
+          } else {
+            jackpotCoinsEl.textContent = getJackpotCoins();
+            jackpotMessageEl.textContent = 'Your balance just synced — try spinning again!';
+          }
+        } catch (err) {
+          showToast('Could not check balance: ' + err.message);
+        }
+        jackpotSpinBtn.disabled = false;
         updateJackpotSpinAvailability();
         return;
       }
@@ -6528,6 +6951,10 @@
       }
       if (wheelOverlay.classList.contains('show')) {
         hideWheelOverlay();
+        return;
+      }
+      if (chipPartyPickerOverlay.classList.contains('show')) {
+        hideChipPartyPicker();
         return;
       }
       if (chipPopupOverlay.classList.contains('show')) {

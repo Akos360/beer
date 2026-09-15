@@ -1,46 +1,72 @@
 # 🍺 Sör
 
-A shared list where friends log and rate beers they've tried — add a beer with photos, rate it, and browse/sort/filter the group's collection.
+A shared PWA for a friend group: log and rate beers & spirits, track drinks at parties, review pubs, compete on a leaderboard, and gamble your points away in a casino. No login — identity is a random ID per device.
 
 Live app: https://beer-dca5c.web.app
 
-## Features
+## Tabs
 
-- Add a beer with: name, brewery, country + an editable flag emoji, beer type, Filtered/unfiltered switch, Degree (°) + ALC %, price (€), tasting comment, and one or more photos. Typing a Degree (common on Czech/Slovak labels, e.g. "Svijany 11°") auto-fills an estimated ALC % using the rule of thumb `(degree − 1) × 0.4` — actual attenuation varies per beer, so it's a starting point you can correct to match the label
-- Typing a name that matches an existing beer (case-insensitive) shows a non-blocking "already exists" warning under the Name field — a nudge, not a hard stop, since two entries can legitimately share a name
-- **Only the beer's creator can Edit or delete it** (tracked via a `createdBy` device ID set on creation). Beers from before this feature had no creator recorded, so they stay editable by anyone rather than getting stranded. One device ID is hardcoded as `ADMIN_UID` in `index.html` and can Edit/delete any beer regardless of who created it
-- **Ratings are per-user and averaged**: everyone who opens a beer (in the read-only view, no need to edit) can tap 1–10 to set or change their own rating; the badge shown everywhere (card, view, sorting) is the live average across everyone who's rated it, with the number of raters in parentheses
-- **Reviews**: below your own rating, a text box lets you post a review, paired with the rating you just gave. Below that, a scrollable "Reviews" list shows everyone's review — their photo, name, comment, and star rating — updating live as people post
-- Tap a card to open a read-only view: swipeable photo carousel, stats, your own rating + review, everyone else's reviews, and (creator only) an Edit button — nothing else is editable until you tap Edit
-- Tap a photo to open it full-screen (pinch/zoom-friendly lightbox)
-- Editing lets you add/remove photos and delete the beer entirely (delete also removes its photos and ratings/reviews from Storage/Firestore)
-- Inline toolbar (no popups): search on its own row, sort (New→Old / Old→New / Name A–Z / Rating high→low / Rating low→high) and type filter below it, both stretched to fill the width
-- Tap the flag emoji directly on a card to edit it in place — its current value is auto-selected so picking a new emoji replaces it instead of appending
-- **The Android/hardware back button navigates within the app instead of exiting it**: each opened screen (beer view, edit form, lightbox, profile view, edit profile, delete confirmation) pushes a browser history entry via `pushOverlayState()`, and a single `popstate` listener closes whichever screen is currently on top — restoring its parent screen (e.g. Edit → the beer's View, Edit Profile → the roster, someone else's profile → your own) rather than dropping straight to Home. Only backing out of every open screen actually exits the app
-- **Profiles, per device, no login**: tapping the avatar button (top-right, next to the theme toggle) opens a read-only view of your own photo, name, and **earned** badge, plus a roster of every other device/user that's set up a profile — tap any of them to see that person's photo/name/badge full-size. The profile view puts the (bigger) photo on the left with the name, tier badge, any collectible cards, and a 2-column stat grid to its right. An Edit button on your own profile opens the actual editable form (photo upload, name) — badges can't be picked, only earned. That same Edit screen shows the full badge ladder (Rookie → Liability) with the point threshold for each tier and your current one highlighted. Your rank is a combined total of beers you've uploaded + parties you've created + pubs you've created + parties you've joined + ratings you've given + reviews/comments you've written — the same breakdown (beers · parties · pubs · joined · ratings · reviews) shows on your own profile, everyone else's, and the roster. Rating a pub and rating a beer both land in the same "ratings" count, and writing a pub comment lands in "reviews" alongside beer reviews, since a `collectionGroup('ratings')` query naturally spans both beers' and pubs' `ratings` subcollections (they share the same subcollection name) — only pub comments needed a dedicated `collectionGroup('comments')` listener, since beer reviews live inside the rating doc itself rather than a separate subcollection. Identity is just a random ID generated on first visit and stored in that browser's `localStorage` — nothing to sign in with, and it's tied to the device/browser, not a person
-- **Collectible cards**: on the Edit Profile screen, two extra "Cards" slots let you pick one card from a standard 52-card poker deck (plus 2 jokers) and one from a 32-card Hungarian deck (Makk/Tök/Piros/Zöld × VII–Ász, used for games like Hetes) — tapping an empty slot opens a full grid of every card in that deck (plus a "None" option) so you can see and grab whichever one you want (the joker, the king of clubs, whatever), and tapping your own already-picked card lets you swap it or clear it. These are purely decorative extras (no name, just the card face) shown next to the tier badge on your profile and everyone else's — nobody else can change your picks, and there's nothing stopping two people from picking the same card
-- Installable as a PWA (Add to Home Screen), using `img/logo.png` as the app icon
-- Light/dark theme toggle
-- **Parties, for counting beers at an event**: a 2×2 "🍺 Beers / 🍻 Parties / 🍸 Pubs / 🏆 Rank" tab switch above the search bar swaps the whole home screen — Parties mode drops the search/filter row entirely and shows a single-column list (one photo + name + "X joined · Y beers" per row, plus a date and year as two small stacked tags on the right when set — separate fields, e.g. date `9/15` and year `2026`, not a native date picker); the `+` button becomes "Add Party" while this tab is active. A party has a name, that optional date/year, and photos, editable only by whoever created it (or the admin). Opening a party shows everyone in the app: people who've tapped **Join** get a beer counter with `+`/`-` only they (or the admin) can tap; everyone else just shows "Not joined" (or a **Join** button on their own row). Counts are summed live into the "X joined · Y beers" line on the list
-- **Pubs ("🍸 Pubs" tab)**: same single-column list style as Parties, but a pub is a name, an optional city (shown as a bordered tag on the right of its list row and under its name in the view screen), photos, a 1–10 rating (averaged across everyone, exactly like beer ratings), and a comment thread. Has its own search/sort/filter toolbar mirroring the Beers one exactly: search by name/city, sort New→Old / Old→New / Name A–Z / Rating high→low / Rating low→high, and an "All cities" dropdown populated from whatever cities have actually been entered. Unlike everything else in the app, **anyone can add more photos** to a pub directly from its view screen — only the pub's creator (or the admin) can rename it, set its city, manage/remove its photos, or delete it. Comments aren't capped at one per person like beer reviews — the same person can post as many as they want, each one still showing their *current* rating alongside it since rating and commenting are tracked separately (a `ratings` subcollection plus a `comments` subcollection, instead of the combined rating+comment doc beers use)
-- **Leaderboard ("🏆 Rank" tab)**: ranks everyone by total beers drunk this year — each person's total is their beers from parties **plus** whatever's been logged directly on the leaderboard, and those two sources are kept completely separate on purpose. Party beers are never copied anywhere; they're summed live, straight off each party's participant counts, for every party created this year. The leaderboard's own `+`/`-` (same self-only-or-admin rule as parties) only ever writes to that person's own day-by-day log, entirely independent of any party — so tapping `+` a couple of extra times never touches a party's count, and the `-` only shows, and only ever removes, beers that were added that same way. It's mathematically impossible for the leaderboard's minus button to eat into a party's total, since the two numbers live in different places and are just added together for display; adjusting a party's count still only happens from that party's own screen. A party's day (for the "X days" stat) is the date it was created, so a whole party still only ever counts as one day no matter how many people tapped `+` during it. At year end, whoever next opens the app triggers an automatic once-only snapshot of the previous year's final standings (parties + manual logs, combined the same way) into an immutable archive (Firestore rules physically block updates/deletes on it once created) — the live board then naturally starts back at zero since it only sums the current year's data. Past years show up in a "Past Years" list below the live board, tap one for a frozen, read-only view
+| Tab | What it's for |
+|---|---|
+| 📝 Reviews | Beers + Spirits sub-tabs — add/rate/review either |
+| 🍻 Parties | Track beers & shots drunk per person, redeem chips |
+| 🍸 Pubs | Rate pubs, tag them by activity (foosball, darts...) |
+| 🏆 Rank | Yearly leaderboard — beers, shots, or combined |
+| 🎰 Casino | Spend coins earned from ranking on slots + a shop |
+
+## Reviews (Beers & Spirits)
+
+- **Beer**: name, brewery, country + flag, type, filtered toggle, Degree (auto-estimates ALC% via `(degree−1)×0.4`), price, comment, photos
+- **Spirit**: name, distillery, type (Vodka/Pálinka/Whiskey/...), ALC%, price, country + flag, comment, photos — no degree/filtered field
+- Both: 1–10 rating averaged across everyone (shown with rater count), one review/rating per person, only the creator (or admin) can edit/delete, search + sort + type filter + count badge, tap a card for a read-only view with a photo lightbox
+
+## Parties
+
+- Join a party to get a beer counter and a shot counter (independent `+`/`-`, self or admin only)
+- **Chips**: buy a "Free Beer" or "Free Shot" chip in the casino shop, then redeem it — upload a photo, spin a wheel to pick who gave it to you (with an Accept/Respin choice), pick which party it's for, then redeem. One beer chip + one shot chip max per person per party
+- Party list/view shows everyone's redeemed chips with their photo; totals show joined count + beer total + shot total
+
+## Pubs
+
+- Name, city, photos, 1–10 rating, unlimited comments per person
+- Tag with any combination of: ⚽ Csocsó, 🎱 Billiárd, 🎯 Darts, 🎳 Bowling, 🥊 Box-gép, 🎰 Automat — filterable, color-coded
+- Anyone can add photos; only the creator/admin can rename, retag, or delete
+
+## Leaderboard
+
+- Three views: Beer / Shots / All, each a "🍺+🍻 ranked" list for the current year
+- A user's total = manual `+`/`-` taps on the board **plus** their live party counts, kept as separate data sources so one can never overwrite the other
+- Year rolls over automatically into a frozen, read-only archive the first time anyone opens the app afterward
+
+## Profiles & Badges
+
+- Per-device profile: photo, name, and a badge earned from a total score (beers + spirits + parties + pubs created + parties joined + ratings + reviews)
+- Optional decorative poker card + Hungarian card picks
+- Roster of every other user, each tappable to view their profile, badges, and equipped casino cosmetics
+
+## Casino
+
+- Everyone starts with coins; earn more by climbing the leaderboard
+- **Jackpot**: slot machine with a paytable, adjustable max bet, and a coin leaderboard
+- **Shop**: Borders, Hats, Skins (profile backgrounds), and Beer/Shot chips — equip one of each category; admin can edit any item's price live
+- Skins stay readable in any theme (forced white text + shadow over the skin art) everywhere a skin shows: leaderboard rows, profile header, user list
+
+## Admin
+
+One hardcoded device ID (`ADMIN_UID` in `index.html`) can, in addition to normal permissions: edit/delete anyone's beer, spirit, party, or pub; edit shop prices; remove any chip from any user's inventory. All enforcement is client-side — there's no real auth, consistent with the app's open trust model for a small group.
 
 ## Tech
 
-Single-page static app (`index.html`) — no build step, no framework. Firebase is loaded via CDN using the compat SDK:
-- **Firestore** — a `beers` collection (`name`, `brewery`, `country`, `flag`, `beerType`, `filtered`, `abv`, `price`, `comment`, `ts`, `createdBy`, computed `avgRating`/`ratingCount`, plus a `photos` array of `{url, path, ts}`), each with a `ratings` subcollection (doc id = rater's uid, `{rating, comment, userId, ts}` — a "rating" and a "review" are the same document) that `avgRating`/`ratingCount` are recomputed from on every rating change, and a `users` collection, doc id = a random UUID generated client-side and stored in `localStorage` (`name`, `photoURL`, `photoPath`, optional `pokerCard`/`hunCard` — a card id like `AS` or `piros_kiraly`, absent when no card is picked). Badges are never stored — they're computed client-side from a live `collectionGroup('ratings')` listener plus the beers list, matched against the `TIERS` thresholds in `index.html`. The poker/Hungarian decks themselves (`POKER_CARDS`/`HUN_CARDS`) are also just constants in `index.html` — rendered as small CSS "card face" divs, no image assets involved
-- Firestore rules include `match /{path=**}/ratings/{userId}` and `match /{path=**}/participants/{userId}` wildcard rules specifically to authorize those collection-group reads — the nested per-document rules alone don't cover cross-collection queries
-- A `parties` collection (`name`, `createdBy`, `ts`, `photos`) each with a `participants` subcollection (doc id = joined user's uid, `{count, ts}` — the doc only exists once that person has tapped Join, and `count` goes up only via `FieldValue.increment(1)`, never manual entry)
-- A `drinkLogs` collection, doc id `{userId}_{YYYY-MM-DD}` (`userId`, `date`, `year`, `count`) holds **only** beers logged directly on the leaderboard — party taps never write here, they stay purely in that party's `participants` doc. The leaderboard total for a user/year is computed on the fly as `sum(drinkLogs for that year)` + `sum(that user's participant.count across every party created that year)`; `computeStandings(manualLogs, usersList, partyMap)` takes the party side as a precomputed map so the live leaderboard (from the already-loaded `allParties`/`allPartyParticipants`) and the once-a-year archiver (a fresh one-time read, since listeners may not have loaded yet) can both feed it without duplicating the aggregation logic. A `leaderboardArchives/{year}` doc is created once (client-side, opportunistically, the next time anyone opens the app after the year rolls over) from that same combined total; Firestore rules allow `create` but hard-deny `update`/`delete` on it, so once written a year's standings can never be changed — confirmed by testing that even a direct client delete attempt is rejected
-- **Storage** — beer photos under `beers/{beerId}/{timestamp}_{filename}`, profile photos under `users/{userId}/{timestamp}_{filename}`, party photos under `parties/{partyId}/{timestamp}_{filename}`
-- **Hosting** — serves the static files directly
-- `manifest.json` + `sw.js` + the `apple-mobile-web-app-*` meta tags in `index.html` make it installable as a standalone app on both Android (Chrome) and iOS (Safari only — Chrome on iOS can't install standalone PWAs, that's an Apple platform restriction)
+Single static `index.html`, no build step, Firebase compat SDK via CDN:
 
-Same architecture as the `baba` app in this repo, adapted for beer's data model. Note: there's no real authentication anywhere in the app (device IDs are just self-reported `localStorage` values), so "only the creator can edit" is a UI-level restriction, not a cryptographically enforced one — consistent with the fully open trust model the rest of the app already relies on for a small friends group.
+- **Firestore**: `beers`, `spirits`, `parties` (+ `participants` subcollection with `count`/`shotCount`), `pubs` (+ `ratings`/`comments`), `users` (profile, inventory, equipped cosmetics, chips array, coins), `drinkLogs`/`shotLogs` (manual leaderboard taps), `leaderboardArchives` (immutable once created), `config/jackpot` (max bet, shop price overrides)
+- **Storage**: photos under `{collection}/{id}/{timestamp}_{filename}`
+- **Hosting** serves the static files; installable as a PWA (`manifest.json`, `sw.js`)
+- Back button navigates screen-to-screen via a `pushOverlayState()`/`popstate` history stack instead of exiting the app
 
 ## Local development
 
-Just open `index.html` in a browser — it talks directly to Firebase, no local server required (though `firebase serve` works too).
+Open `index.html` directly in a browser, or `firebase serve`.
 
 ## Deploying
 
@@ -48,12 +74,12 @@ Just open `index.html` in a browser — it talks directly to Firebase, no local 
 firebase deploy
 ```
 
-Deploys Hosting plus `firestore.rules` and `storage.rules`. Requires `firebase login` and the CLI pointed at the `beer-dca5c` project (already set as default in `.firebaserc`).
+Deploys Hosting + `firestore.rules` + `storage.rules`. Requires `firebase login` with the CLI pointed at `beer-dca5c` (default in `.firebaserc`).
 
-## Firebase project setup (for a fresh clone / new project)
+## Fresh project setup
 
-1. Create a Firebase project, enable Firestore and Storage (Storage requires the Blaze plan)
-2. Register a Web app in the project settings to get a `firebaseConfig` object
-3. Paste those values into the `firebaseConfig` block near the bottom of `index.html`
+1. Create a Firebase project, enable Firestore + Storage (Blaze plan)
+2. Register a Web app, copy its `firebaseConfig`
+3. Paste into the `firebaseConfig` block in `index.html`
 4. Update `.firebaserc` with your project ID
 5. `firebase deploy`
