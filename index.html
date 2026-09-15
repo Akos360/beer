@@ -52,12 +52,17 @@
       box-sizing: border-box
     }
 
+    html {
+      overscroll-behavior-x: none
+    }
+
     body {
       margin: 0;
       background: var(--bg);
       color: var(--text);
       font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
-      -webkit-tap-highlight-color: transparent
+      -webkit-tap-highlight-color: transparent;
+      overscroll-behavior-x: none
     }
 
     button,
@@ -103,7 +108,8 @@
     }
 
     #themeBtn,
-    #jackpotBtn {
+    #jackpotBtn,
+    #normalGamesBtn {
       background: none;
       border: none;
       font-size: 1.3rem;
@@ -830,6 +836,39 @@
       justify-content: space-between;
       align-items: center;
       margin-bottom: 12px
+    }
+
+    .sheetHeadActions {
+      display: flex;
+      align-items: center;
+      gap: 6px
+    }
+
+    .gamesComingSoon {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      gap: 6px;
+      padding: 90px 24px;
+      color: var(--text-dim)
+    }
+
+    .gamesComingSoonIcon {
+      font-size: 3.4rem;
+      margin-bottom: 6px
+    }
+
+    .gamesComingSoon h2 {
+      margin: 0;
+      color: var(--text);
+      font-size: 1.3rem
+    }
+
+    .gamesComingSoon p {
+      margin: 0;
+      font-size: .95rem
     }
 
     .sheetHead h2 {
@@ -1686,7 +1725,7 @@
       align-items: center;
       justify-content: center;
       flex-wrap: wrap;
-      gap: 8px;
+      gap: 4px;
       row-gap: 10px;
       margin-bottom: 16px
     }
@@ -1724,17 +1763,17 @@
     }
 
     .jackpotBetValue {
-      width: 52px;
+      width: 38px;
       min-width: 30px;
       text-align: center;
       font-weight: 800;
-      font-size: 1.1rem;
+      font-size: 1.05rem;
       border: 1px solid var(--border);
       border-radius: 8px;
       background: var(--bg-elev);
       color: var(--text);
       font-family: inherit;
-      padding: 5px 2px;
+      padding: 5px 1px;
       appearance: textfield;
       -moz-appearance: textfield
     }
@@ -1871,6 +1910,200 @@
       width: 80px
     }
 
+    .rouletteTable {
+      display: flex;
+      justify-content: center;
+      padding: 22px;
+      margin: 0 auto 18px;
+      max-width: 340px;
+      border-radius: 24px;
+      background: radial-gradient(ellipse at 50% 25%, #1a7a4a, #0d4a2c 65%, #08341f 100%);
+      border: 4px solid #caa43d;
+      box-shadow: inset 0 0 26px rgba(0, 0, 0, .5), 0 0 22px rgba(20, 160, 90, .25)
+    }
+
+    .rouletteWheelWrap {
+      position: relative;
+      width: 290px;
+      height: 290px;
+      border-radius: 50%;
+      box-shadow: 0 0 0 7px #caa43d, 0 0 22px rgba(0, 0, 0, .5), inset 0 0 24px rgba(0, 0, 0, .6)
+    }
+
+    .rouletteWheelWrap canvas {
+      display: block;
+      border-radius: 50%
+    }
+
+    .rouletteBallOrbit {
+      position: absolute;
+      inset: 0;
+      transform: rotate(0deg)
+    }
+
+    .rouletteBall {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      width: 17px;
+      height: 17px;
+      margin: -8.5px 0 0 -8.5px;
+      border-radius: 50%;
+      background: radial-gradient(circle at 32% 28%, #fff, #ddd 55%, #999 100%);
+      box-shadow: 0 2px 4px rgba(0, 0, 0, .6);
+      transform: translateY(-130px)
+    }
+
+    @keyframes rouletteBallBounce {
+      0% {
+        transform: translateY(-130px)
+      }
+
+      55% {
+        transform: translateY(-130px)
+      }
+
+      65% {
+        transform: translateY(-106px)
+      }
+
+      72% {
+        transform: translateY(-124px)
+      }
+
+      80% {
+        transform: translateY(-112px)
+      }
+
+      87% {
+        transform: translateY(-121px)
+      }
+
+      93% {
+        transform: translateY(-116px)
+      }
+
+      100% {
+        transform: translateY(-120px)
+      }
+    }
+
+    .rouletteCenterCap {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      width: 31px;
+      height: 31px;
+      margin: -15.5px 0 0 -15.5px;
+      border-radius: 50%;
+      background: radial-gradient(circle at 35% 30%, #f7d154, #b8860b 75%);
+      box-shadow: 0 0 0 2px #6b4d10, 0 2px 6px rgba(0, 0, 0, .5)
+    }
+
+    .rouletteBetTypes {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      margin-bottom: 10px
+    }
+
+    .rouletteBetRow2 {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 8px
+    }
+
+    .rouletteBetRow3 {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 8px
+    }
+
+    .rouletteBetBtn {
+      padding: 10px 4px;
+      border-radius: 10px;
+      border: 2px solid var(--border);
+      background: var(--bg-elev);
+      color: var(--text);
+      font-weight: 700;
+      font-size: .88rem;
+      cursor: pointer
+    }
+
+    .rouletteBetRed {
+      background: #c0392b;
+      color: #fff;
+      border-color: #7a2419
+    }
+
+    .rouletteBetBlack {
+      background: #1c1c1c;
+      color: #fff;
+      border-color: #000
+    }
+
+    .rouletteBetBtn.active {
+      border-color: #caa43d;
+      background: rgba(202, 164, 61, .18);
+      box-shadow: 0 0 0 1px #caa43d inset
+    }
+
+    .rouletteBetRed.active {
+      background: #c0392b;
+      border-color: #caa43d;
+      box-shadow: 0 0 0 2px #caa43d inset
+    }
+
+    .rouletteBetBlack.active {
+      background: #1c1c1c;
+      border-color: #caa43d;
+      box-shadow: 0 0 0 2px #caa43d inset
+    }
+
+    #rouletteGameBody .jackpotSpinBtn {
+      margin-bottom: 16px
+    }
+
+    .rouletteNumberBetRow {
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 20px;
+      row-gap: 14px;
+      margin-bottom: 16px
+    }
+
+    .rouletteNumberGroup {
+      display: flex;
+      align-items: center;
+      gap: 8px
+    }
+
+    .rouletteNumberLabel {
+      font-weight: 700;
+      color: var(--text-dim);
+      font-size: .85rem
+    }
+
+    .rouletteNumberBetRow #rouletteNumberInput {
+      width: 60px;
+      text-align: center
+    }
+
+    .rouletteBetStepperGroup {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 6px
+    }
+
+    .rouletteBetStepperRow {
+      display: flex;
+      align-items: center;
+      gap: 8px
+    }
+
     .casinoGameSelectRow {
       margin-bottom: 14px
     }
@@ -1924,17 +2157,20 @@
 
     .bjActionRow {
       display: flex;
+      flex-wrap: wrap;
       gap: 10px;
       margin-bottom: 16px
     }
 
     .bjActionRow .btn {
-      flex: 1;
+      flex: 1 1 40%;
       padding: 13px
     }
 
     .btn.bjHitBtn,
-    .btn.bjStandBtn {
+    .btn.bjStandBtn,
+    .btn.bjDoubleBtn,
+    .btn.bjSplitBtn {
       font-weight: 800;
       letter-spacing: .02em;
       border: none;
@@ -1952,16 +2188,51 @@
       background: linear-gradient(180deg, #ff7a59, #d8492e)
     }
 
+    .btn.bjDoubleBtn {
+      background: linear-gradient(180deg, #ffd873, #caa43d)
+    }
+
+    .btn.bjSplitBtn {
+      background: linear-gradient(180deg, #b98cff, #7c4fd6)
+    }
+
     .btn.bjHitBtn:active,
-    .btn.bjStandBtn:active {
+    .btn.bjStandBtn:active,
+    .btn.bjDoubleBtn:active,
+    .btn.bjSplitBtn:active {
       transform: translateY(2px);
       box-shadow: 0 1px 0 rgba(0, 0, 0, .35), 0 3px 6px rgba(0, 0, 0, .3)
     }
 
     .btn.bjHitBtn:disabled,
-    .btn.bjStandBtn:disabled {
+    .btn.bjStandBtn:disabled,
+    .btn.bjDoubleBtn:disabled,
+    .btn.bjSplitBtn:disabled {
       opacity: .5;
       cursor: not-allowed
+    }
+
+    #bjPlayerHandsWrap {
+      display: flex;
+      gap: 12px;
+      flex-wrap: wrap
+    }
+
+    .bjHandBlock {
+      flex: 1 1 auto;
+      min-width: 120px;
+      padding: 6px 8px;
+      border-radius: 12px;
+      border: 2px solid transparent
+    }
+
+    .bjHandBlock.active {
+      border-color: #caa43d;
+      background: rgba(202, 164, 61, .12)
+    }
+
+    .bjHandBlock.done {
+      opacity: .68
     }
 
     #jackpotTabSwitch {
@@ -2628,7 +2899,7 @@
         Söröm</span></h1>
     <div class="headerRight">
       <button id="jackpotBtn" title="Jackpot">🎰</button>
-      <button id="themeBtn" title="Toggle theme">🌙</button>
+      <button id="normalGamesBtn" title="Games">🎮</button>
       <button id="profileBtn" class="avatarBtn" title="Profile"></button>
     </div>
   </header>
@@ -2729,7 +3000,7 @@
     <div class="jackpotMarquee" id="jackpotMarquee"></div>
     <div class="jackpotNeonTitle">✨ WELCOME TO THE CASINO ✨</div>
     <div class="tabSwitch" id="jackpotTabSwitch" style="margin:10px 14px 0">
-      <button type="button" class="tabBtn active" data-jptab="game">🎰 Jackpot</button>
+      <button type="button" class="tabBtn active" data-jptab="game">🎲 Game</button>
       <button type="button" class="tabBtn" data-jptab="leaderboard">🏆 Leaderboard</button>
       <button type="button" class="tabBtn" data-jptab="shop">🛍️ Shop</button>
     </div>
@@ -2740,10 +3011,6 @@
       </div>
       <div class="casinoGameSelectRow">
         <select class="casinoGameSelect" id="casinoGameSelect"></select>
-      </div>
-      <div class="jackpotAdminRow" id="casinoGameStatusRow" style="display:none">
-        <span id="casinoGameStatusLabel"></span>
-        <button type="button" class="btn ghost" id="casinoGameStatusToggleBtn"></button>
       </div>
       <div class="empty" id="casinoGameClosedNotice" style="display:none;padding:30px 0"></div>
 
@@ -2782,10 +3049,7 @@
             <div class="bjHandLabel">Dealer <span id="bjDealerTotal"></span></div>
             <div class="bjHand" id="bjDealerHand"></div>
           </div>
-          <div>
-            <div class="bjHandLabel">You <span id="bjPlayerTotal"></span></div>
-            <div class="bjHand" id="bjPlayerHand"></div>
-          </div>
+          <div id="bjPlayerHandsWrap"></div>
         </div>
         <div class="jackpotMessage" id="bjMessage">Place your bet!</div>
         <div class="jackpotBetRow" id="bjBetRow">
@@ -2799,6 +3063,8 @@
         <div class="bjActionRow" id="bjActionRow" style="display:none">
           <button type="button" class="btn bjHitBtn" id="bjHitBtn">Hit</button>
           <button type="button" class="btn bjStandBtn" id="bjStandBtn">Stand</button>
+          <button type="button" class="btn bjDoubleBtn" id="bjDoubleBtn" style="display:none">Double</button>
+          <button type="button" class="btn bjSplitBtn" id="bjSplitBtn" style="display:none">Split</button>
         </div>
         <div class="jackpotAdminRow" id="bjAdminRow" style="display:none">
           <span id="bjMaxBetLabel"></span>
@@ -2809,6 +3075,64 @@
             <button type="button" class="btn ghost" id="bjMaxBetCancelBtn">Cancel</button>
           </div>
         </div>
+      </div>
+
+      <div id="rouletteGameBody" style="display:none">
+        <div class="rouletteTable">
+          <div class="rouletteWheelWrap">
+            <canvas id="rouletteCanvas" width="290" height="290"></canvas>
+            <div class="rouletteBallOrbit" id="rouletteBallOrbit">
+              <div class="rouletteBall" id="rouletteBall"></div>
+            </div>
+            <div class="rouletteCenterCap"></div>
+          </div>
+        </div>
+        <div class="jackpotMessage" id="rouletteMessage">Place your bet!</div>
+        <button type="button" class="btn primary jackpotSpinBtn" id="rouletteSpinBtn">SPIN</button>
+        <div class="rouletteBetTypes" id="rouletteBetTypes">
+          <div class="rouletteBetRow2">
+            <button type="button" class="rouletteBetBtn rouletteBetRed" data-bet="red">Red</button>
+            <button type="button" class="rouletteBetBtn rouletteBetBlack" data-bet="black">Black</button>
+          </div>
+          <div class="rouletteBetRow2">
+            <button type="button" class="rouletteBetBtn" data-bet="odd">Odd</button>
+            <button type="button" class="rouletteBetBtn" data-bet="even">Even</button>
+          </div>
+          <div class="rouletteBetRow3">
+            <button type="button" class="rouletteBetBtn" data-bet="dozen1">1st 12</button>
+            <button type="button" class="rouletteBetBtn" data-bet="dozen2">2nd 12</button>
+            <button type="button" class="rouletteBetBtn" data-bet="dozen3">3rd 12</button>
+          </div>
+        </div>
+        <div class="rouletteNumberBetRow" id="rouletteBetRow">
+          <div class="rouletteNumberGroup">
+            <span class="rouletteNumberLabel">№ (35:1)</span>
+            <input type="number" inputmode="numeric" id="rouletteNumberInput" min="0" max="36" placeholder="0-36">
+          </div>
+          <div class="rouletteBetStepperGroup">
+            <div class="rouletteBetStepperRow">
+              <span class="jackpotBetLabel">Bet</span>
+              <button type="button" class="jackpotBetBtn" id="rouletteBetMinus">−</button>
+              <input type="number" inputmode="numeric" class="jackpotBetValue" id="rouletteBetValue" value="1" min="1" step="1">
+              <button type="button" class="jackpotBetBtn" id="rouletteBetPlus">+</button>
+            </div>
+            <span class="jackpotBetMaxLabel" id="rouletteBetMaxLabel"></span>
+          </div>
+        </div>
+        <div class="jackpotAdminRow" id="rouletteAdminRow" style="display:none">
+          <span id="rouletteMaxBetLabel"></span>
+          <button type="button" class="btn ghost" id="rouletteEditMaxBetBtn">Edit Max Bet</button>
+          <div class="jackpotMaxBetEdit" id="rouletteMaxBetEdit" style="display:none">
+            <input type="number" id="rouletteMaxBetInput" min="1" step="1">
+            <button type="button" class="btn primary" id="rouletteMaxBetSaveBtn">Save</button>
+            <button type="button" class="btn ghost" id="rouletteMaxBetCancelBtn">Cancel</button>
+          </div>
+        </div>
+      </div>
+
+      <div class="jackpotAdminRow" id="casinoGameStatusRow" style="display:none">
+        <span id="casinoGameStatusLabel"></span>
+        <button type="button" class="btn ghost" id="casinoGameStatusToggleBtn"></button>
       </div>
     </div>
     <div class="jackpotBody" id="jackpotLbBody" style="display:none">
@@ -2835,6 +3159,13 @@
         <div class="userListHead">Chips</div>
         <div class="shopGrid" id="shopChipsGrid"></div>
       </div>
+    </div>
+  </div>
+  <div id="gamesPage" style="display:none">
+    <div class="gamesComingSoon">
+      <div class="gamesComingSoonIcon">🎮</div>
+      <h2>Coming soon</h2>
+      <p>More games are on the way!</p>
     </div>
   </div>
   <button id="uacFab" title="UAC">UAC</button>
@@ -3191,7 +3522,10 @@
     <div class="sheet">
       <div class="sheetHead">
         <h2>Profile</h2>
-        <button class="closeX" id="profileViewClose">✕</button>
+        <div class="sheetHeadActions">
+          <button id="themeBtn" title="Toggle theme">🌙</button>
+          <button class="closeX" id="profileViewClose">✕</button>
+        </div>
       </div>
       <div class="profileViewSection" id="profileViewSectionEl">
         <span class="avatarHatWrap" id="profileViewAvatarWrap">
@@ -6041,6 +6375,8 @@
     // ---------- Jackpot (just for fun — no real money involved) ----------
     const jackpotPage = document.getElementById('jackpotPage');
     const jackpotBtn = document.getElementById('jackpotBtn');
+    const gamesPage = document.getElementById('gamesPage');
+    const normalGamesBtn = document.getElementById('normalGamesBtn');
     const jackpotCoinsEl = document.getElementById('jackpotCoins');
     const jackpotMessageEl = document.getElementById('jackpotMessage');
     const jackpotSpinBtn = document.getElementById('jackpotSpinBtn');
@@ -6138,6 +6474,63 @@
       else if (value < 20) playJackpotSmallWinSound();
       else if (value < 100) playJackpotBigWinSound();
       else playJackpotJackpotSound();
+    }
+
+    // ---------- Blackjack sound (same Web Audio context + on/off toggle as Jackpot) ----------
+    let jackpotNoiseBuffer = null;
+    function getJackpotNoiseBuffer(ctx) {
+      if (jackpotNoiseBuffer && jackpotNoiseBuffer.sampleRate === ctx.sampleRate) return jackpotNoiseBuffer;
+      const len = Math.floor(ctx.sampleRate * 0.3);
+      const buffer = ctx.createBuffer(1, len, ctx.sampleRate);
+      const data = buffer.getChannelData(0);
+      for (let i = 0; i < len; i++) data[i] = Math.random() * 2 - 1;
+      jackpotNoiseBuffer = buffer;
+      return buffer;
+    }
+    // A card swipe: filtered white noise swept from a bright to a duller
+    // frequency, like a card sliding across felt, rather than a pure tone.
+    function playCardSwooshSound(delay) {
+      if (!isJackpotSoundOn()) return;
+      try {
+        const ctx = getJackpotAudioCtx();
+        const t0 = ctx.currentTime + (delay || 0);
+        const src = ctx.createBufferSource();
+        src.buffer = getJackpotNoiseBuffer(ctx);
+        const filter = ctx.createBiquadFilter();
+        filter.type = 'bandpass';
+        filter.Q.value = 0.7;
+        filter.frequency.setValueAtTime(2600, t0);
+        filter.frequency.exponentialRampToValueAtTime(500, t0 + 0.16);
+        const gain = ctx.createGain();
+        gain.gain.setValueAtTime(0.0001, t0);
+        gain.gain.linearRampToValueAtTime(0.28, t0 + 0.015);
+        gain.gain.exponentialRampToValueAtTime(0.0001, t0 + 0.18);
+        src.connect(filter).connect(gain).connect(ctx.destination);
+        src.start(t0);
+        src.stop(t0 + 0.2);
+      } catch (e) { /* audio not available, fail silently */ }
+    }
+    function playBjDealSound() {
+      playCardSwooshSound(0);
+      playCardSwooshSound(0.09);
+    }
+    function playBjHitSound() {
+      playCardSwooshSound(0);
+    }
+    function playBjTrumpetRun(notes, noteDur, gap) {
+      notes.forEach((f, i) => playJackpotTone(f, noteDur, 'sawtooth', i * gap, 0.16));
+    }
+    // A short triumphant ascending brass call for a win...
+    function playBjWinSound() {
+      playBjTrumpetRun([523.25, 659.25, 783.99, 1046.5], 0.16, 0.12);
+    }
+    // ...and the classic descending "sad trombone" cliché for a loss.
+    function playBjLoseSound() {
+      playBjTrumpetRun([392.0, 369.99, 349.23, 329.63], 0.32, 0.32);
+    }
+    function playBjPushSound() {
+      playJackpotTone(440, 0.09, 'triangle', 0, 0.14);
+      playJackpotTone(440, 0.12, 'triangle', 0.12, 0.14);
     }
     document.getElementById('jackpotMarquee').innerHTML = '<span></span>'.repeat(24);
     const JACKPOT_SYMBOLS = [
@@ -6437,7 +6830,8 @@
     // ---------- Casino: multiple games, admin-gated open/close ----------
     const CASINO_GAMES = [
       { id: 'jackpot', name: '🎰 Jackpot', alwaysOpen: true },
-      { id: 'blackjack', name: '🃏 Blackjack', alwaysOpen: false }
+      { id: 'blackjack', name: '🃏 Blackjack', alwaysOpen: false },
+      { id: 'roulette', name: '🎡 Roulette', alwaysOpen: false }
     ];
     let gamesOpenState = {};
     let casinoActiveGame = localStorage.getItem('sor-casino-game') || 'jackpot';
@@ -6493,12 +6887,14 @@
       const closed = !isAdmin() && !isGameOpen(id);
       document.getElementById('slotGameBody').style.display = (id === 'jackpot' && !closed) ? 'block' : 'none';
       document.getElementById('blackjackGameBody').style.display = (id === 'blackjack' && !closed) ? 'block' : 'none';
+      document.getElementById('rouletteGameBody').style.display = (id === 'roulette' && !closed) ? 'block' : 'none';
       const notice = document.getElementById('casinoGameClosedNotice');
       notice.style.display = closed ? 'block' : 'none';
       if (closed) notice.textContent = `${CASINO_GAMES.find(g => g.id === id)?.name || 'This game'} isn't open yet — check back soon!`;
       renderCasinoGameSelect();
       renderCasinoGameStatusRow();
       if (id === 'blackjack' && !closed) initBlackjackUi();
+      if (id === 'roulette' && !closed) initRouletteUi();
     }
     document.getElementById('casinoGameSelect').onchange = (e) => setCasinoGame(e.target.value);
 
@@ -6669,7 +7065,7 @@
           <div class="leaderboardName lbProfileLink" data-user="${r.id}">${escapeHtml(r.name || 'Anonymous')}</div>
         </div>
         <div class="leaderboardTotal">${r.coins} ${JACKPOT_COIN_ICON}</div>
-        ${isAdmin() ? `<button type="button" class="btn ghost editCoinsBtn" data-user="${r.id}" data-name="${escapeHtml(r.name || 'Anonymous')}" data-coins="${r.coins}" style="padding:6px 12px">Edit</button>` : ''}
+        ${isAdmin() ? `<button type="button" class="btn ghost editCoinsBtn" data-user="${r.id}" data-name="${escapeHtml(r.name || 'Anonymous')}" data-coins="${r.coins}" style="flex:0 0 auto;padding:5px 8px;font-size:.78rem">Edit</button>` : ''}
       </div>`;
       }).join('');
       el.querySelectorAll('.editCoinsBtn').forEach(btn => {
@@ -6711,6 +7107,43 @@
     }
     function closeJackpotPage() { history.back(); }
 
+    // ---------- Games (normal, non-casino games) ----------
+    let gamesPageOpen = false;
+    function showGamesPage() {
+      gamesPageOpen = true;
+      document.getElementById('toolbar').style.display = 'none';
+      beerList.style.display = 'none';
+      partyListEl.style.display = 'none';
+      document.getElementById('pubList').style.display = 'none';
+      document.getElementById('leaderboardPage').style.display = 'none';
+      document.getElementById('fab').style.display = 'none';
+      gamesPage.style.display = 'block';
+    }
+    function openGamesPage() {
+      pushOverlayState();
+      showGamesPage();
+    }
+    function hideGamesPage() {
+      gamesPageOpen = false;
+      gamesPage.style.display = 'none';
+      document.getElementById('toolbar').style.display = 'flex';
+      setActiveTab(activeTab);
+    }
+    function closeGamesPage() { history.back(); }
+    normalGamesBtn.onclick = () => {
+      if (jackpotPageOpen) {
+        // Switching directly from the casino to Games: swap the visible
+        // page in place instead of stacking a second history entry on top
+        // of the one already pushed for the casino, so a single back press
+        // still returns all the way home.
+        jackpotPageOpen = false;
+        jackpotPage.style.display = 'none';
+        showGamesPage();
+      } else {
+        openGamesPage();
+      }
+    };
+
     function renderJackpotAdminRow() {
       const row = document.getElementById('jackpotAdminRow');
       row.style.display = isAdmin() ? 'flex' : 'none';
@@ -6740,8 +7173,21 @@
       }
     };
 
-    jackpotBtn.onclick = openJackpotPage;
-    document.getElementById('homeLogoBtn').onclick = () => { if (jackpotPageOpen) closeJackpotPage(); };
+    jackpotBtn.onclick = () => {
+      if (gamesPageOpen) {
+        // Switching directly from Games to the casino: same reasoning as
+        // the Games button above — swap in place, don't stack history.
+        gamesPageOpen = false;
+        gamesPage.style.display = 'none';
+        showJackpotPage();
+      } else {
+        openJackpotPage();
+      }
+    };
+    document.getElementById('homeLogoBtn').onclick = () => {
+      if (jackpotPageOpen) closeJackpotPage();
+      else if (gamesPageOpen) closeGamesPage();
+    };
 
     // ---------- Chip (Žeton) redemption popup ----------
     const chipPopupOverlay = document.getElementById('chipPopupOverlay');
@@ -7240,6 +7686,7 @@
       return total;
     }
     function bjIsBlackjack(cardIds) { return cardIds.length === 2 && bjHandValue(cardIds) === 21; }
+    function bjIsSplittable(cardIds) { return cardIds.length === 2 && bjRankOf(cardIds[0]) === bjRankOf(cardIds[1]); }
     const bjBetValueEl = document.getElementById('bjBetValue');
     function getBjBet() {
       const stored = localStorage.getItem('sor-bj-bet');
@@ -7265,34 +7712,66 @@
     // render would lag behind the click waiting on a network round-trip.
     // Firestore's copy of blackjackHand exists only so a mid-hand refresh
     // can resume the game; it's never read back into the live UI otherwise.
+    // Shape: { deck, dealerCards, activeIndex, hands: [{cards, bet, doubled, done, busted, isSplitAces}, ...] }
     let bjActiveHand = null;
     function bjCardHtml(id, faceDown) {
       if (faceDown) return '<div class="cardMini cardBack"></div>';
       return cardMiniHtml(POKER_CARDS.find(x => x.id === id));
     }
-    function renderBjHands(hand, opts) {
-      opts = opts || {};
-      document.getElementById('bjDealerHand').innerHTML = hand.dealerCards.map((id, i) => bjCardHtml(id, opts.dealerHideHole && i === 1)).join('');
-      document.getElementById('bjPlayerHand').innerHTML = hand.playerCards.map(id => bjCardHtml(id, false)).join('');
-      document.getElementById('bjDealerTotal').textContent = opts.dealerHideHole ? '' : `(${bjHandValue(hand.dealerCards)})`;
-      document.getElementById('bjPlayerTotal').textContent = `(${bjHandValue(hand.playerCards)})`;
+    function bjCurrentHand() {
+      return bjActiveHand ? bjActiveHand.hands[bjActiveHand.activeIndex] : null;
+    }
+    function renderBjDealer(dealerCards, hideHole) {
+      document.getElementById('bjDealerHand').innerHTML = dealerCards.map((id, i) => bjCardHtml(id, hideHole && i === 1)).join('');
+      document.getElementById('bjDealerTotal').textContent = hideHole ? '' : `(${bjHandValue(dealerCards)})`;
+    }
+    function renderBjPlayerHands(hand) {
+      const multi = hand.hands.length > 1;
+      document.getElementById('bjPlayerHandsWrap').innerHTML = hand.hands.map((h, i) => {
+        const total = bjHandValue(h.cards);
+        const bits = [multi ? `Hand ${i + 1}` : 'You', `(${total})`];
+        if (h.doubled) bits.push('2x');
+        if (h.busted) bits.push('bust');
+        return `<div class="bjHandBlock${i === hand.activeIndex && !h.done ? ' active' : ''}${h.done ? ' done' : ''}">
+          <div class="bjHandLabel">${bits.join(' ')}</div>
+          <div class="bjHand">${h.cards.map(id => bjCardHtml(id, false)).join('')}</div>
+        </div>`;
+      }).join('');
+    }
+    function bjPersist() {
+      usersCol.doc(myUid).set({ blackjackHand: bjActiveHand }, { merge: true }).catch(() => { });
+    }
+    function bjUpdateActionButtons() {
+      const hitBtn = document.getElementById('bjHitBtn');
+      const standBtn = document.getElementById('bjStandBtn');
+      const doubleBtn = document.getElementById('bjDoubleBtn');
+      const splitBtn = document.getElementById('bjSplitBtn');
+      [hitBtn, standBtn, doubleBtn, splitBtn].forEach(b => b.disabled = false);
+      const hand = bjCurrentHand();
+      const canAct = !!hand && !hand.done;
+      hitBtn.style.display = canAct ? 'block' : 'none';
+      standBtn.style.display = canAct ? 'block' : 'none';
+      doubleBtn.style.display = (canAct && hand.cards.length === 2 && !hand.isSplitAces) ? 'block' : 'none';
+      splitBtn.style.display = (canAct && bjActiveHand.hands.length === 1 && bjIsSplittable(hand.cards)) ? 'block' : 'none';
     }
     function bjShowIdleState() {
+      document.getElementById('bjPlayerHandsWrap').innerHTML = '';
       document.getElementById('bjDealerHand').innerHTML = '';
-      document.getElementById('bjPlayerHand').innerHTML = '';
       document.getElementById('bjDealerTotal').textContent = '';
-      document.getElementById('bjPlayerTotal').textContent = '';
       document.getElementById('bjMessage').textContent = 'Place your bet!';
       document.getElementById('bjDealBtn').style.display = 'block';
       document.getElementById('bjActionRow').style.display = 'none';
       document.getElementById('bjBetRow').style.display = 'flex';
     }
     function bjShowPlayingState() {
-      renderBjHands(bjActiveHand, { dealerHideHole: true });
-      document.getElementById('bjMessage').textContent = 'Your move';
+      renderBjPlayerHands(bjActiveHand);
+      renderBjDealer(bjActiveHand.dealerCards, true);
+      document.getElementById('bjMessage').textContent = bjActiveHand.hands.length > 1
+        ? `Hand ${bjActiveHand.activeIndex + 1} — your move` : 'Your move';
       document.getElementById('bjDealBtn').style.display = 'none';
       document.getElementById('bjActionRow').style.display = 'flex';
       document.getElementById('bjBetRow').style.display = 'none';
+      bjUpdateActionButtons();
     }
     function initBlackjackUi() {
       setBjBet(getBjBet());
@@ -7301,26 +7780,73 @@
       // No hand in this session yet — check whether one was persisted before
       // a reload, so refreshing mid-hand doesn't strand an already-paid bet.
       const persisted = allUsers.find(x => x.id === myUid)?.blackjackHand || null;
-      if (persisted && persisted.status === 'player-turn') {
+      if (persisted && Array.isArray(persisted.hands)) {
         bjActiveHand = persisted;
         bjShowPlayingState();
       } else {
         bjShowIdleState();
       }
     }
-    function bjResolve(resultText, payout) {
+    // Settles every hand against the final dealer total in one go — the
+    // only outcome it does NOT cover is a natural blackjack's 3:2 payout,
+    // which only that first deal can ever produce and is handled directly
+    // in the Deal handler instead.
+    function bjResolveAll() {
+      const dealerCards = bjActiveHand.dealerCards;
+      const dealerTotal = bjHandValue(dealerCards);
+      const dealerBust = dealerTotal > 21;
+      const multi = bjActiveHand.hands.length > 1;
+      const totalWagered = bjActiveHand.hands.reduce((s, h) => s + h.bet, 0);
+      let totalPayout = 0;
+      const parts = bjActiveHand.hands.map((h, i) => {
+        const prefix = multi ? `Hand ${i + 1}: ` : '';
+        if (h.busted) return `${prefix}bust`;
+        const total = bjHandValue(h.cards);
+        if (dealerBust || total > dealerTotal) { const payout = h.bet * 2; totalPayout += payout; return `${prefix}win +${payout}`; }
+        if (total < dealerTotal) return `${prefix}lose`;
+        totalPayout += h.bet;
+        return `${prefix}push`;
+      });
+      const resultText = `Dealer ${dealerTotal}${dealerBust ? ' (bust)' : ''} — ${parts.join(' · ')}${totalPayout > 0 ? ' ' + JACKPOT_COIN_ICON : ''}`;
+      const kind = totalPayout > totalWagered ? 'win' : (totalPayout < totalWagered ? 'lose' : 'push');
       bjActiveHand = null;
       const updates = { blackjackHand: firebase.firestore.FieldValue.delete() };
-      if (payout > 0) updates.jackpotCoins = firebase.firestore.FieldValue.increment(payout);
+      if (totalPayout > 0) updates.jackpotCoins = firebase.firestore.FieldValue.increment(totalPayout);
       usersCol.doc(myUid).set(updates, { merge: true }).catch(() => { });
       document.getElementById('bjMessage').innerHTML = resultText;
       document.getElementById('bjActionRow').style.display = 'none';
       document.getElementById('bjDealBtn').style.display = 'block';
       document.getElementById('bjBetRow').style.display = 'flex';
       if (bjDisplayCoins !== null) {
-        bjDisplayCoins += payout;
+        bjDisplayCoins += totalPayout;
         jackpotCoinsEl.textContent = bjDisplayCoins;
         bjDisplayCoins = null;
+      }
+      if (kind === 'win') playBjWinSound();
+      else if (kind === 'lose') playBjLoseSound();
+      else playBjPushSound();
+    }
+    async function bjPlayDealerAndResolve() {
+      document.getElementById('bjActionRow').style.display = 'none';
+      renderBjDealer(bjActiveHand.dealerCards, false);
+      const anyLive = bjActiveHand.hands.some(h => !h.busted);
+      if (anyLive) {
+        while (bjHandValue(bjActiveHand.dealerCards) < 17) {
+          await new Promise(r => setTimeout(r, 500));
+          bjActiveHand.dealerCards = bjActiveHand.dealerCards.concat([bjActiveHand.deck.pop()]);
+          renderBjDealer(bjActiveHand.dealerCards, false);
+        }
+      }
+      bjResolveAll();
+    }
+    function bjGoToNextHandOrResolve() {
+      const idx = bjActiveHand.hands.findIndex(h => !h.done);
+      if (idx === -1) {
+        bjPlayDealerAndResolve();
+      } else {
+        bjActiveHand.activeIndex = idx;
+        bjPersist();
+        bjShowPlayingState();
       }
     }
     document.getElementById('bjDealBtn').onclick = async () => {
@@ -7338,7 +7864,12 @@
         outcome = await db.runTransaction(async (tx) => {
           const snap = await tx.get(ref);
           const serverCoins = coinsOf(snap.exists ? snap.data() : null);
-          if (serverCoins < bet) return { status: 'insufficient', coins: serverCoins };
+          if (serverCoins < bet) {
+            // Genuinely out of coins at the true server value (not just a
+            // stale cache) — top up to the starting stake, same as jackpot.
+            tx.set(ref, { jackpotCoins: JACKPOT_START_COINS }, { merge: true });
+            return { status: 'toppedUp', coins: JACKPOT_START_COINS };
+          }
           const newBalance = serverCoins - bet;
           tx.set(ref, { jackpotCoins: newBalance }, { merge: true });
           return { status: 'ok', coins: newBalance };
@@ -7349,9 +7880,9 @@
         return;
       }
       dealBtn.disabled = false;
-      if (outcome.status === 'insufficient') {
+      if (outcome.status === 'toppedUp') {
         jackpotCoinsEl.textContent = outcome.coins;
-        showToast('Not enough coins for that bet');
+        showToast(`Topped up to ${JACKPOT_START_COINS} coins — good luck!`);
         return;
       }
       bjDisplayCoins = outcome.coins;
@@ -7362,55 +7893,459 @@
       const dealerCards = [deck.pop(), deck.pop()];
       const playerBJ = bjIsBlackjack(playerCards);
       const dealerBJ = bjIsBlackjack(dealerCards);
+      playBjDealSound();
+
+      bjActiveHand = {
+        deck, dealerCards, activeIndex: 0,
+        hands: [{ cards: playerCards, bet, doubled: false, done: false, busted: false, isSplitAces: false }]
+      };
 
       if (playerBJ || dealerBJ) {
-        renderBjHands({ playerCards, dealerCards }, { dealerHideHole: false });
-        if (playerBJ && dealerBJ) { bjResolve('Push — both blackjack! Bet returned.', bet); }
-        else if (playerBJ) { const payout = bet + Math.floor(bet * 1.5); bjResolve(`Blackjack! You win ${payout} ${JACKPOT_COIN_ICON}`, payout); }
-        else { bjResolve('Dealer has blackjack — you lose.', 0); }
+        bjActiveHand.hands[0].done = true;
+        renderBjPlayerHands(bjActiveHand);
+        renderBjDealer(dealerCards, false);
+        if (playerBJ && !dealerBJ) {
+          // bjResolveAll() only knows the standard even-money/push math —
+          // a natural blackjack's 3:2 payout is unique to this exact case.
+          const payout = bet + Math.floor(bet * 1.5);
+          bjActiveHand = null;
+          usersCol.doc(myUid).set({ blackjackHand: firebase.firestore.FieldValue.delete(), jackpotCoins: firebase.firestore.FieldValue.increment(payout) }, { merge: true }).catch(() => { });
+          document.getElementById('bjMessage').innerHTML = `Blackjack! You win ${payout} ${JACKPOT_COIN_ICON}`;
+          document.getElementById('bjActionRow').style.display = 'none';
+          document.getElementById('bjDealBtn').style.display = 'block';
+          document.getElementById('bjBetRow').style.display = 'flex';
+          bjDisplayCoins += payout;
+          jackpotCoinsEl.textContent = bjDisplayCoins;
+          bjDisplayCoins = null;
+          playBjWinSound();
+        } else {
+          // Push (both natural) or a plain loss (dealer natural only) both
+          // resolve correctly through the standard math.
+          bjResolveAll();
+        }
         return;
       }
 
-      bjActiveHand = { bet, deck, playerCards, dealerCards, status: 'player-turn' };
-      usersCol.doc(myUid).set({ blackjackHand: bjActiveHand }, { merge: true }).catch(() => { });
+      bjPersist();
       bjShowPlayingState();
     };
     document.getElementById('bjHitBtn').onclick = () => {
-      if (!bjActiveHand) return;
-      const deck = bjActiveHand.deck.slice();
-      const playerCards = bjActiveHand.playerCards.concat([deck.pop()]);
-      const total = bjHandValue(playerCards);
-      bjActiveHand = { ...bjActiveHand, deck, playerCards };
-      renderBjHands(bjActiveHand, { dealerHideHole: true });
+      const hand = bjCurrentHand();
+      if (!hand || hand.done) return;
+      playBjHitSound();
+      hand.cards.push(bjActiveHand.deck.pop());
+      const total = bjHandValue(hand.cards);
       if (total > 21) {
-        bjResolve(`Bust at ${total} — you lose.`, 0);
+        hand.done = true;
+        hand.busted = true;
+        renderBjPlayerHands(bjActiveHand);
+        bjPersist();
+        bjGoToNextHandOrResolve();
         return;
       }
-      usersCol.doc(myUid).set({ blackjackHand: bjActiveHand }, { merge: true }).catch(() => { });
+      renderBjPlayerHands(bjActiveHand);
+      bjUpdateActionButtons();
+      bjPersist();
     };
-    document.getElementById('bjStandBtn').onclick = async () => {
-      if (!bjActiveHand) return;
-      const hand = bjActiveHand;
-      document.getElementById('bjHitBtn').disabled = true;
-      document.getElementById('bjStandBtn').disabled = true;
-      let deck = hand.deck.slice();
-      let dealerCards = hand.dealerCards.slice();
-      renderBjHands({ ...hand, dealerCards }, { dealerHideHole: false });
-      while (bjHandValue(dealerCards) < 17) {
-        await new Promise(r => setTimeout(r, 500));
-        dealerCards = dealerCards.concat([deck.pop()]);
-        renderBjHands({ ...hand, dealerCards }, { dealerHideHole: false });
+    document.getElementById('bjStandBtn').onclick = () => {
+      const hand = bjCurrentHand();
+      if (!hand || hand.done) return;
+      hand.done = true;
+      renderBjPlayerHands(bjActiveHand);
+      bjPersist();
+      bjGoToNextHandOrResolve();
+    };
+    document.getElementById('bjDoubleBtn').onclick = async () => {
+      const hand = bjCurrentHand();
+      if (!hand || hand.done || hand.cards.length !== 2 || hand.isSplitAces) return;
+      const extraBet = hand.bet;
+      [document.getElementById('bjHitBtn'), document.getElementById('bjStandBtn'), document.getElementById('bjDoubleBtn'), document.getElementById('bjSplitBtn')].forEach(b => b.disabled = true);
+      let outcome;
+      try {
+        const ref = usersCol.doc(myUid);
+        outcome = await db.runTransaction(async (tx) => {
+          const snap = await tx.get(ref);
+          const serverCoins = coinsOf(snap.exists ? snap.data() : null);
+          if (serverCoins < extraBet) return { status: 'insufficient', coins: serverCoins };
+          const newBalance = serverCoins - extraBet;
+          tx.set(ref, { jackpotCoins: newBalance }, { merge: true });
+          return { status: 'ok', coins: newBalance };
+        });
+      } catch (err) {
+        showToast('Could not double: ' + err.message);
+        bjUpdateActionButtons();
+        return;
       }
-      const playerTotal = bjHandValue(hand.playerCards);
-      const dealerTotal = bjHandValue(dealerCards);
-      document.getElementById('bjHitBtn').disabled = false;
-      document.getElementById('bjStandBtn').disabled = false;
-      let resultText, payout;
-      if (dealerTotal > 21) { resultText = `Dealer busts at ${dealerTotal} — you win!`; payout = hand.bet * 2; }
-      else if (dealerTotal > playerTotal) { resultText = `Dealer ${dealerTotal} beats your ${playerTotal} — you lose.`; payout = 0; }
-      else if (dealerTotal < playerTotal) { resultText = `You win, ${playerTotal} vs ${dealerTotal}!`; payout = hand.bet * 2; }
-      else { resultText = `Push — both ${playerTotal}. Bet returned.`; payout = hand.bet; }
-      bjResolve(resultText, payout);
+      if (outcome.status === 'insufficient') {
+        jackpotCoinsEl.textContent = outcome.coins;
+        showToast('Not enough coins to double down');
+        bjUpdateActionButtons();
+        return;
+      }
+      bjDisplayCoins = outcome.coins;
+      jackpotCoinsEl.textContent = bjDisplayCoins;
+      playBjHitSound();
+      hand.bet += extraBet;
+      hand.doubled = true;
+      hand.cards.push(bjActiveHand.deck.pop());
+      hand.done = true;
+      if (bjHandValue(hand.cards) > 21) hand.busted = true;
+      renderBjPlayerHands(bjActiveHand);
+      bjPersist();
+      bjGoToNextHandOrResolve();
+    };
+    document.getElementById('bjSplitBtn').onclick = async () => {
+      const hand = bjCurrentHand();
+      if (!hand || hand.done || bjActiveHand.hands.length !== 1 || !bjIsSplittable(hand.cards)) return;
+      const extraBet = hand.bet;
+      [document.getElementById('bjHitBtn'), document.getElementById('bjStandBtn'), document.getElementById('bjDoubleBtn'), document.getElementById('bjSplitBtn')].forEach(b => b.disabled = true);
+      let outcome;
+      try {
+        const ref = usersCol.doc(myUid);
+        outcome = await db.runTransaction(async (tx) => {
+          const snap = await tx.get(ref);
+          const serverCoins = coinsOf(snap.exists ? snap.data() : null);
+          if (serverCoins < extraBet) return { status: 'insufficient', coins: serverCoins };
+          const newBalance = serverCoins - extraBet;
+          tx.set(ref, { jackpotCoins: newBalance }, { merge: true });
+          return { status: 'ok', coins: newBalance };
+        });
+      } catch (err) {
+        showToast('Could not split: ' + err.message);
+        bjUpdateActionButtons();
+        return;
+      }
+      if (outcome.status === 'insufficient') {
+        jackpotCoinsEl.textContent = outcome.coins;
+        showToast('Not enough coins to split');
+        bjUpdateActionButtons();
+        return;
+      }
+      bjDisplayCoins = outcome.coins;
+      jackpotCoinsEl.textContent = bjDisplayCoins;
+      playBjHitSound();
+
+      const isAces = bjRankOf(hand.cards[0]) === 'A';
+      const secondCard = hand.cards.pop();
+      const newHand = { cards: [secondCard], bet: extraBet, doubled: false, done: false, busted: false, isSplitAces: isAces };
+      hand.cards.push(bjActiveHand.deck.pop());
+      newHand.cards.push(bjActiveHand.deck.pop());
+      hand.isSplitAces = isAces;
+      if (isAces) { hand.done = true; newHand.done = true; }
+      bjActiveHand.hands.push(newHand);
+      bjActiveHand.activeIndex = 0;
+      renderBjPlayerHands(bjActiveHand);
+      bjPersist();
+      if (isAces) bjGoToNextHandOrResolve();
+      else bjShowPlayingState();
+    };
+
+    // ---------- Roulette ----------
+    const ROULETTE_WHEEL_ORDER = [0, 32, 15, 19, 4, 21, 2, 25, 17, 34, 6, 27, 13, 36, 11, 30, 8, 23, 10, 5, 24, 16, 33, 1, 20, 14, 31, 9, 22, 18, 29, 7, 28, 12, 35, 3, 26];
+    const ROULETTE_RED_NUMBERS = new Set([1, 3, 5, 7, 9, 12, 14, 16, 18, 19, 21, 23, 25, 27, 30, 32, 34, 36]);
+    function rouletteColorOf(n) {
+      if (n === 0) return 'green';
+      return ROULETTE_RED_NUMBERS.has(n) ? 'red' : 'black';
+    }
+    const ROULETTE_MIN_BET = 1;
+    const ROULETTE_DEFAULT_MAX_BET = 50;
+    let rouletteMaxBetLive = ROULETTE_DEFAULT_MAX_BET;
+    let rouletteSpinning = false;
+    let rouletteSelectedBetType = null; // 'red'|'black'|'odd'|'even'|'low'|'high'|null
+    let rouletteWheelDrawn = false;
+    configCol.doc('roulette').onSnapshot(snap => {
+      const v = snap.data()?.maxBet;
+      rouletteMaxBetLive = typeof v === 'number' && v >= ROULETTE_MIN_BET ? v : ROULETTE_DEFAULT_MAX_BET;
+      if (jackpotPageOpen && casinoActiveGame === 'roulette') {
+        setRouletteBet(getRouletteBet());
+        renderRouletteAdminRow();
+      }
+    }, err => showToast('Sync error: ' + err.message));
+    function renderRouletteAdminRow() {
+      const row = document.getElementById('rouletteAdminRow');
+      row.style.display = isAdmin() ? 'flex' : 'none';
+      if (!isAdmin()) return;
+      document.getElementById('rouletteMaxBetLabel').textContent = `Max bet: ${rouletteMaxBetLive}`;
+      document.getElementById('rouletteMaxBetEdit').style.display = 'none';
+    }
+    document.getElementById('rouletteEditMaxBetBtn').onclick = () => {
+      document.getElementById('rouletteMaxBetInput').value = rouletteMaxBetLive;
+      document.getElementById('rouletteMaxBetEdit').style.display = 'flex';
+    };
+    document.getElementById('rouletteMaxBetCancelBtn').onclick = () => {
+      document.getElementById('rouletteMaxBetEdit').style.display = 'none';
+    };
+    document.getElementById('rouletteMaxBetSaveBtn').onclick = async () => {
+      const n = Math.floor(Number(document.getElementById('rouletteMaxBetInput').value));
+      if (!Number.isFinite(n) || n < ROULETTE_MIN_BET) {
+        showToast(`Max bet must be a whole number ≥ ${ROULETTE_MIN_BET}`);
+        return;
+      }
+      try {
+        await configCol.doc('roulette').set({ maxBet: n }, { merge: true });
+        showToast('Max bet updated');
+        document.getElementById('rouletteMaxBetEdit').style.display = 'none';
+      } catch (err) {
+        showToast('Failed: ' + err.message);
+      }
+    };
+
+    const rouletteBetValueEl = document.getElementById('rouletteBetValue');
+    function getRouletteBet() {
+      const stored = localStorage.getItem('sor-roulette-bet');
+      const n = stored === null ? ROULETTE_MIN_BET : Number(stored);
+      return Math.min(rouletteMaxBetLive, Math.max(ROULETTE_MIN_BET, Number.isFinite(n) ? n : ROULETTE_MIN_BET));
+    }
+    function setRouletteBet(n) {
+      if (!Number.isFinite(n)) n = ROULETTE_MIN_BET;
+      n = Math.min(rouletteMaxBetLive, Math.max(ROULETTE_MIN_BET, Math.round(n)));
+      localStorage.setItem('sor-roulette-bet', String(n));
+      rouletteBetValueEl.value = n;
+      document.getElementById('rouletteBetMaxLabel').textContent = `Max ${rouletteMaxBetLive}`;
+      document.getElementById('rouletteBetMinus').disabled = rouletteSpinning || n <= ROULETTE_MIN_BET;
+      document.getElementById('rouletteBetPlus').disabled = rouletteSpinning || n >= rouletteMaxBetLive;
+      rouletteBetValueEl.disabled = rouletteSpinning;
+    }
+    document.getElementById('rouletteBetMinus').onclick = () => { if (!rouletteSpinning) setRouletteBet(getRouletteBet() - 1); };
+    document.getElementById('rouletteBetPlus').onclick = () => { if (!rouletteSpinning) setRouletteBet(getRouletteBet() + 1); };
+    rouletteBetValueEl.addEventListener('change', () => { if (!rouletteSpinning) setRouletteBet(Number(rouletteBetValueEl.value)); });
+
+    function rouletteSetBetType(type) {
+      rouletteSelectedBetType = type;
+      document.querySelectorAll('.rouletteBetBtn').forEach(b => b.classList.toggle('active', b.dataset.bet === type));
+      if (type) document.getElementById('rouletteNumberInput').value = '';
+    }
+    document.querySelectorAll('.rouletteBetBtn').forEach(btn => {
+      btn.onclick = () => {
+        if (rouletteSpinning) return;
+        rouletteSetBetType(rouletteSelectedBetType === btn.dataset.bet ? null : btn.dataset.bet);
+      };
+    });
+    document.getElementById('rouletteNumberInput').addEventListener('input', (e) => {
+      if (e.target.value !== '') rouletteSetBetType(null);
+    });
+
+    function getActiveRouletteBet() {
+      const numVal = document.getElementById('rouletteNumberInput').value;
+      if (numVal !== '') {
+        const n = Math.floor(Number(numVal));
+        if (Number.isFinite(n) && n >= 0 && n <= 36) return { kind: 'number', value: n };
+      }
+      if (rouletteSelectedBetType) return { kind: 'outside', value: rouletteSelectedBetType };
+      return null;
+    }
+    // Returns a multiplier on the original bet: 0 = lose, 2 = even-money win
+    // (stake + equal winnings), 3 = dozen win (stake + 2x winnings), 36 =
+    // straight-up win (stake + 35x winnings).
+    function rouletteResolveBet(bet, winningNumber) {
+      if (bet.kind === 'number') return winningNumber === bet.value ? 36 : 0;
+      if (winningNumber === 0) return 0; // 0 loses every outside bet, standard European rule
+      const color = rouletteColorOf(winningNumber);
+      switch (bet.value) {
+        case 'red': return color === 'red' ? 2 : 0;
+        case 'black': return color === 'black' ? 2 : 0;
+        case 'odd': return winningNumber % 2 === 1 ? 2 : 0;
+        case 'even': return winningNumber % 2 === 0 ? 2 : 0;
+        case 'dozen1': return winningNumber <= 12 ? 3 : 0;
+        case 'dozen2': return winningNumber >= 13 && winningNumber <= 24 ? 3 : 0;
+        case 'dozen3': return winningNumber >= 25 ? 3 : 0;
+        default: return 0;
+      }
+    }
+
+    // A decelerating series of ticks standing in for the ball rattling
+    // around the wheel — fast at first, spreading out as it slows, timed to
+    // roughly track the same easing curve the ball's own CSS transition uses.
+    // A short percussive "clack" built from filtered noise (like the card
+    // swoosh) instead of a clean tone — much closer to the sound of a ball
+    // actually crossing a metal fret than a synth beep.
+    function playRouletteClack(delay, peak) {
+      if (!isJackpotSoundOn()) return;
+      try {
+        const ctx = getJackpotAudioCtx();
+        const t0 = ctx.currentTime + (delay || 0);
+        const src = ctx.createBufferSource();
+        src.buffer = getJackpotNoiseBuffer(ctx);
+        const filter = ctx.createBiquadFilter();
+        filter.type = 'bandpass';
+        filter.frequency.value = 1400 + Math.random() * 900;
+        filter.Q.value = 3.5;
+        const gain = ctx.createGain();
+        gain.gain.setValueAtTime(0.0001, t0);
+        gain.gain.linearRampToValueAtTime(peak, t0 + 0.002);
+        gain.gain.exponentialRampToValueAtTime(0.0001, t0 + 0.05);
+        src.connect(filter).connect(gain).connect(ctx.destination);
+        src.start(t0);
+        src.stop(t0 + 0.07);
+      } catch (e) { /* audio not available, fail silently */ }
+    }
+    // A decelerating run of clacks standing in for the ball crossing the
+    // frets around the wheel — dense enough at the start to blur into a
+    // rattling whir, spreading into distinct clacks as it slows, timed to
+    // roughly track the same easing curve the ball's own CSS transition uses.
+    function playRouletteSpinSound(durationSec) {
+      let t = 0, interval = 0.04;
+      while (t < durationSec - 0.1) {
+        const progress = t / durationSec;
+        playRouletteClack(t, 0.16 - progress * 0.06);
+        t += interval;
+        interval *= 1.1;
+      }
+    }
+    function playRouletteWinSound(multiplier) {
+      if (multiplier >= 36) playJackpotArpRun(JACKPOT_ARP_SCALE, 0.11, 0.06, 'square', 0.22);
+      else if (multiplier >= 3) playJackpotArpRun(JACKPOT_ARP_SCALE.slice(0, 8), 0.12, 0.075, 'triangle', 0.22);
+      else playJackpotArpRun(JACKPOT_ARP_SCALE.slice(2, 6), 0.12, 0.08, 'triangle', 0.2);
+    }
+    function playRouletteLoseSound() {
+      playJackpotTone(220, 0.22, 'sine', 0, 0.13);
+      playJackpotTone(160, 0.28, 'sine', 0.1, 0.11);
+    }
+
+    function drawRouletteWheel(canvas) {
+      const ctx = canvas.getContext('2d');
+      const size = canvas.width;
+      const cx = size / 2, cy = size / 2, radius = size / 2 - 2;
+      const n = ROULETTE_WHEEL_ORDER.length;
+      const anglePer = (2 * Math.PI) / n;
+      const fillFor = c => c === 'green' ? '#1a8f4c' : (c === 'red' ? '#c0392b' : '#1c1c1c');
+      ctx.clearRect(0, 0, size, size);
+      ROULETTE_WHEEL_ORDER.forEach((num, i) => {
+        const start = i * anglePer;
+        const end = start + anglePer;
+        ctx.beginPath();
+        ctx.moveTo(cx, cy);
+        ctx.arc(cx, cy, radius, start, end);
+        ctx.closePath();
+        ctx.fillStyle = fillFor(rouletteColorOf(num));
+        ctx.fill();
+        ctx.strokeStyle = '#caa43d';
+        ctx.lineWidth = 1.3;
+        ctx.stroke();
+        ctx.save();
+        ctx.translate(cx, cy);
+        ctx.rotate(start + anglePer / 2);
+        ctx.textAlign = 'right';
+        ctx.fillStyle = '#fff';
+        ctx.font = 'bold 13px Arial, sans-serif';
+        ctx.fillText(String(num), radius - 8, 4.5);
+        ctx.restore();
+      });
+    }
+
+    const ROULETTE_BALL_REST_Y = -130;
+    // Lands the ball at the exact center of pocket `targetIndex`. The ball's
+    // rest position (0deg) sits at the top (canvas angle -90°), and CSS
+    // rotate() turns clockwise, so after rotating by `deg` the ball sits at
+    // canvas angle (-90 + deg) — solving for that to equal the pocket's own
+    // center angle (i*anglePer + anglePer/2, matching how the wheel itself
+    // is drawn) gives the formula below.
+    function spinRouletteWheel(targetIndex, durationSec) {
+      const orbit = document.getElementById('rouletteBallOrbit');
+      const ball = document.getElementById('rouletteBall');
+      orbit.style.transition = 'none';
+      orbit.style.transform = 'rotate(0deg)';
+      ball.style.animation = 'none';
+      ball.style.transform = `translateY(${ROULETTE_BALL_REST_Y}px)`;
+      void orbit.offsetWidth;
+      const n = ROULETTE_WHEEL_ORDER.length;
+      const anglePerDeg = 360 / n;
+      const jitter = (Math.random() - 0.5) * (anglePerDeg * 0.5);
+      const spins = 8;
+      const targetDeg = spins * 360 + targetIndex * anglePerDeg + anglePerDeg / 2 + 90 + jitter;
+      requestAnimationFrame(() => {
+        orbit.style.transition = `transform ${durationSec}s cubic-bezier(0.13,0.71,0.28,1)`;
+        orbit.style.transform = `rotate(${targetDeg}deg)`;
+        ball.style.animation = `rouletteBallBounce ${durationSec}s ease-out forwards`;
+      });
+    }
+
+    function initRouletteUi() {
+      if (!rouletteWheelDrawn) {
+        drawRouletteWheel(document.getElementById('rouletteCanvas'));
+        rouletteWheelDrawn = true;
+      }
+      renderRouletteAdminRow();
+      setRouletteBet(getRouletteBet());
+      if (!rouletteSpinning) document.getElementById('rouletteMessage').textContent = 'Place your bet!';
+    }
+
+    const ROULETTE_SPIN_DURATION = 5;
+    let rouletteDisplayCoins = null;
+    document.getElementById('rouletteSpinBtn').onclick = async () => {
+      if (rouletteSpinning) return;
+      const activeBet = getActiveRouletteBet();
+      if (!activeBet) { showToast('Pick a bet first — a color, parity, range, or a number'); return; }
+      const bet = getRouletteBet();
+      const spinBtn = document.getElementById('rouletteSpinBtn');
+      spinBtn.disabled = true;
+      // Debit inside a transaction against the REAL server balance — same
+      // reasoning as the jackpot and blackjack bets.
+      let outcome;
+      try {
+        const ref = usersCol.doc(myUid);
+        outcome = await db.runTransaction(async (tx) => {
+          const snap = await tx.get(ref);
+          const serverCoins = coinsOf(snap.exists ? snap.data() : null);
+          if (serverCoins < bet) {
+            // Genuinely out of coins at the true server value (not just a
+            // stale cache) — top up to the starting stake, same as jackpot.
+            tx.set(ref, { jackpotCoins: JACKPOT_START_COINS }, { merge: true });
+            return { status: 'toppedUp', coins: JACKPOT_START_COINS };
+          }
+          const newBalance = serverCoins - bet;
+          tx.set(ref, { jackpotCoins: newBalance }, { merge: true });
+          return { status: 'ok', coins: newBalance };
+        });
+      } catch (err) {
+        showToast('Could not spin: ' + err.message);
+        spinBtn.disabled = false;
+        return;
+      }
+      if (outcome.status === 'toppedUp') {
+        jackpotCoinsEl.textContent = outcome.coins;
+        showToast(`Topped up to ${JACKPOT_START_COINS} coins — good luck!`);
+        spinBtn.disabled = false;
+        return;
+      }
+      rouletteDisplayCoins = outcome.coins;
+      jackpotCoinsEl.textContent = rouletteDisplayCoins;
+
+      rouletteSpinning = true;
+      document.getElementById('rouletteMessage').textContent = 'Spinning…';
+      document.querySelectorAll('.rouletteBetBtn').forEach(b => b.disabled = true);
+      document.getElementById('rouletteNumberInput').disabled = true;
+      document.getElementById('rouletteBetMinus').disabled = true;
+      document.getElementById('rouletteBetPlus').disabled = true;
+      rouletteBetValueEl.disabled = true;
+
+      const winningNumber = Math.floor(Math.random() * 37);
+      const winIndex = ROULETTE_WHEEL_ORDER.indexOf(winningNumber);
+      spinRouletteWheel(winIndex, ROULETTE_SPIN_DURATION);
+      playRouletteSpinSound(ROULETTE_SPIN_DURATION);
+
+      setTimeout(() => {
+        const mult = rouletteResolveBet(activeBet, winningNumber);
+        const payout = bet * mult;
+        const color = rouletteColorOf(winningNumber);
+        const colorLabel = color === 'green' ? '🟢' : (color === 'red' ? '🔴' : '⚫');
+        const resultText = payout > 0
+          ? `${colorLabel} ${winningNumber} — you win ${payout} ${JACKPOT_COIN_ICON}!`
+          : `${colorLabel} ${winningNumber} — you lose.`;
+        if (payout > 0) usersCol.doc(myUid).set({ jackpotCoins: firebase.firestore.FieldValue.increment(payout) }, { merge: true }).catch(() => { });
+        if (payout > 0) playRouletteWinSound(mult); else playRouletteLoseSound();
+        document.getElementById('rouletteMessage').innerHTML = resultText;
+        if (rouletteDisplayCoins !== null) {
+          rouletteDisplayCoins += payout;
+          jackpotCoinsEl.textContent = rouletteDisplayCoins;
+          rouletteDisplayCoins = null;
+        }
+        rouletteSpinning = false;
+        spinBtn.disabled = false;
+        document.querySelectorAll('.rouletteBetBtn').forEach(b => b.disabled = false);
+        document.getElementById('rouletteNumberInput').disabled = false;
+        setRouletteBet(getRouletteBet());
+      }, ROULETTE_SPIN_DURATION * 1000 + 150);
     };
 
     // ---------- Back button navigation ----------
@@ -7512,6 +8447,10 @@
       }
       if (jackpotPageOpen) {
         hideJackpotPage();
+        return;
+      }
+      if (gamesPageOpen) {
+        hideGamesPage();
         return;
       }
     });
