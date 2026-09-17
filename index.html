@@ -117,6 +117,38 @@
       padding: 4px
     }
 
+    .notifNudge {
+      display: none;
+      align-items: center;
+      gap: 10px;
+      background: var(--accent);
+      color: #1c1410;
+      margin: 10px 14px 0;
+      padding: 10px 14px;
+      border-radius: 12px;
+      font-weight: 700;
+      font-size: .85rem;
+      cursor: pointer
+    }
+
+    .notifNudge.visible {
+      display: flex
+    }
+
+    .notifNudgeIcon {
+      font-size: 1.2rem;
+      flex: 0 0 auto
+    }
+
+    .notifNudgeText {
+      flex: 1
+    }
+
+    .notifNudgeDismiss {
+      opacity: .7;
+      flex: 0 0 auto
+    }
+
     .headerRight {
       display: flex;
       align-items: center;
@@ -216,7 +248,8 @@
     }
 
     #beerList,
-    #spiritList {
+    #spiritList,
+    #gamesGrid {
       padding: 14px;
       display: grid;
       grid-template-columns: repeat(auto-fill, minmax(158px, 1fr));
@@ -592,6 +625,18 @@
       white-space: nowrap
     }
 
+    .leaderboardRow.leaderboardColHead {
+      justify-content: space-between;
+      padding: 0 8px 2px;
+      margin-bottom: 0
+    }
+
+    .leaderboardColHeadLabel {
+      font-size: .68rem;
+      font-weight: 700;
+      color: var(--text-dim)
+    }
+
     .archiveRow {
       display: flex;
       gap: 12px;
@@ -844,31 +889,221 @@
       gap: 6px
     }
 
-    .gamesComingSoon {
+    #gameViewPage {
+      position: relative;
+      padding: 10px 0;
+      min-height: calc(100vh - 53px);
+      display: flex;
+      flex-direction: column
+    }
+
+    .gameViewHeader {
+      flex: 0 0 auto;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin-bottom: 10px;
+      padding: 0 10px
+    }
+
+    .gameViewBackBtn {
+      flex: 0 0 auto;
+      width: 36px;
+      height: 36px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: 50%;
+      border: 1px solid var(--border);
+      background: var(--bg-elev);
+      color: var(--text);
+      cursor: pointer
+    }
+
+    .gameViewTitle {
+      flex: 1;
+      min-width: 0;
+      font-weight: 800;
+      font-size: 1rem;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis
+    }
+
+    .gameViewStats {
+      flex: 0 0 auto;
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+      font-size: .72rem;
+      color: var(--text-dim);
+      white-space: nowrap
+    }
+
+    .gameViewStatBadge {
+      padding: 2px 8px;
+      border-radius: 6px;
+      border: 1px solid var(--border);
+      background: var(--bg-elev);
+      text-align: center
+    }
+
+    .gameViewStatNum {
+      color: #f7d154;
+      font-weight: 800
+    }
+
+    #gameViewContainer {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      min-height: 0
+    }
+
+    .flappyBoardWrap {
+      position: relative;
+      flex: 1;
+      min-height: 0;
+      touch-action: none
+    }
+
+    .flappyBoardWrap canvas {
+      display: block;
+      width: 100%;
+      height: 100%
+    }
+
+    .tttWrap {
+      flex: 1;
       display: flex;
       flex-direction: column;
       align-items: center;
       justify-content: center;
+      gap: 16px;
+      padding: 10px
+    }
+
+    /* .btn defaults to flex:1 for the equal-width button rows it was
+       designed for elsewhere — inside this vertical layout that instead
+       stretches a lone button to fill all remaining column height. */
+    .tttWrap > .btn {
+      flex: 0 0 auto
+    }
+
+    /* Choose-mode/Leave-game + Play Again sit side by side, equal width —
+       .btn's own flex:1 already does that once they share a row instead of
+       each being a lone flex:0 0 auto column child. */
+    .tttResultRow {
+      display: flex;
+      gap: 10px;
+      width: 100%;
+      max-width: 320px
+    }
+
+    .tttIconBtn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px
+    }
+
+    .tttIconBtn svg {
+      flex: 0 0 auto
+    }
+
+    .tttModeRow {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      width: 100%;
+      max-width: 320px
+    }
+
+    .tttModeBtn {
+      padding: 16px;
+      border-radius: 14px;
+      border: 1px solid var(--border);
+      background: var(--bg-card);
+      color: var(--text);
+      font-weight: 700;
+      font-size: 1rem;
+      cursor: pointer;
+      box-shadow: var(--shadow)
+    }
+
+    .tttUserList {
+      width: 100%;
+      max-width: 380px;
+      max-height: 100%;
+      overflow-y: auto
+    }
+
+    /* Two classes so this reliably beats .btn's flex:1 regardless of which
+       rule happens to come later in the stylesheet — a single-class
+       selector here would tie .btn's specificity and the cascade would
+       fall back to source order, which is exactly what let the button
+       stretch to fill the row instead of hugging its own content. */
+    .userRow .tttInviteBtn {
+      margin-left: auto;
+      flex: 0 0 auto
+    }
+
+    .tttWaitingBox {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 10px;
       text-align: center;
-      gap: 6px;
-      padding: 90px 24px;
       color: var(--text-dim)
     }
 
-    .gamesComingSoonIcon {
-      font-size: 3.4rem;
-      margin-bottom: 6px
+    .tttBoard {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      /* Without this, row height is "auto" — sized by each cell's own
+         content — so a row with an X/O in it comes out taller than an
+         empty row instead of all nine cells being identical squares. */
+      grid-template-rows: repeat(3, 1fr);
+      gap: 8px;
+      width: 100%;
+      max-width: 320px;
+      aspect-ratio: 1
     }
 
-    .gamesComingSoon h2 {
-      margin: 0;
-      color: var(--text);
-      font-size: 1.3rem
+    .tttCell {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 0;
+      font-size: 2.4rem;
+      font-weight: 800;
+      line-height: 1;
+      border-radius: 10px;
+      border: 1px solid var(--border);
+      background: var(--bg-card);
+      cursor: pointer;
+      user-select: none
     }
 
-    .gamesComingSoon p {
-      margin: 0;
-      font-size: .95rem
+    .tttCell.x { color: #4d9dff }
+    .tttCell.o { color: #f7d154 }
+
+    .tttCell.disabled {
+      cursor: default
+    }
+
+    .tttStatusRow {
+      text-align: center;
+      font-weight: 700
+    }
+
+    .tttPlayersRow {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+      font-size: .85rem;
+      color: var(--text-dim)
     }
 
     .sheetHead h2 {
@@ -1692,16 +1927,26 @@
       text-align: center;
       font-size: 1.3rem;
       font-weight: 800;
-      margin-bottom: 16px
+      margin-bottom: 16px;
+      padding: 10px 44px;
+      border-radius: 10px;
+      border: 1px solid var(--accent-2);
+      background: linear-gradient(135deg, rgba(224, 165, 66, .18), rgba(224, 165, 66, .05))
     }
 
     .jackpotSoundBtn {
       position: absolute;
-      right: 4px;
+      right: 8px;
       top: 50%;
       transform: translateY(-50%);
-      background: none;
-      border: none;
+      width: 30px;
+      height: 30px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: var(--bg-elev);
+      border: 1px solid var(--border);
+      border-radius: 50%;
       line-height: 1;
       cursor: pointer;
       color: inherit;
@@ -2060,7 +2305,8 @@
       box-shadow: 0 0 0 2px #caa43d inset
     }
 
-    #rouletteGameBody .jackpotSpinBtn {
+    #rouletteGameBody .jackpotSpinBtn,
+    #plinkoGameBody .jackpotSpinBtn {
       margin-bottom: 16px
     }
 
@@ -2117,6 +2363,117 @@
       color: var(--text);
       font-weight: 700;
       font-size: .95rem
+    }
+
+    .plinkoSegRow {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin-bottom: 10px
+    }
+
+    .plinkoSegLabel {
+      font-size: .82rem;
+      font-weight: 700;
+      color: var(--text-dim);
+      width: 40px;
+      flex-shrink: 0
+    }
+
+    .plinkoSegGroup {
+      display: flex;
+      gap: 6px;
+      flex: 1
+    }
+
+    .plinkoSegBtn {
+      flex: 1;
+      padding: 7px 0;
+      border-radius: 10px;
+      border: 2px solid var(--border);
+      background: var(--bg-elev);
+      color: var(--text);
+      font-weight: 700;
+      font-size: .82rem;
+      cursor: pointer
+    }
+
+    .plinkoSegBtn.active {
+      border-color: #caa43d;
+      background: rgba(202, 164, 61, .18);
+      box-shadow: 0 0 0 1px #caa43d inset
+    }
+
+    .plinkoBoardWrap {
+      position: relative;
+      width: 340px;
+      max-width: 100%;
+      margin: 4px auto 0;
+      border-radius: 18px;
+      background: radial-gradient(ellipse at 50% 15%, #2a1a4a, #180d2c 70%, #0f081f 100%);
+      border: 3px solid #caa43d;
+      box-shadow: inset 0 0 20px rgba(0, 0, 0, .5), 0 0 18px rgba(120, 70, 200, .25);
+      overflow: hidden
+    }
+
+    .plinkoCanvasWrap {
+      position: relative
+    }
+
+    .plinkoBoardWrap canvas {
+      display: block;
+      width: 100%;
+      height: auto
+    }
+
+    .plinkoBall {
+      position: absolute;
+      left: 0;
+      top: 0;
+      /* width/height/aspect-ratio are set per-drop in JS (createPlinkoBall),
+         scaled to the current row count's peg spacing — a fixed pixel size
+         here would be wrong for every row count except whichever one it was
+         tuned for. Centering via transform instead of a fixed negative
+         margin keeps it correct regardless of the ball's actual size. */
+      transform: translate(-50%, -50%);
+      border-radius: 50%;
+      background: radial-gradient(circle at 35% 30%, #fff6c9, #f7d154 55%, #b8860b 100%);
+      box-shadow: 0 0 8px rgba(247, 209, 84, .8);
+      pointer-events: none
+    }
+
+    .plinkoSlots {
+      display: flex;
+      gap: 2px;
+      /* Matches slotSpan = PLINKO_CANVAS_W - 2*PLINKO_MARGIN_X = 340-56=284,
+         i.e. exactly the widest peg row's footprint — the same box the
+         side walls confine the ball to — so the outer buckets sit flush
+         against the triangle's edge instead of floating outside where a
+         ball could never physically land. Nested inside .plinkoBoardWrap
+         so it scales in lockstep with the responsive canvas at any width. */
+      width: 83.53%;
+      margin: 0 auto 10px;
+      padding-top: 3px
+    }
+
+    .plinkoSlot {
+      flex: 1;
+      text-align: center;
+      font-size: .6rem;
+      font-weight: 800;
+      padding: 7px 1px 8px;
+      border-radius: 2px 2px 7px 7px;
+      color: #fff;
+      white-space: nowrap;
+      overflow: hidden;
+      border-top: 2px solid rgba(255, 255, 255, .3);
+      box-shadow: inset 0 -3px 4px rgba(0, 0, 0, .35), 0 2px 3px rgba(0, 0, 0, .4);
+      transition: transform .2s, box-shadow .2s
+    }
+
+    .plinkoSlot.win {
+      transform: scale(1.18) translateY(-2px);
+      box-shadow: 0 0 10px rgba(255, 255, 255, .8), 0 0 0 2px #fff inset
     }
 
     .bjTable {
@@ -2904,6 +3261,12 @@
     </div>
   </header>
 
+  <div class="notifNudge" id="notifNudge" onclick="enableNotifications()">
+    <span class="notifNudgeIcon">🔔</span>
+    <span class="notifNudgeText">Tap to enable notifications (game invites, etc.)</span>
+    <span class="notifNudgeDismiss">→</span>
+  </div>
+
   <div id="toolbar">
     <div class="tabSwitch" id="tabSwitch">
       <button type="button" class="tabBtn active" data-tab="beers">📝 Reviews</button>
@@ -3005,12 +3368,12 @@
       <button type="button" class="tabBtn" data-jptab="shop">🛍️ Shop</button>
     </div>
     <div class="jackpotBody" id="jackpotGameBody">
+      <div class="casinoGameSelectRow">
+        <select class="casinoGameSelect" id="casinoGameSelect"></select>
+      </div>
       <div class="jackpotCoins">
         <span id="jackpotCoinIcon"></span> <span id="jackpotCoins">50</span>
         <button type="button" id="jackpotSoundBtn" class="jackpotSoundBtn" title="Toggle sound">🔊</button>
-      </div>
-      <div class="casinoGameSelectRow">
-        <select class="casinoGameSelect" id="casinoGameSelect"></select>
       </div>
       <div class="empty" id="casinoGameClosedNotice" style="display:none;padding:30px 0"></div>
 
@@ -3130,6 +3493,49 @@
         </div>
       </div>
 
+      <div id="plinkoGameBody" style="display:none">
+        <div class="plinkoSegRow">
+          <span class="plinkoSegLabel">Risk</span>
+          <div class="plinkoSegGroup" id="plinkoRiskGroup">
+            <button type="button" class="plinkoSegBtn" data-risk="low">Low</button>
+            <button type="button" class="plinkoSegBtn" data-risk="medium">Medium</button>
+            <button type="button" class="plinkoSegBtn" data-risk="high">High</button>
+          </div>
+        </div>
+        <div class="plinkoSegRow">
+          <span class="plinkoSegLabel">Rows</span>
+          <div class="plinkoSegGroup" id="plinkoRowsGroup">
+            <button type="button" class="plinkoSegBtn" data-rows="8">8</button>
+            <button type="button" class="plinkoSegBtn" data-rows="12">12</button>
+            <button type="button" class="plinkoSegBtn" data-rows="16">16</button>
+          </div>
+        </div>
+        <div class="plinkoBoardWrap" id="plinkoBoardWrap">
+          <div class="plinkoCanvasWrap" id="plinkoCanvasWrap">
+            <canvas id="plinkoCanvas" width="340" height="320"></canvas>
+          </div>
+          <div class="plinkoSlots" id="plinkoSlots"></div>
+        </div>
+        <div class="jackpotMessage" id="plinkoMessage">Place your bet!</div>
+        <button type="button" class="btn primary jackpotSpinBtn" id="plinkoDropBtn">DROP BALL</button>
+        <div class="jackpotBetRow">
+          <span class="jackpotBetLabel">Bet</span>
+          <button type="button" class="jackpotBetBtn" id="plinkoBetMinus">−</button>
+          <input type="number" inputmode="numeric" class="jackpotBetValue" id="plinkoBetValue" value="1" min="1" step="1">
+          <button type="button" class="jackpotBetBtn" id="plinkoBetPlus">+</button>
+          <span class="jackpotBetMaxLabel" id="plinkoBetMaxLabel"></span>
+        </div>
+        <div class="jackpotAdminRow" id="plinkoAdminRow" style="display:none">
+          <span id="plinkoMaxBetLabel"></span>
+          <button type="button" class="btn ghost" id="plinkoEditMaxBetBtn">Edit Max Bet</button>
+          <div class="jackpotMaxBetEdit" id="plinkoMaxBetEdit" style="display:none">
+            <input type="number" id="plinkoMaxBetInput" min="1" step="1">
+            <button type="button" class="btn primary" id="plinkoMaxBetSaveBtn">Save</button>
+            <button type="button" class="btn ghost" id="plinkoMaxBetCancelBtn">Cancel</button>
+          </div>
+        </div>
+      </div>
+
       <div class="jackpotAdminRow" id="casinoGameStatusRow" style="display:none">
         <span id="casinoGameStatusLabel"></span>
         <button type="button" class="btn ghost" id="casinoGameStatusToggleBtn"></button>
@@ -3162,10 +3568,32 @@
     </div>
   </div>
   <div id="gamesPage" style="display:none">
-    <div class="gamesComingSoon">
-      <div class="gamesComingSoonIcon">🎮</div>
-      <h2>Coming soon</h2>
-      <p>More games are on the way!</p>
+    <div class="tabSwitch" id="gamesTabSwitch" style="margin:10px 14px">
+      <button type="button" class="tabBtn active" data-gtab="games">🎮 Games</button>
+      <button type="button" class="tabBtn" data-gtab="leaderboard">🏆 Leaderboard</button>
+    </div>
+    <div id="gamesGridBody">
+      <div id="gamesGrid"></div>
+    </div>
+    <div id="gamesLbBody" style="display:none;padding:0 14px 90px"></div>
+  </div>
+  <div id="gameViewPage" style="display:none">
+    <div class="gameViewHeader">
+      <button type="button" id="gameViewBackBtn" class="gameViewBackBtn" title="Back"><svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2.8" stroke-linecap="round" stroke-linejoin="round"><path d="M15 5l-7 7 7 7"/></svg></button>
+      <div class="gameViewTitle" id="gameViewTitle"></div>
+      <div class="gameViewStats" id="gameViewStats">
+        <span class="gameViewStatBadge" id="gameViewBestLabel"></span>
+        <span class="gameViewStatBadge" id="gameViewPlaysLabel"></span>
+      </div>
+    </div>
+    <div id="gameViewContainer"></div>
+  </div>
+  <div class="overlay" id="tttInviteOverlay">
+    <div class="sheet">
+      <div class="sheetHead">
+        <h2>🎮 Game Invite</h2>
+      </div>
+      <div id="tttInviteBody"></div>
     </div>
   </div>
   <button id="uacFab" title="UAC">UAC</button>
@@ -6245,9 +6673,62 @@
       refreshProfileDisplays();
       updateUacFabVisibility();
       refreshJackpotIfOpen();
+      refreshGamesIfOpen();
       if (activeTab === 'parties') renderPartyList();
       refreshPartyViewIfOpen();
     }, err => showToast('Sync error: ' + err.message));
+
+    // ---------- Push notifications (game invites, etc.) ----------
+    // Subscriptions are tagged with the current uid (unlike a 2-person app,
+    // this one has a whole friend group in it, so a Cloud Function needs to
+    // be able to target just the one recipient a notification is for).
+    const PUSH_VAPID_PUBLIC = 'BK47gq6up5TInkEQyAEfujd2lTADZydmAfU2obJsyt5rwbS10zhvmtcgJQ7SdS2Zxa5OfBsbCmEhR7W0k8uNTIY';
+    const pushSubscriptionsCol = db.collection('push_subscriptions');
+    async function savePushSubscription() {
+      const reg = await navigator.serviceWorker.ready;
+      let sub = await reg.pushManager.getSubscription();
+      if (!sub) {
+        sub = await reg.pushManager.subscribe({
+          userVisibleOnly: true,
+          applicationServerKey: PUSH_VAPID_PUBLIC,
+        });
+      }
+      const key = btoa(sub.endpoint).replace(/\//g, '_').replace(/\+/g, '-').replace(/=/g, '');
+      // Clean up any older doc for the same browser endpoint under a
+      // different key (e.g. left over from testing with another uid).
+      const existing = await pushSubscriptionsCol.get();
+      const stale = existing.docs.filter(d => d.data().subscription?.endpoint === sub.endpoint && d.id !== key);
+      await Promise.all(stale.map(d => d.ref.delete()));
+      await pushSubscriptionsCol.doc(key).set({ subscription: sub.toJSON(), uid: myUid });
+    }
+    async function enableNotifications() {
+      document.getElementById('notifNudge').classList.remove('visible');
+      try {
+        const perm = await Notification.requestPermission();
+        if (perm === 'granted') await savePushSubscription();
+      } catch { }
+    }
+    (async () => {
+      if (!('Notification' in window) || !('serviceWorker' in navigator)) return;
+      const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent);
+      const isStandalone = window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone === true;
+      const perm = Notification.permission;
+      if (isIOS) {
+        // iOS only allows requestPermission() from a direct user gesture,
+        // and only once the app is installed as a standalone PWA — so it
+        // gets a tap-to-enable banner instead of an automatic prompt.
+        if (isStandalone && perm === 'default') {
+          document.getElementById('notifNudge').classList.add('visible');
+        } else if (perm === 'granted') {
+          savePushSubscription().catch(() => { });
+        }
+      } else {
+        try {
+          const granted = await Notification.requestPermission();
+          if (granted === 'granted') await savePushSubscription();
+        } catch { }
+      }
+    })();
 
     db.collectionGroup('ratings').onSnapshot(snap => {
       allRatings = snap.docs.map(d => ({ id: d.id, beerId: d.ref.parent.parent.id, ...d.data() }));
@@ -6831,8 +7312,13 @@
     const CASINO_GAMES = [
       { id: 'jackpot', name: '🎰 Jackpot', alwaysOpen: true },
       { id: 'blackjack', name: '🃏 Blackjack', alwaysOpen: false },
-      { id: 'roulette', name: '🎡 Roulette', alwaysOpen: false }
+      { id: 'roulette', name: '🎡 Roulette', alwaysOpen: false },
+      { id: 'plinko', name: '🔴 Plinko', alwaysOpen: false }
     ];
+    // Any game id in here has no game body/logic built yet — it shows the
+    // "not open yet" placeholder regardless of the admin open/close flag,
+    // instead of a blank screen, until real gameplay lands for it.
+    const CASINO_GAMES_NOT_BUILT = new Set([]);
     let gamesOpenState = {};
     let casinoActiveGame = localStorage.getItem('sor-casino-game') || 'jackpot';
     function isGameOpen(id) {
@@ -6867,7 +7353,7 @@
     function renderCasinoGameStatusRow() {
       const row = document.getElementById('casinoGameStatusRow');
       const game = CASINO_GAMES.find(g => g.id === casinoActiveGame);
-      if (!isAdmin() || !game || game.alwaysOpen) { row.style.display = 'none'; return; }
+      if (!isAdmin() || !game || game.alwaysOpen || CASINO_GAMES_NOT_BUILT.has(game.id)) { row.style.display = 'none'; return; }
       row.style.display = 'flex';
       const open = isGameOpen(game.id);
       document.getElementById('casinoGameStatusLabel').textContent = open ? 'Open to everyone' : 'Closed — testing only';
@@ -6884,10 +7370,12 @@
       if (!visibleCasinoGames().some(g => g.id === id)) id = 'jackpot';
       casinoActiveGame = id;
       localStorage.setItem('sor-casino-game', id);
-      const closed = !isAdmin() && !isGameOpen(id);
+      const notBuilt = CASINO_GAMES_NOT_BUILT.has(id);
+      const closed = notBuilt || (!isAdmin() && !isGameOpen(id));
       document.getElementById('slotGameBody').style.display = (id === 'jackpot' && !closed) ? 'block' : 'none';
       document.getElementById('blackjackGameBody').style.display = (id === 'blackjack' && !closed) ? 'block' : 'none';
       document.getElementById('rouletteGameBody').style.display = (id === 'roulette' && !closed) ? 'block' : 'none';
+      document.getElementById('plinkoGameBody').style.display = (id === 'plinko' && !closed) ? 'block' : 'none';
       const notice = document.getElementById('casinoGameClosedNotice');
       notice.style.display = closed ? 'block' : 'none';
       if (closed) notice.textContent = `${CASINO_GAMES.find(g => g.id === id)?.name || 'This game'} isn't open yet — check back soon!`;
@@ -6895,6 +7383,7 @@
       renderCasinoGameStatusRow();
       if (id === 'blackjack' && !closed) initBlackjackUi();
       if (id === 'roulette' && !closed) initRouletteUi();
+      if (id === 'plinko' && !closed) initPlinkoUi();
     }
     document.getElementById('casinoGameSelect').onchange = (e) => setCasinoGame(e.target.value);
 
@@ -7088,8 +7577,14 @@
       setJackpotSubTab('game');
       setCasinoGame(casinoActiveGame);
       document.getElementById('toolbar').style.display = 'none';
+      document.getElementById('reviewsSubTabSwitch').style.display = 'none';
+      beerToolbarRows.style.display = 'none';
+      document.getElementById('spiritToolbarRows').style.display = 'none';
+      document.getElementById('pubToolbarRows').style.display = 'none';
       beerList.style.display = 'none';
+      document.getElementById('spiritList').style.display = 'none';
       partyListEl.style.display = 'none';
+      document.getElementById('partyListHead').style.display = 'none';
       document.getElementById('pubList').style.display = 'none';
       document.getElementById('leaderboardPage').style.display = 'none';
       document.getElementById('fab').style.display = 'none';
@@ -7112,12 +7607,19 @@
     function showGamesPage() {
       gamesPageOpen = true;
       document.getElementById('toolbar').style.display = 'none';
+      document.getElementById('reviewsSubTabSwitch').style.display = 'none';
+      beerToolbarRows.style.display = 'none';
+      document.getElementById('spiritToolbarRows').style.display = 'none';
+      document.getElementById('pubToolbarRows').style.display = 'none';
       beerList.style.display = 'none';
+      document.getElementById('spiritList').style.display = 'none';
       partyListEl.style.display = 'none';
+      document.getElementById('partyListHead').style.display = 'none';
       document.getElementById('pubList').style.display = 'none';
       document.getElementById('leaderboardPage').style.display = 'none';
       document.getElementById('fab').style.display = 'none';
       gamesPage.style.display = 'block';
+      setGamesTab('games');
     }
     function openGamesPage() {
       pushOverlayState();
@@ -7143,6 +7645,753 @@
         openGamesPage();
       }
     };
+
+    // Score-only games: no coins, no shop — each game tracks a per-user
+    // best score and play count as a nested field on the user doc, the
+    // same place jackpotCoins already lives, so it rides the existing
+    // live usersCol.onSnapshot sync for free (leaderboard updates
+    // instantly for everyone, no separate listener needed).
+    // A "#" grid with a few moves already placed, instead of a single ❌ —
+    // reads as an actual tic-tac-toe board rather than a generic X icon,
+    // matching the same X/O colors the real board uses.
+    const TTT_GRID_COVER = `<svg viewBox="0 0 100 100" width="68%" height="68%">
+      <line x1="34" y1="6" x2="34" y2="94" stroke="currentColor" stroke-width="5" stroke-linecap="round" opacity=".55"/>
+      <line x1="66" y1="6" x2="66" y2="94" stroke="currentColor" stroke-width="5" stroke-linecap="round" opacity=".55"/>
+      <line x1="6" y1="34" x2="94" y2="34" stroke="currentColor" stroke-width="5" stroke-linecap="round" opacity=".55"/>
+      <line x1="6" y1="66" x2="94" y2="66" stroke="currentColor" stroke-width="5" stroke-linecap="round" opacity=".55"/>
+      <g stroke="#4d9dff" stroke-width="6" stroke-linecap="round">
+        <line x1="13" y1="13" x2="27" y2="27"/>
+        <line x1="27" y1="13" x2="13" y2="27"/>
+        <line x1="43" y1="43" x2="57" y2="57"/>
+        <line x1="57" y1="43" x2="43" y2="57"/>
+      </g>
+      <circle cx="50" cy="20" r="10" fill="none" stroke="#f7d154" stroke-width="6"/>
+      <circle cx="80" cy="50" r="10" fill="none" stroke="#f7d154" stroke-width="6"/>
+      <circle cx="20" cy="80" r="10" fill="none" stroke="#f7d154" stroke-width="6"/>
+    </svg>`;
+    const NORMAL_GAMES = [
+      { id: 'flappybird', name: 'Flappy Bird', emoji: '🐤', start: startFlappyBird },
+      { id: 'tictactoe', name: 'Tic Tac Toe', emoji: '❌', cover: TTT_GRID_COVER, start: startTicTacToe },
+    ];
+    function gameStatsOf(u, gameId) {
+      const g = u?.games?.[gameId];
+      return {
+        best: typeof g?.best === 'number' ? g.best : 0,
+        plays: typeof g?.plays === 'number' ? g.plays : 0,
+      };
+    }
+    let gamesActiveTab = 'games';
+    function setGamesTab(tab) {
+      gamesActiveTab = tab;
+      document.querySelectorAll('#gamesTabSwitch .tabBtn').forEach(b => b.classList.toggle('active', b.dataset.gtab === tab));
+      document.getElementById('gamesGridBody').style.display = tab === 'games' ? 'block' : 'none';
+      document.getElementById('gamesLbBody').style.display = tab === 'leaderboard' ? 'block' : 'none';
+      if (tab === 'games') renderGamesGrid();
+      else renderGamesLeaderboard();
+    }
+    document.querySelectorAll('#gamesTabSwitch .tabBtn').forEach(b => {
+      b.onclick = () => setGamesTab(b.dataset.gtab);
+    });
+    function renderGamesGrid() {
+      const grid = document.getElementById('gamesGrid');
+      const me = allUsers.find(u => u.id === myUid);
+      grid.innerHTML = NORMAL_GAMES.map(g => {
+        const stats = gameStatsOf(me, g.id);
+        return `
+      <div class="card gameCard" data-game="${g.id}">
+        <div class="cover">${g.cover || g.emoji}</div>
+        <div class="body">
+          <div class="name-row"><span class="name">${escapeHtml(g.name)}</span></div>
+          <div class="meta">Best: ${stats.best}${stats.plays ? ` · Played ${stats.plays}×` : ''}</div>
+        </div>
+      </div>`;
+      }).join('');
+      grid.querySelectorAll('.gameCard').forEach(card => {
+        card.onclick = () => openGameView(card.dataset.game);
+      });
+    }
+    function renderGamesLeaderboard() {
+      const wrap = document.getElementById('gamesLbBody');
+      wrap.innerHTML = NORMAL_GAMES.map(g => {
+        const rows = allUsers.map(u => ({ id: u.id, name: u.name, photoURL: u.photoURL, ...gameStatsOf(u, g.id) }))
+          .filter(r => r.plays > 0)
+          .sort((a, b) => b.best - a.best || (a.name || '').localeCompare(b.name || ''));
+        const colHead = `<div class="leaderboardRow leaderboardColHead">
+          <div class="userListHead" style="margin-bottom:0">${g.emoji} ${escapeHtml(g.name)}</div>
+          ${rows.length ? '<div class="leaderboardTotal leaderboardColHeadLabel">Record</div>' : ''}
+        </div>`;
+        const rowsHtml = rows.length ? rows.map((r, i) => {
+          const u = allUsers.find(x => x.id === r.id);
+          return `<div class="leaderboardRow${i < 3 ? ' rank-' + (i + 1) : ''}${skinBgClass(u)}">
+          <div class="leaderboardRank">${RANK_MEDALS[i] || (i + 1)}</div>
+          ${wrapAvatarWithHat(u, `<div class="userAvatar lbProfileLink${avatarBorderClass(u)}" data-user="${r.id}">${avatarInner(r.name, r.photoURL)}</div>`)}
+          <div class="leaderboardInfo">
+            <div class="leaderboardName lbProfileLink" data-user="${r.id}">${escapeHtml(r.name || 'Anonymous')}</div>
+            <div class="leaderboardMeta">Played ${r.plays}×</div>
+          </div>
+          <div class="leaderboardTotal">${r.best}</div>
+        </div>`;
+        }).join('') : '<div class="empty" style="padding:12px 0">No plays yet</div>';
+        return `${colHead}${rowsHtml}`;
+      }).join('');
+      wrap.querySelectorAll('.lbProfileLink').forEach(a => {
+        a.onclick = () => openProfileView(a.dataset.user);
+      });
+    }
+    function refreshGamesIfOpen() {
+      if (gameViewOpen) {
+        // The header's Best/Played badges live outside whatever the game
+        // itself renders, so they need their own refresh whenever the
+        // user doc changes (e.g. a FieldValue.increment write lands) —
+        // the game's own view doesn't know to touch them.
+        if (gameViewCurrentId) renderGameViewStats(gameViewCurrentId);
+        return;
+      }
+      if (!gamesPageOpen) return;
+      if (gamesActiveTab === 'games') renderGamesGrid();
+      else renderGamesLeaderboard();
+    }
+
+    // ---------- Game view (an individual game, opened from the grid) ----------
+    let gameViewOpen = false;
+    let gameViewCleanup = null;
+    let gameViewCurrentId = null;
+    // Shared by every game (not just Flappy Bird) so the header always shows
+    // one row: back button, name, best score, play count — the game below
+    // it gets 100% of the remaining space instead of sharing it with a
+    // second stats row.
+    function renderGameViewStats(gameId) {
+      const me = allUsers.find(u => u.id === myUid);
+      const stats = gameStatsOf(me, gameId);
+      document.getElementById('gameViewBestLabel').innerHTML = `Best: <span class="gameViewStatNum">${stats.best}</span>`;
+      document.getElementById('gameViewPlaysLabel').innerHTML = `Played: <span class="gameViewStatNum">${stats.plays}×</span>`;
+      return stats;
+    }
+    function showGameView(gameId) {
+      const game = NORMAL_GAMES.find(g => g.id === gameId);
+      if (!game) return;
+      gameViewOpen = true;
+      gameViewCurrentId = gameId;
+      gamesPage.style.display = 'none';
+      document.getElementById('gameViewTitle').textContent = `${game.emoji} ${game.name}`;
+      renderGameViewStats(gameId);
+      document.getElementById('gameViewPage').style.display = 'flex';
+      gameViewCleanup = game.start(document.getElementById('gameViewContainer'));
+    }
+    function openGameView(gameId) {
+      pushOverlayState();
+      showGameView(gameId);
+    }
+    function hideGameView() {
+      gameViewOpen = false;
+      gameViewCurrentId = null;
+      if (typeof gameViewCleanup === 'function') gameViewCleanup();
+      gameViewCleanup = null;
+      document.getElementById('gameViewContainer').innerHTML = '';
+      document.getElementById('gameViewPage').style.display = 'none';
+      gamesPage.style.display = 'block';
+      setGamesTab(gamesActiveTab);
+    }
+    function closeGameView() { history.back(); }
+    document.getElementById('gameViewBackBtn').onclick = closeGameView;
+
+    // ---------- Flappy Bird (first normal game — score only, no coins) ----------
+    // Reference size the constants below were tuned at — actual board size
+    // is read from the board wrap's own rendered box (it fills the whole
+    // game view page via flexbox, same as the casino's full-page games),
+    // and every constant scales with it so gameplay feel stays the same on
+    // a phone screen or a wide desktop window rather than either being a
+    // tiny fixed box or blowing pipes/bird up to distorted sizes.
+    const FLAPPY_REF_H = 480;
+    function startFlappyBird(container) {
+      container.innerHTML = `<div class="flappyBoardWrap" id="flappyBoardWrap"></div>`;
+      const boardWrap = document.getElementById('flappyBoardWrap');
+      const W = Math.max(200, Math.floor(boardWrap.clientWidth));
+      const H = Math.max(300, Math.floor(boardWrap.clientHeight));
+      const s = H / FLAPPY_REF_H;
+      const GRAVITY = 1500 * s, FLAP_V = -400 * s, PIPE_SPEED = 160 * s;
+      const PIPE_INTERVAL = 1400;
+      const PIPE_W = W * 0.175, GAP = H * 0.3125;
+      const BIRD_X = W * 0.28, BIRD_R = W * 0.044, GROUND_H = H * 0.0417;
+
+      const canvas = document.createElement('canvas');
+      canvas.id = 'flappyCanvas';
+      canvas.width = W;
+      canvas.height = H;
+      boardWrap.appendChild(canvas);
+      const ctx = canvas.getContext('2d');
+
+      const me = allUsers.find(u => u.id === myUid);
+      const startStats = gameStatsOf(me, 'flappybird');
+      let best = startStats.best, plays = startStats.plays;
+      const bestLabel = document.getElementById('gameViewBestLabel');
+      const playsLabel = document.getElementById('gameViewPlaysLabel');
+      function updateLabels() {
+        bestLabel.innerHTML = `Best: <span class="gameViewStatNum">${best}</span>`;
+        playsLabel.innerHTML = `Played: <span class="gameViewStatNum">${plays}×</span>`;
+      }
+      updateLabels();
+
+      let state = 'ready'; // ready | playing | over
+      let birdY, birdV, pipes, score, pipeTimerMs, rafId, lastT;
+      function reset() {
+        birdY = H / 2;
+        birdV = 0;
+        pipes = [];
+        score = 0;
+        pipeTimerMs = 0;
+        lastT = null;
+      }
+      reset();
+
+      function spawnPipe() {
+        const topH = H * 0.08 + Math.random() * (H - GROUND_H - GAP - H * 0.17);
+        pipes.push({ x: W, topH, passed: false });
+      }
+
+      function flap() {
+        if (state === 'ready') {
+          state = 'playing';
+          rafId = requestAnimationFrame(frame);
+        } else if (state === 'over') {
+          reset();
+          state = 'playing';
+          rafId = requestAnimationFrame(frame);
+        } else {
+          birdV = FLAP_V;
+        }
+      }
+
+      function gameOver() {
+        state = 'over';
+        plays += 1;
+        const isNewBest = score > best;
+        if (isNewBest) best = score;
+        updateLabels();
+        const updates = { games: { flappybird: { plays: firebase.firestore.FieldValue.increment(1) } } };
+        if (isNewBest) updates.games.flappybird.best = score;
+        usersCol.doc(myUid).set(updates, { merge: true }).catch(() => {});
+      }
+
+      function frame(t) {
+        if (state !== 'playing') { draw(); return; }
+        if (lastT === null) lastT = t;
+        const dt = Math.min((t - lastT) / 1000, 0.032);
+        lastT = t;
+
+        birdV += GRAVITY * dt;
+        birdY += birdV * dt;
+
+        pipeTimerMs += dt * 1000;
+        if (pipeTimerMs >= PIPE_INTERVAL) { spawnPipe(); pipeTimerMs = 0; }
+
+        for (const p of pipes) p.x -= PIPE_SPEED * dt;
+        while (pipes.length && pipes[0].x < -PIPE_W) pipes.shift();
+
+        for (const p of pipes) {
+          if (!p.passed && p.x + PIPE_W < BIRD_X - BIRD_R) { p.passed = true; score++; }
+        }
+
+        let dead = birdY + BIRD_R > H - GROUND_H || birdY - BIRD_R < 0;
+        for (const p of pipes) {
+          if (BIRD_X + BIRD_R > p.x && BIRD_X - BIRD_R < p.x + PIPE_W) {
+            if (birdY - BIRD_R < p.topH || birdY + BIRD_R > p.topH + GAP) dead = true;
+          }
+        }
+
+        draw();
+        if (dead) { gameOver(); draw(); return; }
+        rafId = requestAnimationFrame(frame);
+      }
+
+      function draw() {
+        ctx.clearRect(0, 0, W, H);
+        const sky = ctx.createLinearGradient(0, 0, 0, H);
+        sky.addColorStop(0, '#6ec6ff'); sky.addColorStop(1, '#bfe8ff');
+        ctx.fillStyle = sky;
+        ctx.fillRect(0, 0, W, H);
+
+        ctx.fillStyle = '#3a9d3a';
+        for (const p of pipes) {
+          ctx.fillRect(p.x, 0, PIPE_W, p.topH);
+          ctx.fillRect(p.x, p.topH + GAP, PIPE_W, H - GROUND_H - (p.topH + GAP));
+        }
+
+        ctx.fillStyle = '#caa457';
+        ctx.fillRect(0, H - GROUND_H, W, GROUND_H);
+
+        ctx.fillStyle = '#f7d154';
+        ctx.beginPath();
+        ctx.arc(BIRD_X, birdY, BIRD_R, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.strokeStyle = '#b8860b';
+        ctx.lineWidth = Math.max(1.5, BIRD_R * 0.14);
+        ctx.stroke();
+
+        ctx.fillStyle = '#1c1410';
+        ctx.font = `bold ${Math.round(H * 0.058)}px sans-serif`;
+        ctx.textAlign = 'center';
+        ctx.fillText(String(score), W / 2, H * 0.1);
+
+        if (state === 'ready') {
+          ctx.fillStyle = 'rgba(0,0,0,.45)';
+          ctx.fillRect(0, 0, W, H);
+          ctx.fillStyle = '#fff';
+          ctx.font = `bold ${Math.round(H * 0.046)}px sans-serif`;
+          ctx.fillText('Tap to flap!', W / 2, H / 2);
+        } else if (state === 'over') {
+          ctx.fillStyle = 'rgba(0,0,0,.55)';
+          ctx.fillRect(0, 0, W, H);
+          ctx.fillStyle = '#fff';
+          ctx.font = `bold ${Math.round(H * 0.054)}px sans-serif`;
+          ctx.fillText('Game Over', W / 2, H / 2 - H * 0.04);
+          ctx.font = `${Math.round(H * 0.033)}px sans-serif`;
+          ctx.fillText(`Score: ${score}  Best: ${best}`, W / 2, H / 2 + H * 0.02);
+          ctx.fillText('Tap to play again', W / 2, H / 2 + H * 0.075);
+        }
+      }
+      draw();
+
+      const onInput = (e) => { e.preventDefault(); flap(); };
+      canvas.addEventListener('pointerdown', onInput);
+      const onKey = (e) => { if (e.code === 'Space') { e.preventDefault(); flap(); } };
+      window.addEventListener('keydown', onKey);
+
+      return function cleanup() {
+        if (rafId) cancelAnimationFrame(rafId);
+        canvas.removeEventListener('pointerdown', onInput);
+        window.removeEventListener('keydown', onKey);
+      };
+    }
+
+    // ---------- Tic Tac Toe (play vs the computer, or invite another user) ----------
+    const tttInvitesCol = db.collection('tttInvites');
+    const tttGamesCol = db.collection('tttGames');
+    const TTT_LINES = [[0, 1, 2], [3, 4, 5], [6, 7, 8], [0, 3, 6], [1, 4, 7], [2, 5, 8], [0, 4, 8], [2, 4, 6]];
+    // Same bold chevron as the game view's own back button — a plain "←"
+    // character renders thin and curved depending on the font, this is a
+    // crisp fixed shape regardless of platform.
+    const TTT_BACK_ICON = '<svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.8" stroke-linecap="round" stroke-linejoin="round"><path d="M15 5l-7 7 7 7"/></svg>';
+    function tttWinnerOf(board) {
+      for (const [a, b, c] of TTT_LINES) {
+        if (board[a] && board[a] === board[b] && board[a] === board[c]) return board[a];
+      }
+      return null;
+    }
+    // Full-search minimax — tic-tac-toe's whole search tree is tiny, so this
+    // runs instantly with no need for alpha-beta pruning. Ties for the best
+    // score are broken randomly so the computer doesn't play identically
+    // every time, while still never making a losing move.
+    function tttMinimax(board, player) {
+      const winner = tttWinnerOf(board);
+      if (winner === 'O') return { score: 1 };
+      if (winner === 'X') return { score: -1 };
+      if (board.every(c => c)) return { score: 0 };
+      const moves = [];
+      for (let i = 0; i < 9; i++) {
+        if (board[i]) continue;
+        const next = board.slice();
+        next[i] = player;
+        moves.push({ index: i, score: tttMinimax(next, player === 'O' ? 'X' : 'O').score });
+      }
+      const best = player === 'O' ? Math.max(...moves.map(m => m.score)) : Math.min(...moves.map(m => m.score));
+      const bestMoves = moves.filter(m => m.score === best);
+      return { score: best, index: bestMoves[Math.floor(Math.random() * bestMoves.length)].index };
+    }
+
+    // Invite state is tracked globally (not just while Tic Tac Toe happens
+    // to be open) so an invite still reaches its recipient wherever they
+    // are in the app, and the sender still gets pulled into the game the
+    // instant it's accepted even if they wandered off elsewhere meanwhile.
+    let tttIncomingInvite = null;
+    let tttOutgoingInvite = null;
+    let tttOutgoingInviteListeners = [];
+    function notifyTttOutgoingChange() { tttOutgoingInviteListeners.forEach(fn => fn()); }
+    let tttJoinGameId = null;
+    let tttActiveGameId = null;
+
+    function showTttInviteOverlay() {
+      const body = document.getElementById('tttInviteBody');
+      body.innerHTML = `
+        <div class="tttWaitingBox">
+          <div class="userAvatar" style="width:56px;height:56px;font-size:1.3rem">${avatarInner(tttIncomingInvite.fromName, tttIncomingInvite.fromPhoto)}</div>
+          <div><b>${escapeHtml(tttIncomingInvite.fromName || 'Someone')}</b> wants to play Tic Tac Toe!</div>
+        </div>
+        <div class="jackpotBetRow" style="justify-content:center;margin-top:14px">
+          <button type="button" class="btn ghost" id="tttDeclineBtn">Decline</button>
+          <button type="button" class="btn primary" id="tttAcceptBtn">Accept</button>
+        </div>`;
+      document.getElementById('tttAcceptBtn').onclick = tttAcceptInvite;
+      document.getElementById('tttDeclineBtn').onclick = tttDeclineInvite;
+      document.getElementById('tttInviteOverlay').classList.add('show');
+    }
+    function hideTttInviteOverlay() {
+      document.getElementById('tttInviteOverlay').classList.remove('show');
+    }
+    async function tttAcceptInvite() {
+      const invite = tttIncomingInvite;
+      if (!invite) return;
+      hideTttInviteOverlay();
+      const me = allUsers.find(u => u.id === myUid);
+      const game = {
+        playerX: invite.from, playerXName: invite.fromName || 'Anonymous', playerXPhoto: invite.fromPhoto || null,
+        playerO: myUid, playerOName: me?.name || 'Anonymous', playerOPhoto: me?.photoURL || null,
+        board: Array(9).fill(null), turn: 'X', status: 'active', winner: null,
+        createdAt: firebase.firestore.FieldValue.serverTimestamp(),
+      };
+      try {
+        const ref = await tttGamesCol.add(game);
+        await tttInvitesCol.doc(invite.id).set({ status: 'accepted', gameId: ref.id }, { merge: true });
+        goToTttGame(ref.id);
+      } catch (err) {
+        showToast('Failed to start game: ' + err.message);
+      }
+    }
+    function tttDeclineInvite() {
+      const invite = tttIncomingInvite;
+      if (!invite) return;
+      hideTttInviteOverlay();
+      tttInvitesCol.doc(invite.id).set({ status: 'declined' }, { merge: true }).catch(() => {});
+    }
+
+    tttInvitesCol.where('to', '==', myUid).where('status', '==', 'pending').onSnapshot(snap => {
+      const doc = snap.docs[0];
+      if (doc) {
+        tttIncomingInvite = { id: doc.id, ...doc.data() };
+        showTttInviteOverlay();
+      } else if (tttIncomingInvite) {
+        tttIncomingInvite = null;
+        hideTttInviteOverlay();
+      }
+    }, () => {});
+
+    tttInvitesCol.where('from', '==', myUid).onSnapshot(snap => {
+      let stillPending = null;
+      for (const doc of snap.docs) {
+        const data = doc.data();
+        if (data.status === 'accepted' && data.gameId) {
+          tttInvitesCol.doc(doc.id).delete().catch(() => {});
+          tttOutgoingInvite = null;
+          notifyTttOutgoingChange();
+          goToTttGame(data.gameId);
+          return;
+        }
+        if (data.status === 'declined') {
+          showToast(`${data.toName || 'They'} declined your invite`);
+          tttInvitesCol.doc(doc.id).delete().catch(() => {});
+          continue;
+        }
+        if (data.status === 'pending') stillPending = { id: doc.id, ...data };
+      }
+      tttOutgoingInvite = stillPending;
+      notifyTttOutgoingChange();
+    }, () => {});
+
+    // Jumps straight into a live game from wherever the user currently is —
+    // used both when I accept an invite myself and when my own sent invite
+    // gets accepted while I'm off doing something else in the app.
+    function goToTttGame(gameId) {
+      tttJoinGameId = gameId;
+      const alreadyInAGameView = gameViewOpen;
+      if (gameViewOpen) {
+        if (typeof gameViewCleanup === 'function') gameViewCleanup();
+        gameViewCleanup = null;
+        gameViewOpen = false;
+        gameViewCurrentId = null;
+        document.getElementById('gameViewContainer').innerHTML = '';
+        document.getElementById('gameViewPage').style.display = 'none';
+      }
+      if (jackpotPageOpen) { jackpotPageOpen = false; jackpotPage.style.display = 'none'; }
+      if (gamesPageOpen) { gamesPageOpen = false; gamesPage.style.display = 'none'; }
+      if (!alreadyInAGameView) pushOverlayState();
+      showGameView('tictactoe');
+    }
+
+    function startTicTacToe(container) {
+      let activeCleanup = null;
+      function mount(renderFn) {
+        if (activeCleanup) { activeCleanup(); activeCleanup = null; }
+        container.innerHTML = '';
+        activeCleanup = renderFn(container) || null;
+      }
+
+      function mountTttModeSelect(c) {
+        c.innerHTML = `
+        <div class="tttWrap">
+          <div class="tttModeRow">
+            <button type="button" class="tttModeBtn" id="tttVsComputerBtn">🤖 Play vs Computer</button>
+            <button type="button" class="tttModeBtn" id="tttVsFriendBtn">👥 Play vs a Friend</button>
+          </div>
+        </div>`;
+        c.querySelector('#tttVsComputerBtn').onclick = () => mount(mountTttVsComputer);
+        c.querySelector('#tttVsFriendBtn').onclick = () => mount(mountTttFriendPicker);
+      }
+
+      function mountTttVsComputer(c) {
+        const board = Array(9).fill(null);
+        let over = false;
+        let statsRecorded = false;
+
+        c.innerHTML = `
+        <div class="tttWrap">
+          <div class="tttStatusRow" id="tttStatus">Your turn (X)</div>
+          <div class="tttBoard" id="tttBoard"></div>
+          <div class="tttResultRow">
+            <button type="button" class="btn ghost tttIconBtn" id="tttBackBtn">${TTT_BACK_ICON} Choose mode</button>
+            <button type="button" class="btn primary" id="tttPlayAgainBtn" style="display:none">Play Again</button>
+          </div>
+        </div>`;
+        const boardEl = c.querySelector('#tttBoard');
+        const statusEl = c.querySelector('#tttStatus');
+        const playAgainBtn = c.querySelector('#tttPlayAgainBtn');
+
+        function render() {
+          boardEl.innerHTML = board.map((v, i) => `<div class="tttCell${v ? ' ' + v.toLowerCase() : ''}${v || over ? ' disabled' : ''}" data-i="${i}">${v || ''}</div>`).join('');
+          boardEl.querySelectorAll('.tttCell').forEach(cell => {
+            cell.onclick = () => playerMove(Number(cell.dataset.i));
+          });
+        }
+        function recordResult(won) {
+          if (statsRecorded) return;
+          statsRecorded = true;
+          const updates = { games: { tictactoe: { plays: firebase.firestore.FieldValue.increment(1) } } };
+          if (won) updates.games.tictactoe.best = firebase.firestore.FieldValue.increment(1);
+          usersCol.doc(myUid).set(updates, { merge: true }).catch(() => {});
+        }
+        function finish(text, won) {
+          over = true;
+          statusEl.textContent = text;
+          render();
+          recordResult(won);
+          playAgainBtn.style.display = 'block';
+        }
+        function playerMove(i) {
+          if (over || board[i]) return;
+          board[i] = 'X';
+          if (tttWinnerOf(board)) { finish('You won! 🎉', true); return; }
+          if (board.every(x => x)) { finish("It's a draw", false); return; }
+          render();
+          statusEl.textContent = "Computer's turn…";
+          setTimeout(() => {
+            const move = tttMinimax(board, 'O').index;
+            board[move] = 'O';
+            if (tttWinnerOf(board)) { finish('Computer won 🤖', false); return; }
+            if (board.every(x => x)) { finish("It's a draw", false); return; }
+            statusEl.textContent = 'Your turn (X)';
+            render();
+          }, 450);
+        }
+        render();
+        c.querySelector('#tttBackBtn').onclick = () => mount(mountTttModeSelect);
+        playAgainBtn.onclick = () => mount(mountTttVsComputer);
+        return () => {};
+      }
+
+      function mountTttFriendPicker(c) {
+        function render() {
+          if (tttOutgoingInvite) {
+            c.innerHTML = `
+            <div class="tttWrap">
+              <div class="tttWaitingBox">
+                <div>Waiting for <b>${escapeHtml(tttOutgoingInvite.toName || 'them')}</b> to accept…</div>
+              </div>
+              <button type="button" class="btn ghost" id="tttCancelInviteBtn">Cancel invite</button>
+            </div>`;
+            c.querySelector('#tttCancelInviteBtn').onclick = () => {
+              tttInvitesCol.doc(tttOutgoingInvite.id).delete().catch(() => {});
+            };
+            return;
+          }
+          const others = allUsers.filter(u => u.id !== myUid);
+          c.innerHTML = `
+          <div class="tttWrap">
+            <div class="tttUserList" id="tttUserList">
+              ${others.length ? others.map(u => `
+                <div class="userRow">
+                  <div class="userAvatar">${avatarInner(u.name, u.photoURL)}</div>
+                  <div class="userName">${escapeHtml(u.name || 'Anonymous')}</div>
+                  <button type="button" class="btn primary tttInviteBtn" data-user="${u.id}" data-name="${escapeHtml(u.name || 'Anonymous')}">Invite</button>
+                </div>`).join('') : '<div class="empty" style="padding:16px 0">No one else to invite yet</div>'}
+            </div>
+            <button type="button" class="btn ghost tttIconBtn" id="tttBackBtn">${TTT_BACK_ICON} Choose mode</button>
+          </div>`;
+          c.querySelectorAll('.tttInviteBtn').forEach(btn => {
+            btn.onclick = () => sendInvite(btn.dataset.user, btn.dataset.name);
+          });
+          c.querySelector('#tttBackBtn').onclick = () => mount(mountTttModeSelect);
+        }
+        async function sendInvite(toUid, toName) {
+          const me = allUsers.find(u => u.id === myUid);
+          try {
+            await tttInvitesCol.add({
+              from: myUid, fromName: me?.name || 'Anonymous', fromPhoto: me?.photoURL || null,
+              to: toUid, toName, status: 'pending',
+              createdAt: firebase.firestore.FieldValue.serverTimestamp(),
+            });
+          } catch (err) {
+            showToast('Failed to send invite: ' + err.message);
+          }
+        }
+        tttOutgoingInviteListeners.push(render);
+        render();
+        return () => {
+          tttOutgoingInviteListeners = tttOutgoingInviteListeners.filter(fn => fn !== render);
+        };
+      }
+
+      function mountTttLiveGame(c, gameId) {
+        tttActiveGameId = gameId;
+        let statsRecorded = false;
+        // Guards against this same client acting twice on its own write —
+        // the onSnapshot listener below is watching this exact doc, so the
+        // moment either player's "Play Again" click writes rematchGameId
+        // onto it, that same client's listener fires again for it too.
+        let handledRematchId = null;
+        c.innerHTML = `
+        <div class="tttWrap">
+          <div class="tttPlayersRow" id="tttPlayersRow"></div>
+          <div class="tttStatusRow" id="tttStatus">Loading…</div>
+          <div class="tttBoard" id="tttBoard"></div>
+          <div class="tttStatusRow" id="tttRematchHint" style="font-size:.8rem;color:var(--text-dim);min-height:0"></div>
+          <div class="tttResultRow">
+            <button type="button" class="btn ghost tttIconBtn" id="tttLeaveBtn">${TTT_BACK_ICON} Leave game</button>
+            <button type="button" class="btn primary" id="tttPlayAgainBtn" style="display:none">Play Again</button>
+          </div>
+        </div>`;
+        const boardEl = c.querySelector('#tttBoard');
+        const statusEl = c.querySelector('#tttStatus');
+        const playersEl = c.querySelector('#tttPlayersRow');
+        const playAgainBtn = c.querySelector('#tttPlayAgainBtn');
+        const rematchHintEl = c.querySelector('#tttRematchHint');
+
+        // Both players have to agree before a rematch actually starts — one
+        // tap just records that player's own "yes" (rematchX/rematchO) on
+        // the finished game doc. Whichever click is the SECOND one to see
+        // the other side's "yes" already there is the one that creates the
+        // new game, inside a transaction so a near-simultaneous double tap
+        // from both sides can't create two rematches (Firestore retries
+        // whichever transaction lost the race with a fresh read, so it
+        // sees the other side's yes and takes the "second" branch too).
+        async function requestRematch(mySymbol) {
+          playAgainBtn.disabled = true;
+          try {
+            await db.runTransaction(async (tx) => {
+              const ref = tttGamesCol.doc(gameId);
+              const doc = await tx.get(ref);
+              const g = doc.data();
+              if (!g || g.rematchGameId) return;
+              const myField = mySymbol === 'X' ? 'rematchX' : 'rematchO';
+              const otherField = mySymbol === 'X' ? 'rematchO' : 'rematchX';
+              if (g[otherField]) {
+                const newRef = tttGamesCol.doc();
+                tx.set(newRef, {
+                  playerX: g.playerO, playerXName: g.playerOName, playerXPhoto: g.playerOPhoto || null,
+                  playerO: g.playerX, playerOName: g.playerXName, playerOPhoto: g.playerXPhoto || null,
+                  board: Array(9).fill(null), turn: 'X', status: 'active', winner: null,
+                  createdAt: firebase.firestore.FieldValue.serverTimestamp(),
+                });
+                tx.update(ref, { [myField]: true, rematchGameId: newRef.id });
+              } else {
+                tx.update(ref, { [myField]: true });
+              }
+            });
+          } catch (err) {
+            playAgainBtn.disabled = false;
+            showToast('Failed: ' + err.message);
+          }
+        }
+
+        function recordResult(g) {
+          if (statsRecorded) return;
+          statsRecorded = true;
+          const mySymbol = g.playerX === myUid ? 'X' : g.playerO === myUid ? 'O' : null;
+          if (!mySymbol) return;
+          const won = g.status === 'won' && g.winner === mySymbol;
+          const updates = { games: { tictactoe: { plays: firebase.firestore.FieldValue.increment(1) } } };
+          if (won) updates.games.tictactoe.best = firebase.firestore.FieldValue.increment(1);
+          usersCol.doc(myUid).set(updates, { merge: true }).catch(() => {});
+        }
+
+        function makeMove(i, mySymbol, current) {
+          if (current.status !== 'active' || current.turn !== mySymbol || current.board[i]) return;
+          db.runTransaction(async (tx) => {
+            const ref = tttGamesCol.doc(gameId);
+            const doc = await tx.get(ref);
+            const g = doc.data();
+            if (!g || g.status !== 'active' || g.turn !== mySymbol || g.board[i]) return;
+            const board = g.board.slice();
+            board[i] = mySymbol;
+            const winner = tttWinnerOf(board);
+            const draw = !winner && board.every(x => x);
+            tx.update(ref, {
+              board,
+              turn: mySymbol === 'X' ? 'O' : 'X',
+              status: winner ? 'won' : draw ? 'draw' : 'active',
+              winner: winner || null,
+            });
+          }).catch(() => {});
+        }
+
+        const unsub = tttGamesCol.doc(gameId).onSnapshot(snap => {
+          if (!snap.exists) { statusEl.textContent = 'Game not found'; return; }
+          const g = snap.data();
+          if (g.rematchGameId && g.rematchGameId !== handledRematchId) {
+            handledRematchId = g.rematchGameId;
+            mount((cc) => mountTttLiveGame(cc, g.rematchGameId));
+            return;
+          }
+          const mySymbol = g.playerX === myUid ? 'X' : g.playerO === myUid ? 'O' : null;
+          playersEl.textContent = `${g.playerXName} (X) vs ${g.playerOName} (O)`;
+          const board = g.board;
+          boardEl.innerHTML = board.map((v, i) => {
+            const clickable = g.status === 'active' && mySymbol && g.turn === mySymbol && !v;
+            return `<div class="tttCell${v ? ' ' + v.toLowerCase() : ''}${clickable ? '' : ' disabled'}" data-i="${i}">${v || ''}</div>`;
+          }).join('');
+          if (mySymbol) {
+            boardEl.querySelectorAll('.tttCell').forEach(cell => {
+              cell.onclick = () => makeMove(Number(cell.dataset.i), mySymbol, g);
+            });
+          }
+          const gameOver = g.status !== 'active';
+          playAgainBtn.style.display = gameOver && mySymbol ? 'block' : 'none';
+          if (gameOver && mySymbol) {
+            const myAgreed = mySymbol === 'X' ? g.rematchX : g.rematchO;
+            const otherAgreed = mySymbol === 'X' ? g.rematchO : g.rematchX;
+            const opponentName = mySymbol === 'X' ? g.playerOName : g.playerXName;
+            playAgainBtn.disabled = !!myAgreed;
+            playAgainBtn.textContent = myAgreed ? `Waiting for ${opponentName}…` : 'Play Again';
+            rematchHintEl.textContent = otherAgreed && !myAgreed ? `${opponentName} wants a rematch!` : '';
+          } else {
+            rematchHintEl.textContent = '';
+          }
+          if (g.status === 'won') {
+            statusEl.textContent = g.winner === mySymbol ? 'You won! 🎉' : `${g.winner === 'X' ? g.playerXName : g.playerOName} won`;
+            recordResult(g);
+          } else if (g.status === 'draw') {
+            statusEl.textContent = "It's a draw";
+            recordResult(g);
+          } else if (!mySymbol) {
+            statusEl.textContent = 'Spectating…';
+          } else {
+            statusEl.textContent = g.turn === mySymbol ? 'Your turn' : `Waiting for ${g.turn === 'X' ? g.playerXName : g.playerOName}…`;
+          }
+          playAgainBtn.onclick = () => requestRematch(mySymbol);
+        }, () => {});
+
+        c.querySelector('#tttLeaveBtn').onclick = () => mount(mountTttModeSelect);
+        return () => { unsub(); tttActiveGameId = null; };
+      }
+
+      const joinId = tttJoinGameId;
+      tttJoinGameId = null;
+      if (joinId) {
+        mount((c) => mountTttLiveGame(c, joinId));
+      } else {
+        mount(mountTttModeSelect);
+      }
+
+      return () => { if (activeCleanup) activeCleanup(); };
+    }
 
     function renderJackpotAdminRow() {
       const row = document.getElementById('jackpotAdminRow');
@@ -7185,7 +8434,8 @@
       }
     };
     document.getElementById('homeLogoBtn').onclick = () => {
-      if (jackpotPageOpen) closeJackpotPage();
+      if (gameViewOpen) closeGameView();
+      else if (jackpotPageOpen) closeJackpotPage();
       else if (gamesPageOpen) closeGamesPage();
     };
 
@@ -8348,6 +9598,481 @@
       }, ROULETTE_SPIN_DURATION * 1000 + 150);
     };
 
+    // ---------- Plinko ----------
+    // Board physics is a plain binomial random walk (a fair left/right coin
+    // flip per peg row) rather than a real physics sim — this is what every
+    // simplified web Plinko does, and it reproduces the same bell-curve slot
+    // distribution real physics gives, which is what actually matters for
+    // fairness. Risk level only swaps the multiplier table; it never touches
+    // how a ball actually falls (same principle as real Plinko sites).
+    // These multipliers were originally copied from a real casino site's
+    // Plinko, which calibrates them against an idealized "fair coin flip
+    // per row" (binomial) distribution — but our board is real physics,
+    // not a coin flip, and a ball's momentum through the pegs carries it
+    // to the edges far more often than that ideal model assumes. Measured
+    // against thousands of real drops on this actual board (combining two
+    // independent survey passes for a larger, steadier sample), the old
+    // numbers paid out up to ~16x the bet on average (rows=16/high) — the
+    // values below are rescaled from that same real, measured distribution
+    // down to a healthy return (~95% on low risk, tapering to ~85% on
+    // high risk — high risk's payout is dominated by a couple of very
+    // rare extreme-edge slots that are inherently the noisiest to measure,
+    // so it gets the most conservative target of the three as a safety
+    // margin). Every combination keeps the same relative shape as before
+    // (edges pay much more than the center, "high" is far more volatile
+    // than "low") — only the overall scale changed, so the game no longer
+    // pays out more than it takes in.
+    const PLINKO_TABLES = {
+      8: {
+        low: [5, 1.9, 1, 0.9, 0.5, 0.9, 1, 1.9, 5],
+        medium: [11.5, 2.6, 1.1, 0.6, 0.4, 0.6, 1.1, 2.6, 11.5],
+        high: [24, 3.4, 1.2, 0.2, 0.2, 0.2, 1.2, 3.4, 24],
+      },
+      12: {
+        low: [7, 2.6, 1.4, 1.1, 0.9, 0.9, 0.4, 0.9, 0.9, 1.1, 1.4, 2.6, 7],
+        medium: [16.5, 4.1, 2.1, 1.2, 0.9, 0.5, 0.3, 0.5, 0.9, 1.2, 2.1, 4.1, 16.5],
+        high: [36, 5.5, 2.5, 1.2, 0.7, 0.2, 0.1, 0.2, 0.7, 1.2, 2.5, 5.5, 36],
+      },
+      16: {
+        low: [12.5, 7, 1.6, 1.1, 1.1, 0.9, 0.9, 0.8, 0.4, 0.8, 0.9, 0.9, 1.1, 1.1, 1.6, 7, 12.5],
+        medium: [43, 16, 3.9, 1.9, 1.2, 0.6, 0.4, 0.2, 0.1, 0.2, 0.4, 0.6, 1.2, 1.9, 3.9, 16, 43],
+        high: [110, 14.5, 2.9, 1, 0.5, 0.2, 0.1, 0.1, 0.1, 0.1, 0.1, 0.2, 0.5, 1, 2.9, 14.5, 110],
+      },
+    };
+    const PLINKO_MIN_BET = 1;
+    const PLINKO_DEFAULT_MAX_BET = 20;
+    const PLINKO_CANVAS_W = 340, PLINKO_CANVAS_H = 320;
+    const PLINKO_MARGIN_X = 28, PLINKO_MARGIN_TOP = 22, PLINKO_MARGIN_BOTTOM = 18;
+    let plinkoMaxBetLive = PLINKO_DEFAULT_MAX_BET;
+    // Multiple balls can be in flight at once (spam-clicking Drop Ball drops
+    // a new independent ball each time) — this counts them instead of a
+    // single boolean, so we know whether it's safe to let the board's row
+    // count / risk level change (which redraws the peg layout, so that's
+    // locked while any ball is still animating on it).
+    let plinkoInFlightCount = 0;
+    let plinkoRows = [8, 12, 16].includes(Number(localStorage.getItem('sor-plinko-rows'))) ? Number(localStorage.getItem('sor-plinko-rows')) : 12;
+    let plinkoRisk = ['low', 'medium', 'high'].includes(localStorage.getItem('sor-plinko-risk')) ? localStorage.getItem('sor-plinko-risk') : 'medium';
+    let plinkoBoardDrawnForRows = null;
+
+    configCol.doc('plinko').onSnapshot(snap => {
+      const v = snap.data()?.maxBet;
+      plinkoMaxBetLive = typeof v === 'number' && v >= PLINKO_MIN_BET ? v : PLINKO_DEFAULT_MAX_BET;
+      if (jackpotPageOpen && casinoActiveGame === 'plinko') {
+        setPlinkoBet(getPlinkoBet());
+        renderPlinkoAdminRow();
+      }
+    }, err => showToast('Sync error: ' + err.message));
+    function renderPlinkoAdminRow() {
+      const row = document.getElementById('plinkoAdminRow');
+      row.style.display = isAdmin() ? 'flex' : 'none';
+      if (!isAdmin()) return;
+      document.getElementById('plinkoMaxBetLabel').textContent = `Max bet: ${plinkoMaxBetLive}`;
+      document.getElementById('plinkoMaxBetEdit').style.display = 'none';
+    }
+    document.getElementById('plinkoEditMaxBetBtn').onclick = () => {
+      document.getElementById('plinkoMaxBetInput').value = plinkoMaxBetLive;
+      document.getElementById('plinkoMaxBetEdit').style.display = 'flex';
+    };
+    document.getElementById('plinkoMaxBetCancelBtn').onclick = () => {
+      document.getElementById('plinkoMaxBetEdit').style.display = 'none';
+    };
+    document.getElementById('plinkoMaxBetSaveBtn').onclick = async () => {
+      const n = Math.floor(Number(document.getElementById('plinkoMaxBetInput').value));
+      if (!Number.isFinite(n) || n < PLINKO_MIN_BET) {
+        showToast(`Max bet must be a whole number ≥ ${PLINKO_MIN_BET}`);
+        return;
+      }
+      try {
+        await configCol.doc('plinko').set({ maxBet: n }, { merge: true });
+        showToast('Max bet updated');
+        document.getElementById('plinkoMaxBetEdit').style.display = 'none';
+      } catch (err) {
+        showToast('Failed: ' + err.message);
+      }
+    };
+
+    const plinkoBetValueEl = document.getElementById('plinkoBetValue');
+    function getPlinkoBet() {
+      const stored = localStorage.getItem('sor-plinko-bet');
+      const n = stored === null ? PLINKO_MIN_BET : Number(stored);
+      return Math.min(plinkoMaxBetLive, Math.max(PLINKO_MIN_BET, Number.isFinite(n) ? n : PLINKO_MIN_BET));
+    }
+    function setPlinkoBet(n) {
+      if (!Number.isFinite(n)) n = PLINKO_MIN_BET;
+      n = Math.min(plinkoMaxBetLive, Math.max(PLINKO_MIN_BET, Math.round(n)));
+      localStorage.setItem('sor-plinko-bet', String(n));
+      plinkoBetValueEl.value = n;
+      document.getElementById('plinkoBetMaxLabel').textContent = `Max ${plinkoMaxBetLive}`;
+      // Bet + Drop stay usable while balls are in flight — only the board
+      // layout (rows/risk) locks, since each drop is an independent bet.
+      document.getElementById('plinkoBetMinus').disabled = n <= PLINKO_MIN_BET;
+      document.getElementById('plinkoBetPlus').disabled = n >= plinkoMaxBetLive;
+    }
+    document.getElementById('plinkoBetMinus').onclick = () => setPlinkoBet(getPlinkoBet() - 1);
+    document.getElementById('plinkoBetPlus').onclick = () => setPlinkoBet(getPlinkoBet() + 1);
+    plinkoBetValueEl.addEventListener('change', () => setPlinkoBet(Number(plinkoBetValueEl.value)));
+
+    function getPlinkoTable() { return PLINKO_TABLES[plinkoRows][plinkoRisk]; }
+    function plinkoSlotColor(mult) {
+      if (mult >= 10) return '#c0392b';
+      if (mult >= 2) return '#caa43d';
+      if (mult >= 1) return '#3a7d5c';
+      return '#4a4a68';
+    }
+    function renderPlinkoSlots() {
+      const wrap = document.getElementById('plinkoSlots');
+      wrap.innerHTML = getPlinkoTable().map(m =>
+        `<div class="plinkoSlot" style="background:${plinkoSlotColor(m)}">${m}x</div>`
+      ).join('');
+    }
+
+    // Rows 0 (a single peg dead center) and 1 (just two pegs) are skipped —
+    // with nothing else nearby to correct it, a ball's very first deflection
+    // off that lone top peg (or the narrow pair below it) tended to send it
+    // outside the triangle's footprint entirely before the rows had widened
+    // out enough to catch it again, landing far more often in the extreme
+    // (highest-paying) edge slots than a real board's math intends.
+    const PLINKO_SKIP_ROWS = 2;
+    function plinkoGeometry(rows) {
+      // Vertical spacing is stretched over the rows that actually get pegs
+      // (rows - PLINKO_SKIP_ROWS), not the nominal row count, and peg rows
+      // below are positioned starting from that same reclaimed top — so the
+      // space the skipped rows used to occupy is closed up entirely instead
+      // of being left as a dead gap above the first real row.
+      const effRows = rows - PLINKO_SKIP_ROWS;
+      return {
+        pegSpacingX: (PLINKO_CANVAS_W - 2 * PLINKO_MARGIN_X) / rows,
+        rowSpacingY: (PLINKO_CANVAS_H - PLINKO_MARGIN_TOP - PLINKO_MARGIN_BOTTOM) / effRows,
+      };
+    }
+    // Single source of truth for where every peg actually sits, shared by
+    // both the canvas drawing and the physics collision checks below — so
+    // the ball can never visually land "on" a peg, it always has to fit in
+    // the gaps between the exact same dots that get drawn.
+    let _plinkoPegCache = { rows: null, pegs: null };
+    function getPlinkoPegs(rows) {
+      if (_plinkoPegCache.rows !== rows) {
+        const { pegSpacingX, rowSpacingY } = plinkoGeometry(rows);
+        const pegs = [];
+        for (let r = PLINKO_SKIP_ROWS; r < rows; r++) {
+          const y = PLINKO_MARGIN_TOP + (r - PLINKO_SKIP_ROWS) * rowSpacingY;
+          const pegCount = r + 1;
+          const rowWidth = (pegCount - 1) * pegSpacingX;
+          const startX = PLINKO_CANVAS_W / 2 - rowWidth / 2;
+          for (let i = 0; i < pegCount; i++) pegs.push({ x: startX + i * pegSpacingX, y });
+        }
+        _plinkoPegCache = { rows, pegs };
+      }
+      return _plinkoPegCache.pegs;
+    }
+    function drawPlinkoBoard(canvas, rows) {
+      const ctx = canvas.getContext('2d');
+      ctx.clearRect(0, 0, PLINKO_CANVAS_W, PLINKO_CANVAS_H);
+      ctx.fillStyle = '#e8d9ff';
+      const { pegRadius } = plinkoBallPegRadii(rows);
+      getPlinkoPegs(rows).forEach(peg => {
+        ctx.beginPath();
+        ctx.arc(peg.x, peg.y, pegRadius, 0, Math.PI * 2);
+        ctx.fill();
+      });
+    }
+    function setPlinkoBallPos(ball, xPx, yPx) {
+      ball.style.left = (xPx / PLINKO_CANVAS_W * 100) + '%';
+      ball.style.top = (yPx / PLINKO_CANVAS_H * 100) + '%';
+    }
+    // Each drop gets its own ball element so several can be mid-fall at
+    // once (spam-clicking Drop Ball) without fighting over one shared node.
+    // It's removed from the DOM again once it's settled and faded out.
+    function createPlinkoBall(ballRadius) {
+      // Appended into the canvas-only wrapper (not the outer board wrap,
+      // which now also contains the bucket row below the canvas) so the
+      // ball's percentage-of-PLINKO_CANVAS_W/H position lines up with the
+      // canvas's own scaling instead of being computed against a taller box.
+      const wrap = document.getElementById('plinkoCanvasWrap');
+      const ball = document.createElement('div');
+      ball.className = 'plinkoBall';
+      // Sized as a % of canvas width (same unit setPlinkoBallPos positions
+      // in) so it scales correctly at any row count and any viewport width.
+      ball.style.width = (ballRadius * 2 / PLINKO_CANVAS_W * 100) + '%';
+      ball.style.aspectRatio = '1';
+      wrap.appendChild(ball);
+      return ball;
+    }
+
+    function playPlinkoPegSound() { playRouletteClack(0, 0.1); }
+    function playPlinkoResultSound(multiplier) {
+      if (multiplier >= 10) playJackpotJackpotSound();
+      else if (multiplier >= 2) playJackpotBigWinSound();
+      else if (multiplier >= 1) playJackpotSmallWinSound();
+      else playRouletteLoseSound();
+    }
+
+    // Real gravity + circle-vs-circle collision against every peg, not a
+    // scripted row-by-row random walk — the ball actually falls, actually
+    // bounces off whichever peg it physically hits, and is geometrically
+    // incapable of overlapping a peg (collision resolution always pushes it
+    // back out to exactly touch the peg's edge, so it only ever passes
+    // through the gaps between pegs, never on top of one). The only
+    // deliberately random ingredient is a tiny sideways kick on each bounce,
+    // standing in for the ball never hitting a peg at a perfectly
+    // mathematically dead-center point in real life — without that, a
+    // ball dropped from dead center on a symmetric board would
+    // deterministically fall straight down the middle every single time.
+    // Ball/peg size and collision-kick strength scale with the current row
+    // count's own peg spacing instead of being fixed pixel constants — pegs
+    // sit closer together at 16 rows and much further apart at 8, so a ball
+    // sized for 12 rows was too big to fit through 16 rows' gaps at all
+    // (physically wider than the gap between adjacent pegs), while at 8
+    // rows it was so small relative to the oversized gaps that it barely
+    // touched a peg on the way down, landing near-straight instead of
+    // bouncing — both keyed to these same ratios so the gap stays a
+    // consistent ~30% wider than the ball at every row count.
+    const PLINKO_PEG_RADIUS_RATIO = 0.15;
+    const PLINKO_BALL_RADIUS_RATIO = 0.3;
+    // Measured against real play, the ball's momentum through the peg
+    // field was carrying it to the extreme edge slots far more often than
+    // an idealized "fair coin flip per row" board would — a big random
+    // kick plus lively (high-restitution) bounces let it pick a side early
+    // and keep riding that momentum outward instead of getting knocked
+    // back toward center. Both are turned down here so a bounce loses more
+    // energy and randomizes direction less aggressively, pulling the
+    // real empirical distribution back in from the edges.
+    const PLINKO_KICK_RATIO = 0.9; // random sideways kick per peg hit, per px of peg spacing
+    function plinkoBallPegRadii(rows) {
+      const { pegSpacingX } = plinkoGeometry(rows);
+      return { pegRadius: pegSpacingX * PLINKO_PEG_RADIUS_RATIO, ballRadius: pegSpacingX * PLINKO_BALL_RADIUS_RATIO };
+    }
+    const PLINKO_GRAVITY = 950; // px/s^2
+    const PLINKO_RESTITUTION = 0.4;
+    const PLINKO_MAX_FALL_MS = 8000; // safety net so a stuck/unstable ball can't hang forever
+
+    function animatePlinkoDrop(rows) {
+      return new Promise(resolve => {
+        const pegs = getPlinkoPegs(rows);
+        const { pegSpacingX, rowSpacingY } = plinkoGeometry(rows);
+        const { pegRadius, ballRadius } = plinkoBallPegRadii(rows);
+        const kickStrength = pegSpacingX * PLINKO_KICK_RATIO;
+        const ball = createPlinkoBall(ballRadius);
+        // A real Plinko board's side walls run straight up at the width of
+        // the bottom (widest) row, not the full board frame — walling the
+        // ball to the raw canvas edges left it free to drift past the
+        // narrow top rows (where the triangle is only a peg or two wide)
+        // and slip down the outside of the whole pyramid, which is why
+        // every ball was landing in the extreme edge slots and never the
+        // middle ones.
+        const slotSpan = rows * pegSpacingX;
+        const leftWall = PLINKO_CANVAS_W / 2 - slotSpan / 2 + ballRadius;
+        const rightWall = PLINKO_CANVAS_W / 2 + slotSpan / 2 - ballRadius;
+        const bottomY = PLINKO_MARGIN_TOP + (rows - PLINKO_SKIP_ROWS) * rowSpacingY;
+
+        let x = PLINKO_CANVAS_W / 2 + (Math.random() - 0.5) * 3;
+        let y = PLINKO_MARGIN_TOP - rowSpacingY * 0.7;
+        let vx = (Math.random() - 0.5) * 15;
+        let vy = 0;
+        setPlinkoBallPos(ball, x, y);
+        void ball.offsetWidth;
+
+        let lastT = null;
+        let lastPegSoundT = 0;
+        let startT = null;
+        let lastProgressY = y;
+        let lastProgressElapsed = 0;
+        let done = false;
+
+        function settle() {
+          done = true;
+          let slotIndex = Math.round((x - PLINKO_CANVAS_W / 2) / pegSpacingX + rows / 2);
+          slotIndex = Math.max(0, Math.min(rows, slotIndex));
+          setTimeout(() => {
+            ball.style.transition = 'opacity .4s';
+            ball.style.opacity = '0';
+            setTimeout(() => ball.remove(), 400);
+          }, 400);
+          resolve(slotIndex);
+        }
+
+        function frame(t) {
+          if (done) return;
+          if (lastT === null) lastT = t;
+          if (startT === null) startT = t;
+          const dt = Math.min((t - lastT) / 1000, 0.032);
+          lastT = t;
+
+          // Sub-stepping keeps fast-moving balls from tunnelling through a
+          // peg between frames, and keeps the collision response stable.
+          const SUBSTEPS = 4;
+          const sdt = dt / SUBSTEPS;
+          for (let s = 0; s < SUBSTEPS; s++) {
+            vy += PLINKO_GRAVITY * sdt;
+            x += vx * sdt;
+            y += vy * sdt;
+
+            if (x < leftWall) { x = leftWall; vx = Math.abs(vx) * PLINKO_RESTITUTION; }
+            else if (x > rightWall) { x = rightWall; vx = -Math.abs(vx) * PLINKO_RESTITUTION; }
+
+            for (const peg of pegs) {
+              if (Math.abs(peg.y - y) > rowSpacingY * 1.5) continue; // only nearby rows can possibly collide
+              const dx = x - peg.x, dy = y - peg.y;
+              const dist = Math.hypot(dx, dy);
+              const minDist = ballRadius + pegRadius;
+              if (dist > 0.0001 && dist < minDist) {
+                const nx = dx / dist, ny = dy / dist;
+                const overlap = minDist - dist;
+                x += nx * overlap; y += ny * overlap;
+                const vDotN = vx * nx + vy * ny;
+                vx = (vx - 2 * vDotN * nx) * PLINKO_RESTITUTION;
+                vy = (vy - 2 * vDotN * ny) * PLINKO_RESTITUTION;
+                vx += (Math.random() - 0.5) * kickStrength;
+                const now = performance.now();
+                if (now - lastPegSoundT > 40) { playPlinkoPegSound(); lastPegSoundT = now; }
+              }
+            }
+          }
+
+          // A ball can occasionally settle into a stable-looking equilibrium
+          // wedged between a peg and a side wall (bouncing between the two
+          // with just enough residual speed each bounce that a plain "is it
+          // moving slowly" check never notices — the bounce keeps its
+          // velocity looking lively even though it's making no actual
+          // downward progress). So track real progress instead: if it
+          // hasn't gotten meaningfully closer to the bottom in half a
+          // second, that's a stall regardless of instantaneous speed —
+          // shove it firmly back toward the middle (away from whichever
+          // wall it's hugging) and further down, rather than silently
+          // freezing until the multi-second fall-time safety net kicks in.
+          const elapsedSinceStart = t - startT;
+          if (y - lastProgressY > 6) {
+            lastProgressY = y;
+            lastProgressElapsed = elapsedSinceStart;
+          } else if (elapsedSinceStart - lastProgressElapsed > 500) {
+            const towardCenter = x < PLINKO_CANVAS_W / 2 ? 1 : -1;
+            vx += towardCenter * (120 + Math.random() * 80);
+            vy += 220;
+            lastProgressY = y;
+            lastProgressElapsed = elapsedSinceStart;
+          }
+
+          setPlinkoBallPos(ball, x, y);
+
+          if (y >= bottomY || (t - startT) > PLINKO_MAX_FALL_MS) { settle(); return; }
+          requestAnimationFrame(frame);
+        }
+        requestAnimationFrame(frame);
+      });
+    }
+
+    // Only the board layout (rows/risk) ever locks — Drop Ball and the bet
+    // controls stay live the whole time, on purpose, so spam-clicking Drop
+    // Ball drops a new independent ball every time instead of being blocked
+    // until the previous one lands.
+    function setPlinkoRowRiskLocked(locked) {
+      document.querySelectorAll('#plinkoRiskGroup .plinkoSegBtn, #plinkoRowsGroup .plinkoSegBtn').forEach(b => b.disabled = locked);
+    }
+    function setPlinkoRows(rows) {
+      if (plinkoInFlightCount) return; // layout can't change under balls already falling through it
+      plinkoRows = rows;
+      localStorage.setItem('sor-plinko-rows', String(rows));
+      document.querySelectorAll('#plinkoRowsGroup .plinkoSegBtn').forEach(b => b.classList.toggle('active', Number(b.dataset.rows) === rows));
+      drawPlinkoBoard(document.getElementById('plinkoCanvas'), rows);
+      plinkoBoardDrawnForRows = rows;
+      renderPlinkoSlots();
+    }
+    function setPlinkoRisk(risk) {
+      if (plinkoInFlightCount) return;
+      plinkoRisk = risk;
+      localStorage.setItem('sor-plinko-risk', risk);
+      document.querySelectorAll('#plinkoRiskGroup .plinkoSegBtn').forEach(b => b.classList.toggle('active', b.dataset.risk === risk));
+      renderPlinkoSlots();
+    }
+    document.querySelectorAll('#plinkoRiskGroup .plinkoSegBtn').forEach(btn => {
+      btn.onclick = () => setPlinkoRisk(btn.dataset.risk);
+    });
+    document.querySelectorAll('#plinkoRowsGroup .plinkoSegBtn').forEach(btn => {
+      btn.onclick = () => setPlinkoRows(Number(btn.dataset.rows));
+    });
+
+    function initPlinkoUi() {
+      document.querySelectorAll('#plinkoRiskGroup .plinkoSegBtn').forEach(b => b.classList.toggle('active', b.dataset.risk === plinkoRisk));
+      document.querySelectorAll('#plinkoRowsGroup .plinkoSegBtn').forEach(b => b.classList.toggle('active', Number(b.dataset.rows) === plinkoRows));
+      if (plinkoBoardDrawnForRows !== plinkoRows) {
+        drawPlinkoBoard(document.getElementById('plinkoCanvas'), plinkoRows);
+        plinkoBoardDrawnForRows = plinkoRows;
+      }
+      renderPlinkoSlots();
+      renderPlinkoAdminRow();
+      setPlinkoBet(getPlinkoBet());
+      setPlinkoRowRiskLocked(!!plinkoInFlightCount);
+      if (!plinkoInFlightCount) document.getElementById('plinkoMessage').textContent = 'Place your bet!';
+    }
+
+    // Unlike jackpot/roulette/blackjack, Plinko has no cap on how many bets
+    // can be in flight at once — the only limit is the balance itself. A
+    // runTransaction() per click (read-check-write, retrying on conflict)
+    // is exactly what silently capped the ball count before: many concurrent
+    // transactions hitting the same balance doc contend with each other,
+    // and once one exhausts its retries it just fails, quietly dropping
+    // that click's ball. FieldValue.increment() has no such limit — it's
+    // applied atomically server-side with no read/retry cycle, so any number
+    // of concurrent debits/credits land correctly regardless of ordering.
+    // The one thing increment() can't do is a conditional "only if there's
+    // enough balance" check, so that's done against a local running total
+    // instead (reset from the live-synced balance whenever nothing of ours
+    // is in flight, so it can't drift far from the real value between
+    // bursts, while still staying accurate *within* one fast burst where the
+    // live listener hasn't caught up to the previous click yet).
+    let plinkoLocalBalance = null;
+    function plinkoAvailableBalance() {
+      if (plinkoInFlightCount === 0 || plinkoLocalBalance === null) {
+        plinkoLocalBalance = getJackpotCoins();
+      }
+      return plinkoLocalBalance;
+    }
+    document.getElementById('plinkoDropBtn').onclick = async () => {
+      const bet = getPlinkoBet();
+      const rows = plinkoRows;
+      const table = getPlinkoTable();
+
+      if (plinkoAvailableBalance() < bet) {
+        try {
+          await usersCol.doc(myUid).set({ jackpotCoins: JACKPOT_START_COINS }, { merge: true });
+          plinkoLocalBalance = JACKPOT_START_COINS;
+          jackpotCoinsEl.textContent = JACKPOT_START_COINS;
+          showToast(`Topped up to ${JACKPOT_START_COINS} coins — good luck!`);
+        } catch (err) { showToast('Could not drop: ' + err.message); }
+        return;
+      }
+      plinkoLocalBalance -= bet;
+      jackpotCoinsEl.textContent = plinkoLocalBalance;
+      usersCol.doc(myUid).set({ jackpotCoins: firebase.firestore.FieldValue.increment(-bet) }, { merge: true }).catch(() => { });
+
+      plinkoInFlightCount++;
+      setPlinkoRowRiskLocked(true);
+      document.getElementById('plinkoMessage').textContent = 'Dropping…';
+
+      const slotIndex = await animatePlinkoDrop(rows);
+      const mult = table[slotIndex];
+      const payout = Math.round(bet * mult);
+      const slotEls = document.querySelectorAll('#plinkoSlots .plinkoSlot');
+      if (slotEls[slotIndex]) {
+        slotEls[slotIndex].classList.add('win');
+        setTimeout(() => slotEls[slotIndex].classList.remove('win'), 1400);
+      }
+      const resultText = payout > bet
+        ? `${mult}x — you win ${payout} ${JACKPOT_COIN_ICON}!`
+        : (payout === bet ? `${mult}x — you get your bet back.` : `${mult}x — you get ${payout} ${JACKPOT_COIN_ICON} back.`);
+      playPlinkoResultSound(mult);
+      document.getElementById('plinkoMessage').innerHTML = resultText;
+
+      if (payout > 0) {
+        plinkoLocalBalance = (plinkoLocalBalance ?? getJackpotCoins()) + payout;
+        jackpotCoinsEl.textContent = plinkoLocalBalance;
+        usersCol.doc(myUid).set({ jackpotCoins: firebase.firestore.FieldValue.increment(payout) }, { merge: true }).catch(() => { });
+      }
+
+      plinkoInFlightCount--;
+      if (plinkoInFlightCount === 0) setPlinkoRowRiskLocked(false);
+    };
+
     // ---------- Back button navigation ----------
     window.addEventListener('popstate', () => {
       if (uacOverlay.classList.contains('show')) {
@@ -8447,6 +10172,10 @@
       }
       if (jackpotPageOpen) {
         hideJackpotPage();
+        return;
+      }
+      if (gameViewOpen) {
+        hideGameView();
         return;
       }
       if (gamesPageOpen) {

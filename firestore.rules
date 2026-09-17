@@ -76,6 +76,21 @@ service cloud.firestore {
       allow write: if true;
     }
 
+    match /tttInvites/{inviteId} {
+      allow read: if true;
+      allow write: if true;
+    }
+
+    match /push_subscriptions/{subId} {
+      allow read: if true;
+      allow write: if true;
+    }
+
+    match /tttGames/{gameId} {
+      allow read: if true;
+      allow write: if true;
+    }
+
     match /leaderboardArchives/{year} {
       allow read: if true;
       // Immutable once written: creation is open, but an existing
