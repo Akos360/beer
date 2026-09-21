@@ -127,6 +127,25 @@ service cloud.firestore {
       }
     }
 
+    // Energy drinks / coffee — same shape as nikotin above (no alcohol or
+    // nicotine content, no pre-createdBy legacy gap).
+    match /koffein/{itemId} {
+      allow read: if true;
+      allow create: if isMember() && isValidRealName();
+      allow update: if isMember() && (
+        isOwnerOrAdmin(resource.data.get('createdBy', '')) ||
+        onlySharedFieldsChanged(['photos', 'avgRating', 'ratingCount', 'flag'])
+      );
+      allow delete: if isMember() && isOwnerOrAdmin(resource.data.get('createdBy', ''));
+
+      match /ratings/{userId} {
+        allow read: if true;
+        allow create, update: if isMember() && request.auth.uid == userId
+          && isValidRatingValue() && isValidCommentValue();
+        allow delete: if isAdmin() || (isMember() && request.auth.uid == userId);
+      }
+    }
+
     // The base shop price list, mirrored from SHOP_BORDERS/SHOP_HATS/
     // SHOP_SKINS in index.html — admin's live price edits (config/jackpot
     // .shopPrices) override these the same way the client already reads

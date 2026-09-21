@@ -35,6 +35,11 @@ service firebase.storage {
       allow create, update: if isMember() && isValidImage();
       allow delete: if isMember();
     }
+    match /koffein/{itemId}/{fileName} {
+      allow read: if true;
+      allow create, update: if isMember() && isValidImage();
+      allow delete: if isMember();
+    }
     match /users/{userId}/{fileName} {
       allow read: if true;
       // A user's own photo folder, or an admin acting on it — either way

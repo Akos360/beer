@@ -244,7 +244,7 @@ exports.lookupVariants = onCall({ secrets: [GEMINI_API_KEY] }, async (request) =
   const uid = request.auth.uid;
   const name = String(request.data?.name || '').trim();
   const brewery = String(request.data?.brewery || '').trim();
-  const kind = request.data?.kind === 'spirit' ? 'spirit' : request.data?.kind === 'nikotin' ? 'nikotin' : 'beer';
+  const kind = request.data?.kind === 'spirit' ? 'spirit' : request.data?.kind === 'nikotin' ? 'nikotin' : request.data?.kind === 'koffein' ? 'koffein' : 'beer';
   if (!name) throw new HttpsError('invalid-argument', 'Name required.');
 
   // Checked up front (read-only) so a run of transient upstream failures
@@ -267,7 +267,9 @@ exports.lookupVariants = onCall({ secrets: [GEMINI_API_KEY] }, async (request) =
     ? `List the real, commonly sold variants of the beer ${subject}. Include different strength/ABV versions (e.g. "10°", "11°", "12°" or "% ABV" depending on how that beer is normally labeled), different package sizes (e.g. "0.5L can", "0.33L bottle", "1.5L bottle", "draft"), and notable style variants (e.g. "unfiltered", "dark", "radler", "non-alcoholic") — only ones that genuinely exist for this specific beer. If you don't recognize this beer or aren't confident about its real variants, return an empty list rather than guessing generic ones.`
     : kind === 'spirit'
     ? `List the real, commonly sold variants of the spirit ${subject}. Include bottle sizes (e.g. "0.5L", "0.7L", "1L", "1.75L"), different ABV/proof versions if applicable, and flavor or style variants (e.g. "vanilla", "spiced", "unfiltered", "aged 12 years") — only ones that genuinely exist for this specific product. If you don't recognize this product or aren't confident about its real variants, return an empty list rather than guessing generic ones.`
-    : `List the real, commonly sold variants of the cigarette or nicotine pouch product ${subject}. Include nicotine strength versions (e.g. "3mg", "6mg", "10mg", "16mg", or whatever unit that product is normally labeled with), flavor variants (e.g. "mint", "citrus", "berry", "menthol", "original"), and notable pack-size differences — only ones that genuinely exist for this specific product. If you don't recognize this product or aren't confident about its real variants, return an empty list rather than guessing generic ones.`;
+    : kind === 'nikotin'
+    ? `List the real, commonly sold variants of the cigarette or nicotine pouch product ${subject}. Include nicotine strength versions (e.g. "3mg", "6mg", "10mg", "16mg", or whatever unit that product is normally labeled with), flavor variants (e.g. "mint", "citrus", "berry", "menthol", "original"), and notable pack-size differences — only ones that genuinely exist for this specific product. If you don't recognize this product or aren't confident about its real variants, return an empty list rather than guessing generic ones.`
+    : `List the real, commonly sold variants of the energy drink or coffee product ${subject}. Include can/bottle/pack sizes (e.g. "250ml can", "500ml can", "1L bottle"), caffeine content versions if applicable, sugar-free/zero versions, and flavor variants (e.g. "original", "tropical", "watermelon", "vanilla", "mocha") — only ones that genuinely exist for this specific product. If you don't recognize this product or aren't confident about its real variants, return an empty list rather than guessing generic ones.`;
 
   // The free tier shares one project-wide quota across everyone using the
   // feature, not a per-person one — so a 429 here usually means the whole

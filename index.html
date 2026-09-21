@@ -235,6 +235,8 @@
     #spiritTypeSelect,
     #nikotinSortSelect,
     #nikotinTypeSelect,
+    #koffeinSortSelect,
+    #koffeinTypeSelect,
     #pubSortSelect,
     #pubCityFilter {
       flex: 1;
@@ -259,6 +261,7 @@
     #beerList,
     #spiritList,
     #nikotinList,
+    #koffeinList,
     #gamesGrid {
       padding: 14px;
       display: grid;
@@ -301,16 +304,19 @@
     #beerToolbarRows,
     #spiritToolbarRows,
     #nikotinToolbarRows,
+    #koffeinToolbarRows,
     #pubToolbarRows {
       display: flex;
       flex-direction: column;
       gap: 8px
     }
 
-    /* 3 sub-tabs (Beers/Spirits/Nikotin) instead of .tabSwitch's default 2 —
-       same override pattern #jackpotTabSwitch already uses for its 3 tabs. */
+    /* 4 sub-tabs (Beers/Spirits/Nikotin/Koffein) now fit .tabSwitch's
+       default 2-column grid exactly — 2x2, same layout as the main
+       #tabSwitch above it. No override needed, but kept explicit since
+       this used to be a 3-tab override (repeat(3, 1fr)). */
     #reviewsSubTabSwitch {
-      grid-template-columns: repeat(3, 1fr)
+      grid-template-columns: repeat(2, 1fr)
     }
 
     #partyList,
@@ -1955,6 +1961,7 @@
     #photoStrip,
     #spiritPhotoStrip,
     #nikotinPhotoStrip,
+    #koffeinPhotoStrip,
     #partyPhotoStrip,
     #pubPhotoStrip {
       display: flex;
@@ -3949,6 +3956,7 @@
       <button type="button" class="tabBtn active" data-subtab="beer">🍺 Sörök</button>
       <button type="button" class="tabBtn" data-subtab="spirit">🥃 Alko</button>
       <button type="button" class="tabBtn" data-subtab="nikotin">🚬 Nikotin</button>
+      <button type="button" class="tabBtn" data-subtab="koffein">⚡ Koffein</button>
     </div>
     <div id="beerToolbarRows">
       <div class="row">
@@ -4006,6 +4014,26 @@
         </select>
       </div>
     </div>
+    <div id="koffeinToolbarRows" style="display:none">
+      <div class="row">
+        <input id="koffeinSearchInput" type="search" placeholder="Search name, country…">
+        <span class="countBadge" id="koffeinCountBadge">0</span>
+      </div>
+      <div class="row">
+        <select id="koffeinSortSelect">
+          <option value="newest">New -> Old</option>
+          <option value="oldest">Old -> New</option>
+          <option value="name">Name A–Z</option>
+          <option value="rating-desc">Rating high→low</option>
+          <option value="rating-asc">Rating low→high</option>
+        </select>
+        <select id="koffeinTypeSelect">
+          <option value="">All types</option>
+          <option value="Energeťák">Energeťák</option>
+          <option value="Kávé">Kávé</option>
+        </select>
+      </div>
+    </div>
     <div id="pubToolbarRows" style="display:none">
       <div class="row">
         <input id="pubSearchInput" type="search" placeholder="Search name, city…">
@@ -4038,6 +4066,7 @@
   <div id="beerList"></div>
   <div id="spiritList" style="display:none"></div>
   <div id="nikotinList" style="display:none"></div>
+  <div id="koffeinList" style="display:none"></div>
   <div class="userListHead" id="partyListHead" style="display:none">Parties</div>
   <div id="partyList" style="display:none"></div>
   <div id="pubList" style="display:none"></div>
@@ -4730,6 +4759,124 @@
           <button type="button" class="btn danger" id="nikotinDeleteBtn" style="display:none">Delete</button>
           <button type="button" class="btn ghost" id="nikotinCancelBtn">Cancel</button>
           <button type="submit" class="btn primary" id="nikotinSaveBtn">Add Nikotin</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <div class="overlay" id="koffeinViewOverlay">
+    <div class="sheet">
+      <div class="sheetHead">
+        <h2>Koffein</h2>
+        <button class="closeX" id="koffeinViewClose">✕</button>
+      </div>
+      <div class="viewCarousel" id="koffeinViewCarousel"></div>
+      <div class="field" style="margin-top:-4px;margin-bottom:14px">
+        <button type="button" class="btn ghost" id="koffeinViewAddPhotoBtn" style="padding:8px 14px">+ Add
+          photo</button>
+        <input type="file" id="koffeinViewPhotoInput" accept="image/*" multiple style="display:none">
+      </div>
+      <div class="viewStats" id="koffeinViewStats"></div>
+      <div class="field">
+        <label>Your rating</label>
+        <div class="ratingButtons" id="koffeinViewRatingButtons"></div>
+      </div>
+      <div class="field" style="margin-top:14px">
+        <label>Your review</label>
+        <textarea id="koffeinViewReviewInput" placeholder="What did you think?"></textarea>
+        <button type="button" class="btn primary" id="koffeinViewReviewPostBtn" style="margin-top:8px">Post
+          review</button>
+      </div>
+      <div class="field" style="margin-top:14px">
+        <label>Reviews</label>
+        <div class="viewReviews" id="koffeinViewReviews"></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="overlay" id="koffeinFormOverlay">
+    <div class="sheet">
+      <div class="sheetHead">
+        <h2 id="koffeinFormTitle">Add Koffein</h2>
+        <button class="closeX" id="koffeinFormClose">✕</button>
+      </div>
+      <div id="koffeinPhotoStrip"></div>
+      <input type="file" id="koffeinPhotoInput" accept="image/*" multiple style="display:none">
+      <form id="koffeinForm">
+        <div class="field">
+          <label>Real name</label>
+          <input id="kfRealName" required placeholder="e.g. Red Bull">
+          <span class="hint">The actual product name — used to find its variants</span>
+        </div>
+        <div class="field">
+          <label>Nickname <span class="hint">(optional)</span></label>
+          <input id="kfName" placeholder="What your group calls it">
+          <span class="hint" id="kfNameDupeHint" style="display:none"></span>
+        </div>
+        <div class="field">
+          <details class="variantDropdown">
+            <summary id="kfVariantSummary">Known variants (0)</summary>
+            <div class="variantToolRow">
+              <button type="button" class="btn ghost" id="kfFindVariantsBtn">🔍 Find variants</button>
+              <input type="text" id="kfCustomVariantInput" placeholder="Add one manually…">
+              <button type="button" class="btn ghost" id="kfAddCustomVariantBtn">+</button>
+            </div>
+            <div class="variantChecklist" id="kfVariantChecklist"></div>
+          </details>
+        </div>
+        <div class="flagCountry">
+          <div class="field">
+            <label>Flag</label>
+            <input id="kfFlag" maxlength="8" placeholder="🏳️">
+          </div>
+          <div class="field">
+            <label>Country</label>
+            <input id="kfCountry" placeholder="e.g. Austria">
+          </div>
+        </div>
+        <div class="field">
+          <label>Type</label>
+          <select id="kfType">
+            <option value="Energeťák">Energeťák</option>
+            <option value="Kávé">Kávé</option>
+          </select>
+        </div>
+        <div class="twoCol">
+          <div class="field">
+            <label>Caffeine content</label>
+            <input id="kfCaffeine" placeholder="e.g. 80mg">
+          </div>
+          <div class="field">
+            <label>Flavor <span class="hint">(optional)</span></label>
+            <input id="kfFlavor" placeholder="e.g. Tropical">
+          </div>
+        </div>
+        <div class="field">
+          <label>Zero sugar</label>
+          <label class="switch">
+            <input type="checkbox" id="kfZeroSugar">
+            <span class="slider"></span>
+          </label>
+        </div>
+        <div class="field">
+          <label>Price</label>
+          <div class="priceField">
+            <span class="euro">€</span>
+            <input id="kfPrice" type="number" step="0.1" min="0" placeholder="0.00">
+          </div>
+        </div>
+        <div class="field">
+          <label>Your rating</label>
+          <div class="ratingButtons" id="koffeinRatingButtons"></div>
+        </div>
+        <div class="field">
+          <label>Comment</label>
+          <textarea id="kfComment" placeholder="What did you think?"></textarea>
+        </div>
+        <div class="formActions">
+          <button type="button" class="btn danger" id="koffeinDeleteBtn" style="display:none">Delete</button>
+          <button type="button" class="btn ghost" id="koffeinCancelBtn">Cancel</button>
+          <button type="submit" class="btn primary" id="koffeinSaveBtn">Add Koffein</button>
         </div>
       </form>
     </div>
@@ -5844,23 +5991,26 @@
         const showBeerSub = isBeersTab && activeReviewsSubTab === 'beer';
         const showSpiritSub = isBeersTab && activeReviewsSubTab === 'spirit';
         const showNikotinSub = isBeersTab && activeReviewsSubTab === 'nikotin';
+        const showKoffeinSub = isBeersTab && activeReviewsSubTab === 'koffein';
 
         document.getElementById('reviewsSubTabSwitch').style.display = isBeersTab ? 'grid' : 'none';
         beerToolbarRows.style.display = showBeerSub ? 'flex' : 'none';
         document.getElementById('spiritToolbarRows').style.display = showSpiritSub ? 'flex' : 'none';
         document.getElementById('nikotinToolbarRows').style.display = showNikotinSub ? 'flex' : 'none';
+        document.getElementById('koffeinToolbarRows').style.display = showKoffeinSub ? 'flex' : 'none';
         document.getElementById('pubToolbarRows').style.display = isPubs ? 'flex' : 'none';
 
         beerList.style.display = showBeerSub ? 'grid' : 'none';
         document.getElementById('spiritList').style.display = showSpiritSub ? 'grid' : 'none';
         document.getElementById('nikotinList').style.display = showNikotinSub ? 'grid' : 'none';
+        document.getElementById('koffeinList').style.display = showKoffeinSub ? 'grid' : 'none';
         document.getElementById('partyListHead').style.display = isParties ? 'block' : 'none';
         partyListEl.style.display = isParties ? 'flex' : 'none';
         document.getElementById('pubList').style.display = isPubs ? 'flex' : 'none';
         document.getElementById('leaderboardPage').style.display = isLeaderboard ? 'block' : 'none';
 
         document.getElementById('fab').style.display = isLeaderboard ? 'none' : 'flex';
-        document.getElementById('fab').title = isParties ? 'Add party' : isPubs ? 'Add pub' : showSpiritSub ? 'Add spirit' : showNikotinSub ? 'Add nikotin' : 'Add beer';
+        document.getElementById('fab').title = isParties ? 'Add party' : isPubs ? 'Add pub' : showSpiritSub ? 'Add spirit' : showNikotinSub ? 'Add nikotin' : showKoffeinSub ? 'Add koffein' : 'Add beer';
       }
       function setActiveTab(tab) {
         activeTab = tab;
@@ -5879,6 +6029,7 @@
         else if (activeTab === 'pubs') openPubForm(null);
         else if (activeTab === 'beers' && activeReviewsSubTab === 'spirit') openSpiritForm(null);
         else if (activeTab === 'beers' && activeReviewsSubTab === 'nikotin') openNikotinForm(null);
+        else if (activeTab === 'beers' && activeReviewsSubTab === 'koffein') openKoffeinForm(null);
         else openForm(null);
       };
 
@@ -8208,6 +8359,524 @@
         if (item) openNikotinForm(item);
       });
 
+      // ---------- Koffein (energy drinks / coffee — no alcohol or nicotine
+      // content here either, so "type" is a fixed Energeťák/Kávé choice
+      // (used as a filter tag) and caffeine content + flavor stand in for
+      // the drink-specific fields the other review types have instead) ----------
+      const koffeinCol = db.collection('koffein');
+      let allKoffein = [];
+      let koffeinEditingId = null;
+      let koffeinPendingPhotos = [];
+
+      const koffeinListEl = document.getElementById('koffeinList');
+      const koffeinSearchInput = document.getElementById('koffeinSearchInput');
+      const koffeinSortSelect = document.getElementById('koffeinSortSelect');
+      const koffeinTypeSelect = document.getElementById('koffeinTypeSelect');
+
+      function filteredSortedKoffein() {
+        let list = allKoffein.slice();
+        const q = koffeinSearchInput.value.trim().toLowerCase();
+        if (q) list = list.filter(k => [k.name, k.realName, k.country, k.flavor, k.comment].some(v => (v || '').toLowerCase().includes(q)));
+        if (koffeinTypeSelect.value) list = list.filter(k => k.koffeinType === koffeinTypeSelect.value);
+        switch (koffeinSortSelect.value) {
+          case 'name': list.sort((a, b) => itemLabel(a).localeCompare(itemLabel(b))); break;
+          case 'rating-desc': list.sort((a, b) => (b.avgRating || 0) - (a.avgRating || 0)); break;
+          case 'rating-asc': list.sort((a, b) => (a.avgRating || 0) - (b.avgRating || 0)); break;
+          case 'oldest': list.sort((a, b) => (a.ts || 0) - (b.ts || 0)); break;
+          default: list.sort((a, b) => (b.ts || 0) - (a.ts || 0));
+        }
+        return list;
+      }
+
+      function renderKoffeinList() {
+        const list = filteredSortedKoffein();
+        document.getElementById('koffeinCountBadge').textContent = list.length;
+        if (!list.length) {
+          koffeinListEl.innerHTML = '<div class="empty">No koffein entries yet ⚡<br>Tap + to add the first one.</div>';
+          return;
+        }
+        koffeinListEl.innerHTML = list.map(k => {
+          const cover = (k.photos && k.photos[0]) ? `<img src="${escapeHtml(k.photos[0].url)}" alt="">` : '⚡';
+          const creator = allUsers.find(u => u.id === k.createdBy);
+          return `
+    <div class="card" data-id="${k.id}">
+      <div class="cover">
+        ${cover}
+        <span class="badge rating" style="background:${ratingColor(k.avgRating || 0)}">${k.avgRating != null ? k.avgRating.toFixed(1) : '–'}/10${k.ratingCount ? ` (${k.ratingCount})` : ''}</span>
+        ${k.caffeine ? `<span class="badge abv">${escapeHtml(normalizeCaffeine(k.caffeine))}</span>` : ''}
+        ${writtenReviewCount(k.id) ? `<span class="badge reviews">📝 ${writtenReviewCount(k.id)}</span>` : ''}
+        ${creator ? `<div class="creatorAvatar" data-creator="${creator.id}" title="Added by ${escapeHtml(creator.name || creator.realName || 'someone')}">${avatarInner(creator.name, creator.photoURL)}</div>` : ''}
+      </div>
+      <div class="body">
+        <div class="name-row">
+          <span class="flag" contenteditable="true" spellcheck="false" data-flag="${k.id}">${escapeHtml(k.flag || '🏳️')}</span>
+          <span class="name">${escapeHtml(itemLabel(k))}</span>
+        </div>
+        <div class="meta">${escapeHtml(k.country || '')}${k.country && k.koffeinType ? ' · ' : ''}${escapeHtml(k.koffeinType || '')}</div>
+      </div>
+    </div>`;
+        }).join('');
+
+        koffeinListEl.querySelectorAll('.creatorAvatar').forEach(el => {
+          el.addEventListener('click', (e) => {
+            e.stopPropagation();
+            openProfileView(el.dataset.creator);
+          });
+        });
+        koffeinListEl.querySelectorAll('.card').forEach(card => {
+          card.addEventListener('click', (e) => {
+            if (e.target.closest('.flag') || e.target.closest('.creatorAvatar')) return;
+            const item = allKoffein.find(k => k.id === card.dataset.id);
+            if (item) openKoffeinView(item);
+          });
+        });
+      }
+
+      koffeinListEl.addEventListener('focusin', (e) => {
+        const el = e.target.closest('.flag');
+        if (el) selectFlagContents(el);
+      });
+      koffeinListEl.addEventListener('focusout', async (e) => {
+        const el = e.target.closest('.flag');
+        if (!el) return;
+        const id = el.dataset.flag;
+        const val = el.textContent.trim() || '🏳️';
+        try { await koffeinCol.doc(id).update({ flag: val }); } catch (err) { showToast('Could not save flag'); }
+      });
+      koffeinListEl.addEventListener('keydown', (e) => {
+        if (e.target.closest('.flag') && e.key === 'Enter') { e.preventDefault(); e.target.blur(); }
+      });
+      koffeinListEl.addEventListener('click', (e) => {
+        const el = e.target.closest('.flag');
+        if (el) {
+          e.stopPropagation();
+          setTimeout(() => selectFlagContents(el), 0);
+        }
+      });
+
+      koffeinSearchInput.oninput = renderKoffeinList;
+      koffeinSortSelect.onchange = renderKoffeinList;
+      koffeinTypeSelect.onchange = renderKoffeinList;
+
+      koffeinCol.onSnapshot(snap => {
+        allKoffein = snap.docs.map(d => ({ id: d.id, ...d.data() }));
+        renderKoffeinList();
+        refreshKoffeinViewIfOpen();
+        refreshProfileDisplays();
+      }, err => showToast('Sync error: ' + err.message));
+
+      async function submitMyKoffeinRating(itemId, ratingValue) {
+        await koffeinCol.doc(itemId).collection('ratings').doc(myUid).set(
+          { rating: ratingValue, userId: myUid, ts: Date.now() }, { merge: true }
+        );
+        const snap = await koffeinCol.doc(itemId).collection('ratings').get();
+        const ratings = snap.docs.map(d => d.data().rating).filter(r => typeof r === 'number');
+        const count = ratings.length;
+        const avg = count ? ratings.reduce((a, b) => a + b, 0) / count : null;
+        await koffeinCol.doc(itemId).update({ avgRating: avg, ratingCount: count });
+        return { avgRating: avg, ratingCount: count };
+      }
+      async function getMyRatingForKoffein(itemId) {
+        try {
+          const doc = await koffeinCol.doc(itemId).collection('ratings').doc(myUid).get();
+          return doc.exists ? doc.data().rating : null;
+        } catch (e) { return null; }
+      }
+      async function submitMyKoffeinReview(itemId, commentText) {
+        await koffeinCol.doc(itemId).collection('ratings').doc(myUid).set(
+          { comment: commentText, userId: myUid, ts: Date.now() }, { merge: true }
+        );
+      }
+
+      // ---------- Koffein add/edit form ----------
+      const koffeinFormOverlay = document.getElementById('koffeinFormOverlay');
+      const koffeinForm = document.getElementById('koffeinForm');
+      const koffeinFormTitle = document.getElementById('koffeinFormTitle');
+      const koffeinPhotoStrip = document.getElementById('koffeinPhotoStrip');
+      const koffeinPhotoInput = document.getElementById('koffeinPhotoInput');
+      const koffeinRatingButtonsEl = document.getElementById('koffeinRatingButtons');
+      const koffeinDeleteBtn = document.getElementById('koffeinDeleteBtn');
+      let koffeinFormRating = null;
+
+      const kfNameEl = document.getElementById('kfName');
+      const kfNameDupeHint = document.getElementById('kfNameDupeHint');
+      kfNameEl.addEventListener('input', () => {
+        const name = kfNameEl.value.trim().toLowerCase();
+        const dupe = name && allKoffein.find(k => k.id !== koffeinEditingId && (k.name || '').trim().toLowerCase() === name);
+        if (dupe) {
+          kfNameDupeHint.textContent = `An entry named "${dupe.name}" already exists`;
+          kfNameDupeHint.className = 'hint warn';
+          kfNameDupeHint.style.display = 'block';
+        } else {
+          kfNameDupeHint.style.display = 'none';
+        }
+      });
+
+      function renderKoffeinRatingButtons() {
+        buildRatingButtons(koffeinRatingButtonsEl, koffeinFormRating, async (n) => {
+          koffeinFormRating = n;
+          renderKoffeinRatingButtons();
+          if (koffeinEditingId) {
+            try {
+              await submitMyKoffeinRating(koffeinEditingId, n);
+            } catch (err) {
+              showToast('Rating failed: ' + err.message);
+            }
+          }
+        });
+      }
+
+      function renderKoffeinPhotoStrip(item) {
+        koffeinPhotoStrip.innerHTML = '';
+        const photos = (item && item.photos) || [];
+        photos.forEach((p, i) => {
+          const div = document.createElement('div');
+          div.className = 'thumb';
+          div.innerHTML = `<img src="${escapeHtml(p.url)}"><button class="rm" title="Remove">✕</button>`;
+          div.querySelector('img').onclick = () => openLightbox(photos, i);
+          div.querySelector('.rm').onclick = () => removeExistingKoffeinPhoto(item.id, p);
+          koffeinPhotoStrip.appendChild(div);
+        });
+        koffeinPendingPhotos.forEach((pp, i) => {
+          const div = document.createElement('div');
+          div.className = 'thumb';
+          div.innerHTML = `<img src="${pp.url}"><button class="rm" title="Remove">✕</button>`;
+          div.querySelector('.rm').onclick = () => { koffeinPendingPhotos.splice(i, 1); renderKoffeinPhotoStrip(item); };
+          koffeinPhotoStrip.appendChild(div);
+        });
+        const addTile = document.createElement('button');
+        addTile.type = 'button';
+        addTile.className = 'addThumb';
+        addTile.textContent = '+';
+        addTile.onclick = () => koffeinPhotoInput.click();
+        koffeinPhotoStrip.appendChild(addTile);
+      }
+
+      koffeinPhotoInput.onchange = async () => {
+        const files = Array.from(koffeinPhotoInput.files || []);
+        koffeinPhotoInput.value = '';
+        if (!files.length) return;
+        if (koffeinEditingId) {
+          try {
+            for (const file of files) await uploadPhotoToKoffein(koffeinEditingId, file);
+            const fresh = allKoffein.find(k => k.id === koffeinEditingId);
+            renderKoffeinPhotoStrip(fresh);
+          } catch (err) {
+            showToast('Photo upload failed: ' + err.message);
+          }
+        } else {
+          files.forEach(file => koffeinPendingPhotos.push({ file, url: URL.createObjectURL(file) }));
+          renderKoffeinPhotoStrip(null);
+        }
+      };
+
+      async function uploadPhotoToKoffein(itemId, file) {
+        const path = `koffein/${itemId}/${Date.now()}_${file.name}`;
+        const ref = storage.ref(path);
+        await ref.put(file);
+        const url = await ref.getDownloadURL();
+        await koffeinCol.doc(itemId).update({
+          photos: firebase.firestore.FieldValue.arrayUnion({ url, path, ts: Date.now() })
+        });
+      }
+      async function removeExistingKoffeinPhoto(itemId, photoObj) {
+        try {
+          await storage.ref(photoObj.path).delete();
+        } catch (e) { /* file may already be gone */ }
+        await koffeinCol.doc(itemId).update({
+          photos: firebase.firestore.FieldValue.arrayRemove(photoObj)
+        });
+        const fresh = allKoffein.find(k => k.id === itemId);
+        const updatedPhotos = (fresh.photos || []).filter(p => p.path !== photoObj.path);
+        renderKoffeinPhotoStrip({ id: itemId, photos: updatedPhotos });
+      }
+
+      let koffeinFormOpenedId = null;
+      async function openKoffeinForm(item) {
+        koffeinFormOpenedId = item ? item.id : null;
+        pushOverlayState();
+        koffeinEditingId = item ? item.id : null;
+        koffeinPendingPhotos = [];
+        koffeinFormTitle.textContent = item ? 'Edit Koffein' : 'Add Koffein';
+        document.getElementById('koffeinSaveBtn').textContent = item ? 'Save' : 'Add Koffein';
+        koffeinDeleteBtn.style.display = item ? 'block' : 'none';
+
+        document.getElementById('kfRealName').value = item?.realName || '';
+        document.getElementById('kfName').value = item?.name || '';
+        kfNameDupeHint.style.display = 'none';
+        renderVariantChecklist('kfVariantChecklist', item?.variants || []);
+        document.getElementById('kfCustomVariantInput').value = '';
+        document.getElementById('kfVariantChecklist').closest('details.variantDropdown').open = false;
+        document.getElementById('kfFlag').value = item?.flag || '';
+        document.getElementById('kfCountry').value = item?.country || '';
+        document.getElementById('kfType').value = item?.koffeinType || 'Energeťák';
+        document.getElementById('kfCaffeine').value = item?.caffeine || '';
+        document.getElementById('kfFlavor').value = item?.flavor || '';
+        document.getElementById('kfZeroSugar').checked = !!item?.zeroSugar;
+        document.getElementById('kfPrice').value = item?.price ?? '';
+        koffeinFormRating = null;
+        renderKoffeinRatingButtons();
+        document.getElementById('kfComment').value = item?.comment || '';
+        renderKoffeinPhotoStrip(item);
+
+        koffeinFormOverlay.classList.add('show');
+
+        if (item) {
+          const mine = await getMyRatingForKoffein(item.id);
+          if (koffeinEditingId === item.id) {
+            koffeinFormRating = mine;
+            renderKoffeinRatingButtons();
+          }
+        }
+      }
+      function hideKoffeinForm() {
+        koffeinFormOverlay.classList.remove('show');
+        koffeinPendingPhotos = [];
+        koffeinEditingId = null;
+      }
+      function closeKoffeinForm() { history.back(); }
+      document.getElementById('koffeinFormClose').onclick = closeKoffeinForm;
+      document.getElementById('koffeinCancelBtn').onclick = closeKoffeinForm;
+      koffeinFormOverlay.addEventListener('click', (e) => { if (e.target === koffeinFormOverlay) closeKoffeinForm(); });
+
+      document.getElementById('kfFindVariantsBtn').onclick = () => findVariants({
+        nameInputId: 'kfRealName', breweryInputId: null, containerId: 'kfVariantChecklist', btnId: 'kfFindVariantsBtn', kind: 'koffein'
+      });
+      document.getElementById('kfAddCustomVariantBtn').onclick = () => {
+        const input = document.getElementById('kfCustomVariantInput');
+        addCustomVariant('kfVariantChecklist', input.value);
+        input.value = '';
+      };
+      document.getElementById('kfCustomVariantInput').onkeydown = (e) => {
+        if (e.key === 'Enter') { e.preventDefault(); document.getElementById('kfAddCustomVariantBtn').click(); }
+      };
+
+      // A bare number ("114") gets "mg" appended automatically; anything
+      // already carrying a unit or non-numeric text ("80mg", "N/A") is
+      // left exactly as typed.
+      function normalizeCaffeine(raw) {
+        const trimmed = raw.trim();
+        return /^\d+(\.\d+)?$/.test(trimmed) ? `${trimmed}mg` : trimmed;
+      }
+
+      koffeinForm.onsubmit = async (e) => {
+        e.preventDefault();
+        if (!canWrite()) return promptInstallOrSignIn();
+        const saveBtn = document.getElementById('koffeinSaveBtn');
+        saveBtn.disabled = true;
+        const data = {
+          realName: document.getElementById('kfRealName').value.trim(),
+          name: document.getElementById('kfName').value.trim(),
+          flag: document.getElementById('kfFlag').value.trim() || '🏳️',
+          country: document.getElementById('kfCountry').value.trim(),
+          koffeinType: document.getElementById('kfType').value,
+          caffeine: normalizeCaffeine(document.getElementById('kfCaffeine').value),
+          flavor: document.getElementById('kfFlavor').value.trim(),
+          zeroSugar: document.getElementById('kfZeroSugar').checked,
+          price: document.getElementById('kfPrice').value === '' ? null : Number(document.getElementById('kfPrice').value),
+          comment: document.getElementById('kfComment').value.trim(),
+          variants: getCheckedVariants('kfVariantChecklist')
+        };
+        try {
+          if (koffeinEditingId) {
+            await koffeinCol.doc(koffeinEditingId).update(data);
+            showToast('Koffein updated');
+          } else {
+            data.photos = [];
+            data.ts = Date.now();
+            data.createdBy = myUid;
+            const ref = await koffeinCol.add(data);
+            for (const pp of koffeinPendingPhotos) await uploadPhotoToKoffein(ref.id, pp.file);
+            if (koffeinFormRating != null) await submitMyKoffeinRating(ref.id, koffeinFormRating);
+            showToast('Koffein added');
+          }
+          closeKoffeinForm();
+        } catch (err) {
+          showToast('Save failed: ' + err.message);
+        } finally {
+          saveBtn.disabled = false;
+        }
+      };
+
+      // ---------- Delete koffein ----------
+      function confirmDeleteKoffein(item) {
+        askConfirm(`Delete "${item.name || 'this entry'}"? Its photos will be removed too.`, async () => {
+          for (const p of (item.photos || [])) {
+            try { await storage.ref(p.path).delete(); } catch (e) { }
+          }
+          const ratingsSnap = await koffeinCol.doc(item.id).collection('ratings').get();
+          for (const doc of ratingsSnap.docs) {
+            try { await doc.ref.delete(); } catch (e) { }
+          }
+          await koffeinCol.doc(item.id).delete();
+          showToast('Koffein deleted');
+        });
+      }
+      koffeinDeleteBtn.onclick = () => {
+        const item = allKoffein.find(k => k.id === koffeinEditingId);
+        if (!item) return;
+        confirmDeleteKoffein(item);
+      };
+
+      // ---------- Koffein view ----------
+      const koffeinViewOverlay = document.getElementById('koffeinViewOverlay');
+      const koffeinViewCarousel = document.getElementById('koffeinViewCarousel');
+      const koffeinViewStatsEl = document.getElementById('koffeinViewStats');
+      const koffeinViewRatingButtonsEl = document.getElementById('koffeinViewRatingButtons');
+      const koffeinViewReviewsEl = document.getElementById('koffeinViewReviews');
+      const koffeinViewReviewInput = document.getElementById('koffeinViewReviewInput');
+      const koffeinViewReviewPostBtn = document.getElementById('koffeinViewReviewPostBtn');
+      let currentKoffeinViewId = null;
+      let currentKoffeinViewItem = null;
+      let myKoffeinViewRating = null;
+      let koffeinViewRatingsUnsub = null;
+      let koffeinViewReviewInputTouched = false;
+
+      function renderKoffeinReviewsList(ratingsDocs) {
+        const reviews = ratingsDocs.filter(r => (r.comment || '').trim().length > 0);
+        if (!reviews.length) {
+          koffeinViewReviewsEl.innerHTML = '<div class="empty" style="padding:14px 0">No reviews yet</div>';
+          return;
+        }
+        reviews.sort((a, b) => (b.ts || 0) - (a.ts || 0));
+        koffeinViewReviewsEl.innerHTML = reviews.map(r => {
+          const u = allUsers.find(x => x.id === r.userId);
+          return `<div class="reviewRow">
+      <div class="userAvatar">${avatarInner(u?.name, u?.photoURL)}</div>
+      <div class="reviewBody">
+        <div class="reviewHead">
+          <span class="userName">${nameWithAdminTag(u)}</span>
+          ${r.rating != null ? `<span class="reviewStars">⭐ ${r.rating}/10</span>` : ''}
+        </div>
+        <div class="reviewComment">${escapeHtml(r.comment)}</div>
+      </div>
+    </div>`;
+        }).join('');
+      }
+
+      function renderKoffeinViewStats(item) {
+        const canEdit = !item.createdBy || item.createdBy === myUid || isAdmin();
+        koffeinViewStatsEl.innerHTML = `
+    <div class="viewTitleRow">
+      <div class="viewTitle"><span>${escapeHtml(item.flag || '🏳️')}</span><span>${escapeHtml(itemLabel(item))}</span></div>
+      ${canEdit ? `<button type="button" class="btn primary viewEditBtnInline" id="koffeinViewEditBtnInline">Edit</button>` : ''}
+    </div>
+    ${(item.name && item.realName && item.realName !== item.name) ? `<div class="viewMeta" style="margin-top:-6px;font-style:italic">${escapeHtml(item.realName)}</div>` : ''}
+    <div class="viewMeta">${[escapeHtml(item.country || ''), escapeHtml(item.koffeinType || ''), escapeHtml(item.flavor || '')].filter(Boolean).join(' · ')}</div>
+    ${creatorRowHtml(item)}
+    <div class="viewBadges">
+      <span style="background:${ratingColor(item.avgRating || 0)};color:#1c1410">${item.avgRating != null ? item.avgRating.toFixed(1) : '–'}/10${item.ratingCount ? ` (${item.ratingCount})` : ''}</span>
+      ${item.caffeine ? `<span style="background:var(--bg-elev);color:var(--text);border:1px solid var(--border)">${escapeHtml(normalizeCaffeine(item.caffeine))}</span>` : ''}
+      ${item.price != null ? `<span style="background:var(--bg-elev);color:var(--text);border:1px solid var(--border)">€${item.price}</span>` : ''}
+      ${item.zeroSugar != null ? `<span style="background:var(--bg-elev);color:var(--text);border:1px solid var(--border)">${item.zeroSugar ? 'Zero sugar' : 'Sugar'}</span>` : ''}
+    </div>
+    ${(item.variants || []).length ? `<details class="variantDropdown viewVariants">
+      <summary>Known variants (${item.variants.length})</summary>
+      ${item.variants.map(v => `<div class="viewVariantRow">– ${escapeHtml(v)}</div>`).join('')}
+    </details>` : ''}
+    ${item.comment ? `<div class="viewComment">${escapeHtml(item.comment)}</div>` : ''}
+  `;
+      }
+
+      function refreshKoffeinViewIfOpen() {
+        if (!koffeinViewOverlay.classList.contains('show') || !currentKoffeinViewId) return;
+        const fresh = allKoffein.find(k => k.id === currentKoffeinViewId);
+        if (!fresh) return;
+        currentKoffeinViewItem = fresh;
+        renderKoffeinViewStats(fresh);
+      }
+
+      function renderKoffeinViewRatingButtons() {
+        buildRatingButtons(koffeinViewRatingButtonsEl, myKoffeinViewRating, async (n) => {
+          const itemId = currentKoffeinViewId;
+          myKoffeinViewRating = n;
+          renderKoffeinViewRatingButtons();
+          try {
+            const result = await submitMyKoffeinRating(itemId, n);
+            if (currentKoffeinViewId === itemId && currentKoffeinViewItem) {
+              currentKoffeinViewItem = { ...currentKoffeinViewItem, avgRating: result.avgRating, ratingCount: result.ratingCount };
+              renderKoffeinViewStats(currentKoffeinViewItem);
+            }
+          } catch (err) {
+            showToast('Rating failed: ' + err.message);
+          }
+        });
+      }
+
+      async function showKoffeinView(item) {
+        currentKoffeinViewId = item.id;
+        currentKoffeinViewItem = item;
+        const photos = item.photos || [];
+        koffeinViewCarousel.innerHTML = photos.length
+          ? photos.map((p, i) => `<img src="${escapeHtml(p.url)}" data-i="${i}">`).join('')
+          : '<div class="placeholder">⚡</div>';
+        koffeinViewCarousel.querySelectorAll('img').forEach(img => {
+          img.onclick = () => openLightbox(photos, Number(img.dataset.i));
+        });
+        renderKoffeinViewStats(item);
+        myKoffeinViewRating = null;
+        renderKoffeinViewRatingButtons();
+        koffeinViewReviewInput.value = '';
+        koffeinViewReviewInputTouched = false;
+        koffeinViewReviewsEl.innerHTML = '';
+        koffeinViewOverlay.classList.add('show');
+
+        if (koffeinViewRatingsUnsub) { koffeinViewRatingsUnsub(); koffeinViewRatingsUnsub = null; }
+        koffeinViewRatingsUnsub = koffeinCol.doc(item.id).collection('ratings').onSnapshot(snap => {
+          const docs = snap.docs.map(d => ({ id: d.id, ...d.data() }));
+          renderKoffeinReviewsList(docs);
+          const mine = docs.find(d => d.id === myUid);
+          myKoffeinViewRating = mine?.rating ?? null;
+          renderKoffeinViewRatingButtons();
+          if (!koffeinViewReviewInputTouched) koffeinViewReviewInput.value = mine?.comment || '';
+        }, err => showToast('Sync error: ' + err.message));
+      }
+      function openKoffeinView(item) {
+        pushOverlayState();
+        return showKoffeinView(item);
+      }
+      function hideKoffeinView() {
+        koffeinViewOverlay.classList.remove('show');
+        currentKoffeinViewId = null;
+        currentKoffeinViewItem = null;
+        if (koffeinViewRatingsUnsub) { koffeinViewRatingsUnsub(); koffeinViewRatingsUnsub = null; }
+      }
+      function closeKoffeinView() { history.back(); }
+      koffeinViewReviewInput.addEventListener('input', () => { koffeinViewReviewInputTouched = true; });
+      koffeinViewReviewPostBtn.onclick = async () => {
+        const itemId = currentKoffeinViewId;
+        try {
+          await submitMyKoffeinReview(itemId, koffeinViewReviewInput.value.trim());
+          koffeinViewReviewInputTouched = false;
+          showToast('Review posted');
+        } catch (err) {
+          showToast('Review failed: ' + err.message);
+        }
+      };
+      document.getElementById('koffeinViewClose').onclick = closeKoffeinView;
+      koffeinViewOverlay.addEventListener('click', (e) => { if (e.target === koffeinViewOverlay) closeKoffeinView(); });
+      document.getElementById('koffeinViewAddPhotoBtn').onclick = () => document.getElementById('koffeinViewPhotoInput').click();
+      document.getElementById('koffeinViewPhotoInput').onchange = async () => {
+        const input = document.getElementById('koffeinViewPhotoInput');
+        const files = Array.from(input.files || []);
+        input.value = '';
+        if (!files.length || !currentKoffeinViewId) return;
+        try {
+          for (const file of files) await uploadPhotoToKoffein(currentKoffeinViewId, file);
+          showToast('Photo added');
+        } catch (err) {
+          showToast('Photo upload failed: ' + err.message);
+        }
+      };
+      koffeinViewStatsEl.addEventListener('click', (e) => {
+        const creatorRow = e.target.closest('.viewCreatorRow');
+        if (creatorRow) { openProfileView(creatorRow.dataset.user); return; }
+        if (!e.target.closest('#koffeinViewEditBtnInline')) return;
+        const item = allKoffein.find(k => k.id === currentKoffeinViewId);
+        hideKoffeinView();
+        if (item) openKoffeinForm(item);
+      });
+
       // ---------- Reviews sub-tab (Beers / Spirits) ----------
       let activeReviewsSubTab = 'beer';
       function setReviewsSubTab(sub) {
@@ -8247,6 +8916,7 @@
           `${stats.beersUploaded} beers`,
           `${stats.spiritsUploaded} spirits`,
           `${stats.nikotinUploaded} nikotin`,
+          `${stats.koffeinUploaded} koffein`,
           `${stats.partiesAdded} parties`,
           `${stats.pubsAdded} pubs`,
           `${stats.partiesJoined} joined`,
@@ -8314,6 +8984,7 @@
         const beersUploaded = allBeers.filter(b => b.createdBy === userId).length;
         const spiritsUploaded = allSpirits.filter(s => s.createdBy === userId).length;
         const nikotinUploaded = allNikotin.filter(n => n.createdBy === userId).length;
+        const koffeinUploaded = allKoffein.filter(k => k.createdBy === userId).length;
         const partiesAdded = allParties.filter(p => p.createdBy === userId).length;
         const pubsAdded = allPubs.filter(p => p.createdBy === userId).length;
         const partiesJoined = Object.values(allPartyParticipants).filter(participants => participants.some(p => p.id === userId)).length;
@@ -8322,8 +8993,8 @@
         const beerReviewsWritten = mine.filter(r => (r.comment || '').trim().length > 0).length;
         const pubCommentsWritten = allComments.filter(c => c.userId === userId).length;
         const reviewsWritten = beerReviewsWritten + pubCommentsWritten;
-        const total = beersUploaded + spiritsUploaded + nikotinUploaded + partiesAdded + pubsAdded + partiesJoined + ratingsGiven + reviewsWritten;
-        return { beersUploaded, spiritsUploaded, nikotinUploaded, partiesAdded, pubsAdded, partiesJoined, ratingsGiven, reviewsWritten, total, tier: getTierForTotal(total) };
+        const total = beersUploaded + spiritsUploaded + nikotinUploaded + koffeinUploaded + partiesAdded + pubsAdded + partiesJoined + ratingsGiven + reviewsWritten;
+        return { beersUploaded, spiritsUploaded, nikotinUploaded, koffeinUploaded, partiesAdded, pubsAdded, partiesJoined, ratingsGiven, reviewsWritten, total, tier: getTierForTotal(total) };
       }
 
       let allUsers = [];
@@ -8789,6 +9460,7 @@
         render();
         renderSpiritList();
         renderNikotinList();
+        renderKoffeinList();
       }, err => showToast('Sync error: ' + err.message));
 
       db.collectionGroup('comments').onSnapshot(snap => {
@@ -9716,10 +10388,12 @@
         beerToolbarRows.style.display = 'none';
         document.getElementById('spiritToolbarRows').style.display = 'none';
         document.getElementById('nikotinToolbarRows').style.display = 'none';
+        document.getElementById('koffeinToolbarRows').style.display = 'none';
         document.getElementById('pubToolbarRows').style.display = 'none';
         beerList.style.display = 'none';
         document.getElementById('spiritList').style.display = 'none';
         document.getElementById('nikotinList').style.display = 'none';
+        document.getElementById('koffeinList').style.display = 'none';
         partyListEl.style.display = 'none';
         document.getElementById('partyListHead').style.display = 'none';
         document.getElementById('pubList').style.display = 'none';
@@ -9812,10 +10486,12 @@
         beerToolbarRows.style.display = 'none';
         document.getElementById('spiritToolbarRows').style.display = 'none';
         document.getElementById('nikotinToolbarRows').style.display = 'none';
+        document.getElementById('koffeinToolbarRows').style.display = 'none';
         document.getElementById('pubToolbarRows').style.display = 'none';
         beerList.style.display = 'none';
         document.getElementById('spiritList').style.display = 'none';
         document.getElementById('nikotinList').style.display = 'none';
+        document.getElementById('koffeinList').style.display = 'none';
         partyListEl.style.display = 'none';
         document.getElementById('partyListHead').style.display = 'none';
         document.getElementById('pubList').style.display = 'none';
@@ -10012,10 +10688,12 @@
         beerToolbarRows.style.display = 'none';
         document.getElementById('spiritToolbarRows').style.display = 'none';
         document.getElementById('nikotinToolbarRows').style.display = 'none';
+        document.getElementById('koffeinToolbarRows').style.display = 'none';
         document.getElementById('pubToolbarRows').style.display = 'none';
         beerList.style.display = 'none';
         document.getElementById('spiritList').style.display = 'none';
         document.getElementById('nikotinList').style.display = 'none';
+        document.getElementById('koffeinList').style.display = 'none';
         partyListEl.style.display = 'none';
         document.getElementById('partyListHead').style.display = 'none';
         document.getElementById('pubList').style.display = 'none';
@@ -10054,10 +10732,12 @@
         beerToolbarRows.style.display = 'none';
         document.getElementById('spiritToolbarRows').style.display = 'none';
         document.getElementById('nikotinToolbarRows').style.display = 'none';
+        document.getElementById('koffeinToolbarRows').style.display = 'none';
         document.getElementById('pubToolbarRows').style.display = 'none';
         beerList.style.display = 'none';
         document.getElementById('spiritList').style.display = 'none';
         document.getElementById('nikotinList').style.display = 'none';
+        document.getElementById('koffeinList').style.display = 'none';
         partyListEl.style.display = 'none';
         document.getElementById('partyListHead').style.display = 'none';
         document.getElementById('pubList').style.display = 'none';
@@ -12748,6 +13428,14 @@
           }
           return;
         }
+        if (koffeinFormOverlay.classList.contains('show')) {
+          hideKoffeinForm();
+          if (koffeinFormOpenedId) {
+            const item = allKoffein.find(k => k.id === koffeinFormOpenedId);
+            if (item) showKoffeinView(item);
+          }
+          return;
+        }
         if (partyFormOverlay.classList.contains('show')) {
           hidePartyForm();
           if (partyFormOpenedFromId) {
@@ -12779,6 +13467,10 @@
         }
         if (nikotinViewOverlay.classList.contains('show')) {
           hideNikotinView();
+          return;
+        }
+        if (koffeinViewOverlay.classList.contains('show')) {
+          hideKoffeinView();
           return;
         }
         if (partyViewOverlay.classList.contains('show')) {
