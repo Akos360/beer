@@ -1,110 +1,347 @@
 rules_version = '2';
 service cloud.firestore {
   match /databases/{database}/documents {
+
+    function isSignedIn() { return request.auth != null; }
+
+    // A real member: signed in via Firebase Anonymous Auth AND has verified
+    // the shared group passcode. Both passcodeVerified and isAdmin are
+    // custom claims on the auth token (not Firestore fields) — set only by
+    // the verifyPasscode/claimAdmin Cloud Functions (Admin SDK) — because a
+    // client can never set a claim on its own token. Checking the token
+    // directly here also avoids a Firestore lookup on every single write.
+    // A plain browser visit never reaches this: it never signs in at all
+    // (see isStandalone/canWrite() in index.html), so it only ever gets the
+    // `allow read: if true` on each collection.
+    function isMember() {
+      return isSignedIn() && request.auth.token.passcodeVerified == true;
+    }
+
+    // No client-visible constant to spoof the way the old hardcoded
+    // ADMIN_UID was — isAdmin only ever comes from the auth token claim.
+    function isAdmin() {
+      return isSignedIn() && request.auth.token.isAdmin == true;
+    }
+
+    function isValidName() {
+      return request.resource.data.name is string
+        && request.resource.data.name.size() > 0
+        && request.resource.data.name.size() < 200;
+    }
+
+    // Beers/spirits split into an optional nickname (`name`) and a required
+    // `realName` — this checks the field that's actually mandatory for
+    // those two, since isValidName() above still applies as-is to
+    // parties/pubs (which never got a nickname/real-name split).
+    function isValidRealName() {
+      return request.resource.data.realName is string
+        && request.resource.data.realName.size() > 0
+        && request.resource.data.realName.size() < 200;
+    }
+
+    // Ratings can be written by either of two separate merge writes
+    // (submitMyRating touches only `rating`, submitMyReview only `comment`),
+    // so each check has to tolerate the other field being absent from THIS
+    // particular write — `request.resource.data` is the fully-merged
+    // resulting document either way, so the field is still validated
+    // whenever it's actually present in the end result.
+    function isValidRatingValue() {
+      return !('rating' in request.resource.data) ||
+        (request.resource.data.rating is int
+          && request.resource.data.rating >= 1 && request.resource.data.rating <= 10);
+    }
+    function isValidCommentValue() {
+      return !('comment' in request.resource.data) ||
+        (request.resource.data.comment is string && request.resource.data.comment.size() < 2000);
+    }
+
+    // A beer/spirit/party/pub is editable/deletable by whoever created it or
+    // an admin — except beers/spirits predating the createdBy field, which
+    // stay open to any member (matches the client's own `!beer.createdBy ||
+    // ...` fallback in index.html, since there's no real owner on record for
+    // those). Any member can still update the handful of fields several
+    // people legitimately touch together on shared content — adding/removing
+    // their own photos, or the rating tally recomputed after anyone rates —
+    // without needing ownership of the item itself.
+    function isOwnerOrAdmin(createdBy) {
+      return isAdmin() || (createdBy is string && createdBy == request.auth.uid);
+    }
+    function onlySharedFieldsChanged(allowed) {
+      return request.resource.data.diff(resource.data).affectedKeys().hasOnly(allowed);
+    }
+
     match /beers/{beerId} {
       allow read: if true;
-      allow create: if request.resource.data.name is string
-                    && request.resource.data.name.size() > 0
-                    && request.resource.data.name.size() < 200;
-      allow update, delete: if true;
+      allow create: if isMember() && isValidRealName();
+      allow update: if isMember() && (
+        isOwnerOrAdmin(resource.data.get('createdBy', '')) ||
+        !('createdBy' in resource.data) ||
+        onlySharedFieldsChanged(['photos', 'avgRating', 'ratingCount', 'flag'])
+      );
+      allow delete: if isMember() && (isOwnerOrAdmin(resource.data.get('createdBy', '')) || !('createdBy' in resource.data));
 
       match /ratings/{userId} {
         allow read: if true;
-        allow write: if true;
+        allow create, update: if isMember() && request.auth.uid == userId
+          && isValidRatingValue() && isValidCommentValue();
+        allow delete: if isAdmin() || (isMember() && request.auth.uid == userId);
       }
     }
+
     match /spirits/{spiritId} {
       allow read: if true;
-      allow create: if request.resource.data.name is string
-                    && request.resource.data.name.size() > 0
-                    && request.resource.data.name.size() < 200;
-      allow update, delete: if true;
+      allow create: if isMember() && isValidRealName();
+      allow update: if isMember() && (
+        isOwnerOrAdmin(resource.data.get('createdBy', '')) ||
+        !('createdBy' in resource.data) ||
+        onlySharedFieldsChanged(['photos', 'avgRating', 'ratingCount', 'flag'])
+      );
+      allow delete: if isMember() && (isOwnerOrAdmin(resource.data.get('createdBy', '')) || !('createdBy' in resource.data));
 
       match /ratings/{userId} {
         allow read: if true;
-        allow write: if true;
+        allow create, update: if isMember() && request.auth.uid == userId
+          && isValidRatingValue() && isValidCommentValue();
+        allow delete: if isAdmin() || (isMember() && request.auth.uid == userId);
       }
+    }
+
+    // Cigarettes / nicotine pouches — no alcohol content, so no equivalent
+    // of beers/spirits' pre-createdBy legacy gap either (this collection
+    // never existed before createdBy did); otherwise identical ownership
+    // and shared-field pattern.
+    match /nikotin/{itemId} {
+      allow read: if true;
+      allow create: if isMember() && isValidRealName();
+      allow update: if isMember() && (
+        isOwnerOrAdmin(resource.data.get('createdBy', '')) ||
+        onlySharedFieldsChanged(['photos', 'avgRating', 'ratingCount', 'flag'])
+      );
+      allow delete: if isMember() && isOwnerOrAdmin(resource.data.get('createdBy', ''));
+
+      match /ratings/{userId} {
+        allow read: if true;
+        allow create, update: if isMember() && request.auth.uid == userId
+          && isValidRatingValue() && isValidCommentValue();
+        allow delete: if isAdmin() || (isMember() && request.auth.uid == userId);
+      }
+    }
+
+    // The base shop price list, mirrored from SHOP_BORDERS/SHOP_HATS/
+    // SHOP_SKINS in index.html — admin's live price edits (config/jackpot
+    // .shopPrices) override these the same way the client already reads
+    // them via shopPriceFor(). Keep this in sync if new items are added.
+    function shopBasePrices() {
+      return {
+        'border_bronze': 8000, 'border_silver': 15000, 'border_gold': 30000,
+        'border_ice': 60000, 'border_rainbow': 120000,
+        'hat_clown': 12000, 'hat_tophat': 25000, 'hat_wizard': 55000,
+        'hat_viking': 90000, 'hat_crown': 200000,
+        'skin_sunset': 10000, 'skin_ocean': 20000, 'skin_forest': 20000,
+        'skin_midnight': 40000, 'skin_royal': 80000, 'skin_prism': 150000
+      };
+    }
+    function shopPriceOf(id) {
+      let cfg = exists(/databases/$(database)/documents/config/jackpot)
+        ? get(/databases/$(database)/documents/config/jackpot).data : {};
+      return cfg.get('shopPrices', {}).get(id, shopBasePrices().get(id, -1));
+    }
+    // Only engages when `inventory` is actually part of this write's
+    // resulting document — every other profile write (name, photo, equip,
+    // game stats, notif toggle, coin awards from real play) leaves
+    // `inventory` untouched, so `newInv == oldInv` short-circuits true and
+    // none of this runs for them. When inventory DOES grow, requires
+    // exactly one recognized item added, nothing removed, and the coin
+    // balance in this same write dropping by exactly that item's price —
+    // matching exactly what buyShopItem() already does in one transaction.
+    // An id outside the known list is intentionally left unrestricted here:
+    // it can't unlock any real cosmetic in the client anyway.
+    function itemAddPriceOk(id, oldInv, newInv, coinDelta) {
+      return !(newInv.hasAny([id]) && !oldInv.hasAny([id])) || coinDelta == shopPriceOf(id);
+    }
+    function inventoryChangeIsPaidFor() {
+      let oldInv = resource.data.get('inventory', []);
+      let newInv = request.resource.data.get('inventory', []);
+      let coinDelta = resource.data.get('jackpotCoins', 50) - request.resource.data.get('jackpotCoins', 50);
+      return newInv == oldInv || (
+        newInv.size() == oldInv.size() + 1 && newInv.hasAll(oldInv) &&
+        itemAddPriceOk('border_bronze', oldInv, newInv, coinDelta) &&
+        itemAddPriceOk('border_silver', oldInv, newInv, coinDelta) &&
+        itemAddPriceOk('border_gold', oldInv, newInv, coinDelta) &&
+        itemAddPriceOk('border_ice', oldInv, newInv, coinDelta) &&
+        itemAddPriceOk('border_rainbow', oldInv, newInv, coinDelta) &&
+        itemAddPriceOk('hat_clown', oldInv, newInv, coinDelta) &&
+        itemAddPriceOk('hat_tophat', oldInv, newInv, coinDelta) &&
+        itemAddPriceOk('hat_wizard', oldInv, newInv, coinDelta) &&
+        itemAddPriceOk('hat_viking', oldInv, newInv, coinDelta) &&
+        itemAddPriceOk('hat_crown', oldInv, newInv, coinDelta) &&
+        itemAddPriceOk('skin_sunset', oldInv, newInv, coinDelta) &&
+        itemAddPriceOk('skin_ocean', oldInv, newInv, coinDelta) &&
+        itemAddPriceOk('skin_forest', oldInv, newInv, coinDelta) &&
+        itemAddPriceOk('skin_midnight', oldInv, newInv, coinDelta) &&
+        itemAddPriceOk('skin_royal', oldInv, newInv, coinDelta) &&
+        itemAddPriceOk('skin_prism', oldInv, newInv, coinDelta)
+      );
+    }
+    // Can't equip a border/hat/skin that isn't in your own inventory —
+    // closes off granting yourself free cosmetics by writing equippedX
+    // directly, on top of the purchase check above (which stops adding a
+    // fake item to inventory for free in the first place).
+    function equipsAreOwned() {
+      let newInv = request.resource.data.get('inventory', []);
+      let hat = request.resource.data.get('equippedHat', null);
+      let border = request.resource.data.get('equippedBorder', null);
+      let skin = request.resource.data.get('equippedSkin', null);
+      return (hat == null || newInv.hasAny([hat]))
+        && (border == null || newInv.hasAny([border]))
+        && (skin == null || newInv.hasAny([skin]));
     }
 
     match /users/{userId} {
       allow read: if true;
-      allow write: if true;
+      // A user doc only ever gets created by the verifyPasscode Cloud
+      // Function (Admin SDK, bypasses these rules) the instant the passcode
+      // is verified — never directly by a client. That closes off writing
+      // anything at all, even your own profile, without having gone
+      // through the passcode first (anonymous sign-in alone is free and
+      // proves nothing).
+      allow create: if false;
+      // Once that doc exists, its owner can update their own profile
+      // fields (name, photo, coins, game stats, inventory), and an admin
+      // can edit any user's doc (coin corrections, real names, removing a
+      // chip, etc.) unconstrained by the shop checks below. Neither path
+      // can ever touch isAdmin/passcodeVerified — those stay server-only.
+      // Currency awarded by actual gameplay (jackpot/blackjack/roulette/
+      // plinko payouts) still isn't server-validated — closing that fully
+      // means moving those payouts into Cloud Functions, a bigger follow-up
+      // beyond this pass.
+      allow update: if isMember() && (request.auth.uid == userId || isAdmin())
+        && !request.resource.data.diff(resource.data).affectedKeys().hasAny(['isAdmin', 'passcodeVerified'])
+        && (isAdmin() || (inventoryChangeIsPaidFor() && equipsAreOwned()));
+      allow delete: if isAdmin();
     }
 
     match /parties/{partyId} {
       allow read: if true;
-      allow create: if request.resource.data.name is string
-                    && request.resource.data.name.size() > 0
-                    && request.resource.data.name.size() < 200;
-      allow update, delete: if true;
+      allow create: if isMember() && isValidName();
+      // Any member attending can add/remove their own photos on a shared
+      // party (the view page's own +Add photo button is open to everyone,
+      // not just whoever created the party) — everything else (name, date)
+      // is owner/admin-only, matching the client's own canEdit check.
+      allow update: if isMember() && (isOwnerOrAdmin(resource.data.get('createdBy', '')) || onlySharedFieldsChanged(['photos']));
+      allow delete: if isMember() && isOwnerOrAdmin(resource.data.get('createdBy', ''));
 
       match /participants/{userId} {
         allow read: if true;
-        allow write: if true;
+        allow write: if isMember() && (request.auth.uid == userId || isAdmin());
       }
     }
 
     match /pubs/{pubId} {
       allow read: if true;
-      allow create: if request.resource.data.name is string
-                    && request.resource.data.name.size() > 0
-                    && request.resource.data.name.size() < 200;
-      allow update, delete: if true;
+      allow create: if isMember() && isValidName();
+      // Same reasoning as parties: any member can add photos or trigger the
+      // cached avgRating/ratingCount recompute after rating; only the
+      // creator/admin can change the pub's own name/city/tags or delete it.
+      allow update: if isMember() && (isOwnerOrAdmin(resource.data.get('createdBy', '')) || onlySharedFieldsChanged(['photos', 'avgRating', 'ratingCount']));
+      allow delete: if isMember() && isOwnerOrAdmin(resource.data.get('createdBy', ''));
 
       match /ratings/{userId} {
         allow read: if true;
-        allow write: if true;
+        allow create, update: if isMember() && request.auth.uid == userId
+          && isValidRatingValue() && isValidCommentValue();
+        allow delete: if isAdmin() || (isMember() && request.auth.uid == userId);
       }
       match /comments/{commentId} {
         allow read: if true;
-        allow write: if true;
+        allow create: if isMember() && request.resource.data.userId == request.auth.uid
+          && request.resource.data.text is string && request.resource.data.text.size() < 2000;
+        allow update, delete: if isAdmin() || (isSignedIn() && resource.data.userId == request.auth.uid);
       }
     }
 
+    // Personal per-day counters — only their own owner (matched by the
+    // `userId` field on the doc, since the doc id is a compound
+    // `${uid}_${date}` key rather than the uid alone) or an admin may write
+    // one, matching the leaderboard's own canControl check in index.html
+    // (self, or admin adjusting anyone's count).
     match /drinkLogs/{logId} {
       allow read: if true;
-      allow write: if true;
+      allow create, update: if isMember() && (request.resource.data.userId == request.auth.uid || isAdmin());
+      allow delete: if isMember() && (resource.data.userId == request.auth.uid || isAdmin());
     }
 
     match /shotLogs/{logId} {
       allow read: if true;
-      allow write: if true;
+      allow create, update: if isMember() && (request.resource.data.userId == request.auth.uid || isAdmin());
+      allow delete: if isMember() && (resource.data.userId == request.auth.uid || isAdmin());
     }
 
+    // Casino/game settings (max bets, shop prices, open/close toggles) —
+    // admin-only, same as the client already treats them.
     match /config/{docId} {
       allow read: if true;
-      allow write: if true;
+      allow write: if isAdmin();
     }
 
     match /tttInvites/{inviteId} {
       allow read: if true;
-      allow write: if true;
-    }
-
-    match /push_subscriptions/{subId} {
-      allow read: if true;
-      allow write: if true;
+      allow write: if isMember();
     }
 
     match /tttGames/{gameId} {
       allow read: if true;
-      allow write: if true;
+      allow write: if isMember();
+    }
+
+    // Tied to a verified member's own uid so a subscription can't be
+    // spoofed to intercept or spam someone else's notifications.
+    match /push_subscriptions/{subId} {
+      allow read: if true;
+      allow create, update: if isMember() && request.resource.data.uid == request.auth.uid;
+      allow delete: if isAdmin() || (isSignedIn() && resource.data.uid == request.auth.uid);
+    }
+
+    // Only the admin composes announcements; any member can post an idea
+    // and delete their own (or an admin can delete either).
+    match /announcements/{announcementId} {
+      allow read: if true;
+      allow create: if isAdmin() && request.resource.data.text is string && request.resource.data.text.size() < 5000;
+      allow update, delete: if isAdmin();
+    }
+
+    match /ideas/{ideaId} {
+      allow read: if true;
+      allow create: if isMember() && request.resource.data.authorUid == request.auth.uid
+        && request.resource.data.text is string && request.resource.data.text.size() < 5000;
+      allow update, delete: if isAdmin() || (isSignedIn() && resource.data.authorUid == request.auth.uid);
     }
 
     match /leaderboardArchives/{year} {
       allow read: if true;
-      // Immutable once written: creation is open, but an existing
+      // Immutable once written: creation is admin-only, and an existing
       // archived year can never be changed or removed.
-      allow create: if true;
+      allow create: if isAdmin();
       allow update, delete: if false;
     }
 
+    // Rate-limit bookkeeping for verifyPasscode — the Cloud Function uses
+    // the Admin SDK (bypasses these rules); clients never touch this
+    // directly.
+    match /passcodeAttempts/{uid} {
+      allow read, write: if false;
+    }
+
+    // Rate-limit bookkeeping for lookupVariants — same pattern, Admin-SDK-only.
+    match /lookupAttempts/{uid} {
+      allow read, write: if false;
+    }
+
     // Required in addition to the nested rules above so that
-    // collectionGroup('ratings') / collectionGroup('participants') queries
-    // (used to compute badge stats and party totals across all
-    // beers/parties) are authorized — the nested rules only cover direct
-    // /beers/{beerId}/ratings/{userId} and /parties/{partyId}/participants/{userId}
-    // path access, not cross-collection queries.
+    // collectionGroup('ratings') / collectionGroup('participants') /
+    // collectionGroup('comments') queries (used to compute badge stats and
+    // party totals across all beers/parties) are authorized — the nested
+    // rules only cover direct path access, not cross-collection queries.
     match /{path=**}/ratings/{userId} {
       allow read: if true;
     }

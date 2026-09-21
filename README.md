@@ -56,14 +56,21 @@ Live app: https://beer-dca5c.web.app
 
 ## Admin
 
-One hardcoded device ID (`ADMIN_UID` in `index.html`) can, in addition to normal permissions: edit/delete anyone's beer, spirit, party, or pub; edit shop prices; remove any chip from any user's inventory; open/close casino games. All enforcement is client-side — there's no real auth, consistent with the app's open trust model for a small group.
+Whoever has `isAdmin: true` on their `users/{uid}` doc can, in addition to normal permissions: edit/delete anyone's beer, spirit, party, or pub; edit shop prices; remove any chip from any user's inventory; open/close casino games; edit anyone's coins or real name. `isAdmin` is never client-writable — it's set once, manually, via the Firebase console or Admin SDK, and enforced server-side in `firestore.rules`.
+
+## Identity & access
+
+- Opening the link in a plain browser tab (not installed) is **read-only**: browsing works with zero sign-in and no account is ever created.
+- Installing the app (Add to Home Screen / Install app) prompts for the shared group passcode (verified server-side by the `verifyPasscode` Cloud Function, rate-limited), then Firebase Anonymous Auth signs the device in with a real, unforgeable uid. First time on a given device, this also picks up any existing profile from the old `localStorage` uid automatically (`migrateLegacyProfileIfAny` in `index.html`).
+- New members set a nickname + photo once (`passcodeVerified` on their `users/{uid}` doc gates everything else); `firestore.rules`/`storage.rules` require that flag — set only by the Cloud Function — for any write.
 
 ## Tech
 
 Single static `index.html`, no build step, Firebase compat SDK via CDN:
 
-- **Firestore**: `beers`, `spirits`, `parties` (+ `participants` subcollection with `count`/`shotCount`), `pubs` (+ `ratings`/`comments`), `users` (profile, inventory, equipped cosmetics, chips array, coins, in-progress `blackjackHand`), `drinkLogs`/`shotLogs` (manual leaderboard taps), `leaderboardArchives` (immutable once created), `config/jackpot` (max bet, shop price overrides), `config/games` (per-game open/closed flags)
+- **Firestore**: `beers`, `spirits`, `parties` (+ `participants` subcollection with `count`/`shotCount`), `pubs` (+ `ratings`/`comments`), `users` (profile, inventory, equipped cosmetics, chips array, coins, in-progress `blackjackHand`), `drinkLogs`/`shotLogs` (manual leaderboard taps), `leaderboardArchives` (immutable once created), `config/jackpot` (max bet, shop price overrides), `config/games` (per-game open/closed flags), `passcodeAttempts` (server-only rate-limit bookkeeping)
 - **Storage**: photos under `{collection}/{id}/{timestamp}_{filename}`
+- **Functions**: `verifyPasscode` (callable, rate-limited, sets `passcodeVerified`), `onTttInviteCreated` (push notification on invite)
 - **Hosting** serves the static files; installable as a PWA (`manifest.json`, `sw.js`)
 - Back button navigates screen-to-screen via a `pushOverlayState()`/`popstate` history stack instead of exiting the app
 
