@@ -114,7 +114,6 @@
       flex: 0 0 auto
     }
 
-    #themeBtn,
     #jackpotBtn,
     #normalGamesBtn {
       background: none;
@@ -122,6 +121,63 @@
       font-size: 1.3rem;
       cursor: pointer;
       padding: 4px
+    }
+
+    .themeToggle {
+      position: relative;
+      flex: 0 0 auto;
+      width: 52px;
+      height: 27px;
+      border-radius: 999px;
+      border: 1px solid var(--border);
+      background: linear-gradient(to right, #fcd34d, #bae6fd);
+      cursor: pointer;
+      padding: 0;
+      transition: background .2s
+    }
+
+    [data-theme="dark"] .themeToggle {
+      background: linear-gradient(to right, #263159, #0f1420)
+    }
+
+    .themeToggleIcon {
+      position: absolute;
+      top: 50%;
+      transform: translateY(-50%);
+      font-size: .7rem;
+      line-height: 1;
+      pointer-events: none
+    }
+
+    .themeToggleIcon.sun {
+      left: 6px
+    }
+
+    .themeToggleIcon.moon {
+      right: 6px
+    }
+
+    .themeToggleKnob {
+      position: absolute;
+      top: 2px;
+      left: 2px;
+      width: 21px;
+      height: 21px;
+      border-radius: 50%;
+      background: #fff;
+      box-shadow: 0 1px 3px rgba(0, 0, 0, .35);
+      transition: transform .2s ease, background .2s
+    }
+
+    [data-theme="dark"] .themeToggleKnob {
+      transform: translateX(25px);
+      background: #2b2f3a
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      .themeToggleKnob {
+        transition: none
+      }
     }
 
     .notifNudge {
@@ -1103,7 +1159,8 @@
     }
 
     .bacDrinkRow .bacDrinkVol,
-    .bacDrinkRow .bacDrinkAbv {
+    .bacDrinkRow .bacDrinkAbv,
+    .bacDrinkRow .bacDrinkMinAgo {
       flex: 0 0 58px;
       min-width: 0;
       padding: 9px 6px;
@@ -4359,8 +4416,10 @@
           <span class="bacColSpacer"></span>
           <span class="bacColLabel">ml</span>
           <span class="bacColLabel">%</span>
+          <span class="bacColLabel">perc</span>
           <span class="bacColSpacerSmall"></span>
         </div>
+        <span class="hint">Hány perce itta meg — ez számít, mert 3 sör 20 perc alatt egészen mást ad ki, mint 3 óra alatt</span>
         <div id="bacDrinksList"></div>
         <button type="button" class="btn ghost" id="bacAddDrinkBtn" style="margin-top:8px;width:100%">+ Add
           drink</button>
@@ -4926,11 +4985,11 @@
         <div class="twoCol">
           <div class="field">
             <label>Date (M/D)</label>
-            <input id="pfDate" placeholder="e.g. 9/11">
+            <input id="pfDate" required placeholder="e.g. 9/11">
           </div>
           <div class="field">
             <label>Year</label>
-            <input id="pfYear" type="number" placeholder="2026">
+            <input id="pfYear" type="number" required min="2000" max="2100" placeholder="2026">
           </div>
         </div>
         <div class="formActions">
@@ -5021,7 +5080,11 @@
       <div class="sheetHead">
         <h2>Profile</h2>
         <div class="sheetHeadActions">
-          <button id="themeBtn" title="Toggle theme">🌙</button>
+          <button id="themeBtn" class="themeToggle" type="button" title="Toggle theme" aria-label="Toggle light/dark theme">
+            <span class="themeToggleIcon sun" aria-hidden="true">☀️</span>
+            <span class="themeToggleIcon moon" aria-hidden="true">🌙</span>
+            <span class="themeToggleKnob" aria-hidden="true"></span>
+          </button>
           <button class="closeX" id="profileViewClose">✕</button>
         </div>
       </div>
@@ -5165,6 +5228,16 @@
         <button class="closeX" id="cardPickerClose">✕</button>
       </div>
       <div class="cardPickerGrid" id="cardPickerGrid"></div>
+    </div>
+  </div>
+
+  <div class="overlay" id="ratersListOverlay">
+    <div class="sheet">
+      <div class="sheetHead">
+        <h2>Ratings</h2>
+        <button class="closeX" id="ratersListClose">✕</button>
+      </div>
+      <div id="ratersListBody"></div>
     </div>
   </div>
 
@@ -5391,19 +5464,22 @@
       }
 
       // ---------- Theme ----------
+      // Visual state (knob position, track color) is pure CSS, driven off
+      // documentElement's [data-theme] attribute — no icon-swapping JS needed.
       const themeBtn = document.getElementById('themeBtn');
-      function applyThemeIcon() {
+      function applyThemeAriaState() {
         const t = document.documentElement.getAttribute('data-theme');
-        themeBtn.textContent = t === 'dark' ? '☀️' : '🌙';
+        themeBtn.setAttribute('aria-checked', t === 'dark' ? 'true' : 'false');
       }
+      themeBtn.setAttribute('role', 'switch');
       themeBtn.onclick = () => {
         const cur = document.documentElement.getAttribute('data-theme');
         const next = cur === 'dark' ? 'light' : 'dark';
         document.documentElement.setAttribute('data-theme', next);
         try { localStorage.setItem('beer-theme', next); } catch (e) { }
-        applyThemeIcon();
+        applyThemeAriaState();
       };
-      applyThemeIcon();
+      applyThemeAriaState();
 
       // ---------- State ----------
       let allBeers = [];
@@ -5511,6 +5587,79 @@
       function itemLabel(item) {
         return (item?.name || item?.realName || 'Unnamed');
       }
+
+      // Duplicate-item guard shared by every "add new" form (beer/spirit/
+      // nikotin/koffein/pub/party) — only the real product/place/event name
+      // is compared (never a personal nickname, since two people can call
+      // the same real thing something different), and only when EVERY one
+      // of the type-specific "variant" fields also matches (a beer's own
+      // degree/ABV, an energy drink's flavor, a pub's city, a party's
+      // date) — a real duplicate needs the whole item to match, not just
+      // the name, since a different variant of the same-named thing is a
+      // separate, legitimate entry.
+      function findDuplicateItem(existingList, nameField, candidateName, candidateFields, matchFields) {
+        const name = (candidateName || '').trim().toLowerCase();
+        if (!name) return null;
+        const norm = v => (v === undefined || v === null || v === '') ? null : v;
+        return existingList.find(item => {
+          if (((item[nameField]) || '').trim().toLowerCase() !== name) return false;
+          return matchFields.every(f => norm(item[f]) === norm(candidateFields[f]));
+        }) || null;
+      }
+
+      // Shared "who rated this" list — every review type (beer/spirit/
+      // nikotin/koffein/pub) stores ratings the same way
+      // (xCol.doc(itemId).collection('ratings').doc(userId) => {rating,
+      // userId, ts}), so one overlay covers all of them; the view page's
+      // rating badge just needs to call showRatersList(xCol, itemId).
+      const ratersListOverlay = document.getElementById('ratersListOverlay');
+      let ratersListUnsub = null;
+
+      function renderRatersList(raters) {
+        const el = document.getElementById('ratersListBody');
+        if (!raters.length) {
+          el.innerHTML = '<div class="empty" style="padding:14px 0">No ratings yet</div>';
+          return;
+        }
+        el.innerHTML = raters.map((r, i) => `
+      <div class="reviewRow" data-i="${i}" style="cursor:pointer">
+        <div class="userAvatar">${avatarInner(r.user?.name, r.user?.photoURL)}</div>
+        <div class="reviewBody">
+          <div class="reviewHead">
+            <span class="userName">${nameWithAdminTag(r.user)}</span>
+            <span class="reviewStars">⭐ ${r.rating}/10</span>
+          </div>
+        </div>
+      </div>`).join('');
+        el.querySelectorAll('.reviewRow').forEach(row => {
+          row.onclick = () => {
+            const r = raters[Number(row.dataset.i)];
+            if (r.userId) { hideRatersList(); openProfileView(r.userId); }
+          };
+        });
+      }
+
+      function showRatersList(colRef, itemId) {
+        pushOverlayState();
+        document.getElementById('ratersListBody').innerHTML = '<div class="empty" style="padding:14px 0">Loading…</div>';
+        ratersListOverlay.classList.add('show');
+        if (ratersListUnsub) { ratersListUnsub(); ratersListUnsub = null; }
+        ratersListUnsub = colRef.doc(itemId).collection('ratings').onSnapshot(snap => {
+          const raters = snap.docs
+            .map(d => ({ userId: d.id, ...d.data() }))
+            .filter(r => typeof r.rating === 'number')
+            .map(r => ({ ...r, user: allUsers.find(u => u.id === r.userId) }))
+            .sort((a, b) => (b.rating - a.rating) || ((b.ts || 0) - (a.ts || 0)));
+          renderRatersList(raters);
+        }, err => showToast('Sync error: ' + err.message));
+      }
+      function hideRatersList() {
+        ratersListOverlay.classList.remove('show');
+        if (ratersListUnsub) { ratersListUnsub(); ratersListUnsub = null; }
+      }
+      function closeRatersList() { history.back(); }
+      document.getElementById('ratersListClose').onclick = closeRatersList;
+      ratersListOverlay.addEventListener('click', (e) => { if (e.target === ratersListOverlay) closeRatersList(); });
 
       // Small "Added by [avatar] name" row shown on a beer/spirit's view
       // page — the grid card shows just the avatar (corner badge, tight on
@@ -5887,8 +6036,6 @@
       beerForm.onsubmit = async (e) => {
         e.preventDefault();
         if (!canWrite()) return promptInstallOrSignIn();
-        const saveBtn = document.getElementById('saveBtn');
-        saveBtn.disabled = true;
         const data = {
           realName: document.getElementById('fRealName').value.trim(),
           name: document.getElementById('fName').value.trim(),
@@ -5903,6 +6050,15 @@
           comment: document.getElementById('fComment').value.trim(),
           variants: getCheckedVariants('fVariantChecklist')
         };
+        if (!editingId) {
+          const dupe = findDuplicateItem(allBeers, 'realName', data.realName, data, ['degree', 'abv']);
+          if (dupe) {
+            showToast(`This beer already exists with the same degree/ABV: "${itemLabel(dupe)}"`);
+            return;
+          }
+        }
+        const saveBtn = document.getElementById('saveBtn');
+        saveBtn.disabled = true;
         try {
           if (editingId) {
             await beersCol.doc(editingId).update(data);
@@ -6057,13 +6213,37 @@
         return `<span class="shopPreviewChip chip-${chip.type} partyChipMini" title="${escapeHtml(chip.owner?.name || 'Anonymous')} · ${label}"></span>`;
       }
 
+      // Parties are dated via free-text "M/D" (pfDate) + a separate numeric
+      // year (pfYear), not a real date picker — parsed here into a
+      // comparable timestamp. Returns null for anything that doesn't parse,
+      // so callers can fall back to creation time for undated parties.
+      function partyDateValue(p) {
+        const m = /^(\d{1,2})\s*\/\s*(\d{1,2})$/.exec((p.date || '').trim());
+        if (!m) return null;
+        const month = Number(m[1]);
+        const day = Number(m[2]);
+        if (month < 1 || month > 12 || day < 1 || day > 31) return null;
+        const year = Number(p.year) || new Date().getFullYear();
+        return new Date(year, month - 1, day).getTime();
+      }
+      function sortPartiesByDateDesc(parties) {
+        return parties.slice().sort((a, b) => {
+          const da = partyDateValue(a);
+          const db = partyDateValue(b);
+          if (da != null && db != null) return db - da;
+          if (da != null) return -1;
+          if (db != null) return 1;
+          return (b.ts || 0) - (a.ts || 0);
+        });
+      }
+
       function renderPartyList() {
         document.getElementById('partyListHead').textContent = `Parties (${allParties.length})`;
         if (!allParties.length) {
           partyListEl.innerHTML = '<div class="empty">No parties yet 🎉<br>Tap + to start one.</div>';
           return;
         }
-        const sorted = allParties.slice().sort((a, b) => (b.ts || 0) - (a.ts || 0));
+        const sorted = sortPartiesByDateDesc(allParties);
         partyListEl.innerHTML = sorted.map(p => {
           const totals = partyTotals(p.id);
           const cover = (p.photos && p.photos[0]) ? `<img src="${escapeHtml(p.photos[0].url)}">` : '🎉';
@@ -6240,25 +6420,33 @@
           el.innerHTML = '<div class="empty" style="padding:14px 0">No chips redeemed here yet</div>';
           return;
         }
-        el.innerHTML = chips.map((chip, i) => {
+        el.innerHTML = chips.map((chip) => {
           const giver = allUsers.find(u => u.id === chip.givenByUid);
-          return `<div class="reviewRow">
+          return `<div class="reviewRow" data-chip-id="${chip.id}" data-owner-id="${chip.owner?.id || ''}" style="cursor:pointer">
       <span class="shopPreviewChip chip-${chip.type} partyChipViewBadge"></span>
       <div class="userAvatar">${avatarInner(chip.owner?.name, chip.owner?.photoURL)}</div>
       <div class="reviewBody">
         <div class="reviewHead">
           <span class="userName">${nameWithAdminTag(chip.owner)}</span>
         </div>
-        <div class="reviewComment">${giver ? `bought by ${escapeHtml(giver.name || 'Anonymous')}` : ''}</div>
+        ${chip.givenByUid ? `<div class="reviewComment" style="display:flex;align-items:center;gap:6px">
+          <span class="userAvatar" style="width:18px;height:18px;flex:0 0 auto">${avatarInner(giver?.name, giver?.photoURL)}</span>
+          <span>bought by ${giver ? escapeHtml(giver.name || 'Anonymous') : 'Unknown (account deleted)'}</span>
+        </div>` : ''}
       </div>
-      ${chip.photoURL ? `<img src="${escapeHtml(chip.photoURL)}" class="partyChipPhotoThumb" data-i="${i}">` : ''}
+      ${chip.photoURL ? `<img src="${escapeHtml(chip.photoURL)}" class="partyChipPhotoThumb">` : ''}
     </div>`;
         }).join('');
-        const photos = chips.filter(c => c.photoURL).map(c => ({ url: c.photoURL }));
-        el.querySelectorAll('.partyChipPhotoThumb').forEach(img => {
-          const chip = chips[Number(img.dataset.i)];
-          const photoIndex = photos.findIndex(p => p.url === chip.photoURL);
-          img.onclick = () => openLightbox(photos, photoIndex);
+        // Tapping anywhere on a row (photo included) opens the full chip
+        // popup — the same one used from a profile's chip grid — which
+        // already shows the bought-by/redeemed-by/party info plus the
+        // full-size photo, so there's no separate bare-photo lightbox here.
+        el.querySelectorAll('.reviewRow').forEach(row => {
+          row.onclick = () => {
+            const chipId = row.dataset.chipId;
+            const ownerId = row.dataset.ownerId;
+            if (chipId && ownerId) openChipPopup(chipId, ownerId);
+          };
         });
       }
 
@@ -6403,14 +6591,40 @@
       document.getElementById('partyCancelBtn').onclick = closePartyForm;
       partyFormOverlay.addEventListener('click', (e) => { if (e.target === partyFormOverlay) closePartyForm(); });
 
+      // Real range/validity check for the free-text M/D + year fields —
+      // `required` on the inputs only catches "left empty", not "13/32".
+      // Built on new Date() itself so Feb 30, Apr 31, non-leap Feb 29 etc.
+      // are rejected too, not just out-of-range month/day.
+      function validatePartyDate(dateStr, year) {
+        const m = /^(\d{1,2})\s*\/\s*(\d{1,2})$/.exec(dateStr.trim());
+        if (!m) return 'Enter the date as M/D, e.g. 9/11';
+        const month = Number(m[1]);
+        const day = Number(m[2]);
+        if (month < 1 || month > 12) return 'Month must be between 1 and 12';
+        if (day < 1 || day > 31) return 'Day must be between 1 and 31';
+        if (!year) return 'Year is required';
+        const d = new Date(year, month - 1, day);
+        if (d.getMonth() !== month - 1 || d.getDate() !== day) return `${month}/${day} isn't a real date`;
+        return null;
+      }
+
       partyForm.onsubmit = async (e) => {
         e.preventDefault();
         if (!canWrite()) return promptInstallOrSignIn();
-        const saveBtn = document.getElementById('partySaveBtn');
-        saveBtn.disabled = true;
         const name = document.getElementById('pfName').value.trim();
         const date = document.getElementById('pfDate').value.trim();
         const year = document.getElementById('pfYear').value === '' ? null : Number(document.getElementById('pfYear').value);
+        const dateError = validatePartyDate(date, year);
+        if (dateError) { showToast(dateError); return; }
+        if (!partyEditingId) {
+          const dupe = findDuplicateItem(allParties, 'name', name, { date, year }, ['date', 'year']);
+          if (dupe) {
+            showToast(`A party with this name and date already exists: "${dupe.name}"`);
+            return;
+          }
+        }
+        const saveBtn = document.getElementById('partySaveBtn');
+        saveBtn.disabled = true;
         try {
           if (partyEditingId) {
             await partiesCol.doc(partyEditingId).update({ name, date, year });
@@ -6619,7 +6833,9 @@
       }
 
       function renderPubViewBadges(pub) {
-        pubViewBadges.innerHTML = `<span style="background:${ratingColor(pub.avgRating || 0)};color:#1c1410">${pub.avgRating != null ? pub.avgRating.toFixed(1) : '–'}/10${pub.ratingCount ? ` (${pub.ratingCount})` : ''}</span>${pubTagBadgeHtml(pub)}`;
+        pubViewBadges.innerHTML = `<span class="ratingBadgeClickable" style="background:${ratingColor(pub.avgRating || 0)};color:#1c1410;cursor:pointer">${pub.avgRating != null ? pub.avgRating.toFixed(1) : '–'}/10${pub.ratingCount ? ` (${pub.ratingCount})` : ''}</span>${pubTagBadgeHtml(pub)}`;
+        const ratingBadgeEl = pubViewBadges.querySelector('.ratingBadgeClickable');
+        if (ratingBadgeEl) ratingBadgeEl.onclick = () => showRatersList(pubsCol, pub.id);
       }
 
       function renderPubRatingButtons() {
@@ -6832,11 +7048,18 @@
       pubForm.onsubmit = async (e) => {
         e.preventDefault();
         if (!canWrite()) return promptInstallOrSignIn();
-        const saveBtn = document.getElementById('pubSaveBtn');
-        saveBtn.disabled = true;
         const name = document.getElementById('pubfName').value.trim();
         const city = document.getElementById('pubfCity').value.trim();
         const tags = pubFormSelectedTags.slice();
+        if (!pubEditingId) {
+          const dupe = findDuplicateItem(allPubs, 'name', name, { city }, ['city']);
+          if (dupe) {
+            showToast(`This pub already exists in ${city || 'that city'}: "${dupe.name}"`);
+            return;
+          }
+        }
+        const saveBtn = document.getElementById('pubSaveBtn');
+        saveBtn.disabled = true;
         try {
           if (pubEditingId) {
             await pubsCol.doc(pubEditingId).update({ name, city, tags });
@@ -7217,7 +7440,7 @@
     <div class="viewMeta">${[escapeHtml(beer.brewery || ''), escapeHtml(beer.country || ''), escapeHtml(beer.beerType || '')].filter(Boolean).join(' · ')}</div>
     ${creatorRowHtml(beer)}
     <div class="viewBadges">
-      <span style="background:${ratingColor(beer.avgRating || 0)};color:#1c1410">${beer.avgRating != null ? beer.avgRating.toFixed(1) : '–'}/10${beer.ratingCount ? ` (${beer.ratingCount})` : ''}</span>
+      <span class="ratingBadgeClickable" style="background:${ratingColor(beer.avgRating || 0)};color:#1c1410;cursor:pointer">${beer.avgRating != null ? beer.avgRating.toFixed(1) : '–'}/10${beer.ratingCount ? ` (${beer.ratingCount})` : ''}</span>
       ${beer.degree != null ? `<span style="background:var(--bg-elev);color:var(--text);border:1px solid var(--border)">${beer.degree}°</span>` : ''}
       ${beer.abv != null ? `<span style="background:var(--bg-elev);color:var(--text);border:1px solid var(--border)">${beer.abv}% ALC</span>` : ''}
       ${beer.price != null ? `<span style="background:var(--bg-elev);color:var(--text);border:1px solid var(--border)">€${beer.price}</span>` : ''}
@@ -7229,6 +7452,8 @@
     </details>` : ''}
     ${beer.comment ? `<div class="viewComment">${escapeHtml(beer.comment)}</div>` : ''}
   `;
+        const ratingBadgeEl = viewStats.querySelector('.ratingBadgeClickable');
+        if (ratingBadgeEl) ratingBadgeEl.onclick = () => showRatersList(beersCol, beer.id);
       }
 
       function refreshViewIfOpen() {
@@ -7639,8 +7864,6 @@
       spiritForm.onsubmit = async (e) => {
         e.preventDefault();
         if (!canWrite()) return promptInstallOrSignIn();
-        const saveBtn = document.getElementById('spiritSaveBtn');
-        saveBtn.disabled = true;
         const data = {
           realName: document.getElementById('sfRealName').value.trim(),
           name: document.getElementById('sfName').value.trim(),
@@ -7653,6 +7876,15 @@
           comment: document.getElementById('sfComment').value.trim(),
           variants: getCheckedVariants('sfVariantChecklist')
         };
+        if (!spiritEditingId) {
+          const dupe = findDuplicateItem(allSpirits, 'realName', data.realName, data, ['abv']);
+          if (dupe) {
+            showToast(`This spirit already exists with the same ABV: "${itemLabel(dupe)}"`);
+            return;
+          }
+        }
+        const saveBtn = document.getElementById('spiritSaveBtn');
+        saveBtn.disabled = true;
         try {
           if (spiritEditingId) {
             await spiritsCol.doc(spiritEditingId).update(data);
@@ -7741,7 +7973,7 @@
     <div class="viewMeta">${[escapeHtml(spirit.brand || ''), escapeHtml(spirit.country || ''), escapeHtml(spirit.spiritType || '')].filter(Boolean).join(' · ')}</div>
     ${creatorRowHtml(spirit)}
     <div class="viewBadges">
-      <span style="background:${ratingColor(spirit.avgRating || 0)};color:#1c1410">${spirit.avgRating != null ? spirit.avgRating.toFixed(1) : '–'}/10${spirit.ratingCount ? ` (${spirit.ratingCount})` : ''}</span>
+      <span class="ratingBadgeClickable" style="background:${ratingColor(spirit.avgRating || 0)};color:#1c1410;cursor:pointer">${spirit.avgRating != null ? spirit.avgRating.toFixed(1) : '–'}/10${spirit.ratingCount ? ` (${spirit.ratingCount})` : ''}</span>
       ${spirit.abv != null ? `<span style="background:var(--bg-elev);color:var(--text);border:1px solid var(--border)">${spirit.abv}% ALC</span>` : ''}
       ${spirit.price != null ? `<span style="background:var(--bg-elev);color:var(--text);border:1px solid var(--border)">€${spirit.price}</span>` : ''}
     </div>
@@ -7751,6 +7983,8 @@
     </details>` : ''}
     ${spirit.comment ? `<div class="viewComment">${escapeHtml(spirit.comment)}</div>` : ''}
   `;
+        const ratingBadgeEl = spiritViewStatsEl.querySelector('.ratingBadgeClickable');
+        if (ratingBadgeEl) ratingBadgeEl.onclick = () => showRatersList(spiritsCol, spirit.id);
       }
 
       function refreshSpiritViewIfOpen() {
@@ -8146,8 +8380,6 @@
       nikotinForm.onsubmit = async (e) => {
         e.preventDefault();
         if (!canWrite()) return promptInstallOrSignIn();
-        const saveBtn = document.getElementById('nikotinSaveBtn');
-        saveBtn.disabled = true;
         const data = {
           realName: document.getElementById('nfRealName').value.trim(),
           name: document.getElementById('nfName').value.trim(),
@@ -8160,6 +8392,15 @@
           comment: document.getElementById('nfComment').value.trim(),
           variants: getCheckedVariants('nfVariantChecklist')
         };
+        if (!nikotinEditingId) {
+          const dupe = findDuplicateItem(allNikotin, 'realName', data.realName, data, ['strength', 'flavor']);
+          if (dupe) {
+            showToast(`This already exists with the same strength/flavor: "${itemLabel(dupe)}"`);
+            return;
+          }
+        }
+        const saveBtn = document.getElementById('nikotinSaveBtn');
+        saveBtn.disabled = true;
         try {
           if (nikotinEditingId) {
             await nikotinCol.doc(nikotinEditingId).update(data);
@@ -8248,7 +8489,7 @@
     <div class="viewMeta">${[escapeHtml(item.country || ''), escapeHtml(item.nikotinType || ''), escapeHtml(item.flavor || '')].filter(Boolean).join(' · ')}</div>
     ${creatorRowHtml(item)}
     <div class="viewBadges">
-      <span style="background:${ratingColor(item.avgRating || 0)};color:#1c1410">${item.avgRating != null ? item.avgRating.toFixed(1) : '–'}/10${item.ratingCount ? ` (${item.ratingCount})` : ''}</span>
+      <span class="ratingBadgeClickable" style="background:${ratingColor(item.avgRating || 0)};color:#1c1410;cursor:pointer">${item.avgRating != null ? item.avgRating.toFixed(1) : '–'}/10${item.ratingCount ? ` (${item.ratingCount})` : ''}</span>
       ${item.strength ? `<span style="background:var(--bg-elev);color:var(--text);border:1px solid var(--border)">${escapeHtml(item.strength)}</span>` : ''}
       ${item.price != null ? `<span style="background:var(--bg-elev);color:var(--text);border:1px solid var(--border)">€${item.price}</span>` : ''}
     </div>
@@ -8258,6 +8499,8 @@
     </details>` : ''}
     ${item.comment ? `<div class="viewComment">${escapeHtml(item.comment)}</div>` : ''}
   `;
+        const ratingBadgeEl = nikotinViewStatsEl.querySelector('.ratingBadgeClickable');
+        if (ratingBadgeEl) ratingBadgeEl.onclick = () => showRatersList(nikotinCol, item.id);
       }
 
       function refreshNikotinViewIfOpen() {
@@ -8662,8 +8905,6 @@
       koffeinForm.onsubmit = async (e) => {
         e.preventDefault();
         if (!canWrite()) return promptInstallOrSignIn();
-        const saveBtn = document.getElementById('koffeinSaveBtn');
-        saveBtn.disabled = true;
         const data = {
           realName: document.getElementById('kfRealName').value.trim(),
           name: document.getElementById('kfName').value.trim(),
@@ -8677,6 +8918,15 @@
           comment: document.getElementById('kfComment').value.trim(),
           variants: getCheckedVariants('kfVariantChecklist')
         };
+        if (!koffeinEditingId) {
+          const dupe = findDuplicateItem(allKoffein, 'realName', data.realName, data, ['caffeine', 'flavor']);
+          if (dupe) {
+            showToast(`This already exists with the same caffeine/flavor: "${itemLabel(dupe)}"`);
+            return;
+          }
+        }
+        const saveBtn = document.getElementById('koffeinSaveBtn');
+        saveBtn.disabled = true;
         try {
           if (koffeinEditingId) {
             await koffeinCol.doc(koffeinEditingId).update(data);
@@ -8765,7 +9015,7 @@
     <div class="viewMeta">${[escapeHtml(item.country || ''), escapeHtml(item.koffeinType || ''), escapeHtml(item.flavor || '')].filter(Boolean).join(' · ')}</div>
     ${creatorRowHtml(item)}
     <div class="viewBadges">
-      <span style="background:${ratingColor(item.avgRating || 0)};color:#1c1410">${item.avgRating != null ? item.avgRating.toFixed(1) : '–'}/10${item.ratingCount ? ` (${item.ratingCount})` : ''}</span>
+      <span class="ratingBadgeClickable" style="background:${ratingColor(item.avgRating || 0)};color:#1c1410;cursor:pointer">${item.avgRating != null ? item.avgRating.toFixed(1) : '–'}/10${item.ratingCount ? ` (${item.ratingCount})` : ''}</span>
       ${item.caffeine ? `<span style="background:var(--bg-elev);color:var(--text);border:1px solid var(--border)">${escapeHtml(normalizeCaffeine(item.caffeine))}</span>` : ''}
       ${item.price != null ? `<span style="background:var(--bg-elev);color:var(--text);border:1px solid var(--border)">€${item.price}</span>` : ''}
       ${item.zeroSugar != null ? `<span style="background:var(--bg-elev);color:var(--text);border:1px solid var(--border)">${item.zeroSugar ? 'Zero sugar' : 'Sugar'}</span>` : ''}
@@ -8776,6 +9026,8 @@
     </details>` : ''}
     ${item.comment ? `<div class="viewComment">${escapeHtml(item.comment)}</div>` : ''}
   `;
+        const ratingBadgeEl = koffeinViewStatsEl.querySelector('.ratingBadgeClickable');
+        if (ratingBadgeEl) ratingBadgeEl.onclick = () => showRatersList(koffeinCol, item.id);
       }
 
       function refreshKoffeinViewIfOpen() {
@@ -10577,6 +10829,15 @@
         egyeni: { label: '✏️ Egyéni', volumeMl: 330, abv: 5 },
       };
       const BAC_ELIMINATION_PER_HOUR = 0.15; // ‰ per hour, standard textbook average
+      // Sanity caps ("regulations") so a mistyped or joke value (500% ABV, a
+      // 50L "drink", a session claimed to span a whole week) can't feed the
+      // formula garbage — real-world upper bounds, not arbitrary round numbers:
+      // 96% covers the strongest legally sold spirits (e.g. Spirytus); 3L
+      // covers even a shared pitcher logged as one row; 12h covers a full
+      // night out without pretending the "session" model still applies beyond that.
+      const BAC_MAX_ABV = 96;
+      const BAC_MAX_VOLUME_ML = 3000;
+      const BAC_MAX_MINUTES_AGO = 720;
       let bacCalcPageOpen = false;
       let bacSex = localStorage.getItem('sor-bac-sex') === 'female' ? 'female' : 'male';
       let bacDrinks = [];
@@ -10599,15 +10860,16 @@
         <select class="bacDrinkType" data-idx="${i}">
           ${Object.entries(BAC_DRINK_PRESETS).map(([k, p]) => `<option value="${k}"${d.type === k ? ' selected' : ''}>${p.label}</option>`).join('')}
         </select>
-        <input type="number" class="bacDrinkVol" data-idx="${i}" value="${d.volumeMl}" min="0" placeholder="ml">
-        <input type="number" class="bacDrinkAbv" data-idx="${i}" value="${d.abv}" min="0" max="100" step="0.1" placeholder="%">
+        <input type="number" class="bacDrinkVol" data-idx="${i}" value="${d.volumeMl}" min="1" max="${BAC_MAX_VOLUME_ML}" placeholder="ml">
+        <input type="number" class="bacDrinkAbv" data-idx="${i}" value="${d.abv}" min="0.1" max="${BAC_MAX_ABV}" step="0.1" placeholder="%">
+        <input type="number" class="bacDrinkMinAgo" data-idx="${i}" value="${d.minutesAgo || 0}" min="0" max="${BAC_MAX_MINUTES_AGO}" step="5" placeholder="perc">
         <button type="button" class="bacDrinkRemove" data-idx="${i}" title="Törlés">✕</button>
       </div>`).join('');
         el.querySelectorAll('.bacDrinkType').forEach(sel => {
           sel.onchange = () => {
             const i = Number(sel.dataset.idx);
             const preset = BAC_DRINK_PRESETS[sel.value];
-            bacDrinks[i] = { type: sel.value, volumeMl: preset.volumeMl, abv: preset.abv };
+            bacDrinks[i] = { type: sel.value, volumeMl: preset.volumeMl, abv: preset.abv, minutesAgo: bacDrinks[i].minutesAgo || 0 };
             renderBacDrinks();
           };
         });
@@ -10617,12 +10879,15 @@
         el.querySelectorAll('.bacDrinkAbv').forEach(inp => {
           inp.oninput = () => { bacDrinks[Number(inp.dataset.idx)].abv = Number(inp.value) || 0; };
         });
+        el.querySelectorAll('.bacDrinkMinAgo').forEach(inp => {
+          inp.oninput = () => { bacDrinks[Number(inp.dataset.idx)].minutesAgo = Number(inp.value) || 0; };
+        });
         el.querySelectorAll('.bacDrinkRemove').forEach(btn => {
           btn.onclick = () => { bacDrinks.splice(Number(btn.dataset.idx), 1); renderBacDrinks(); };
         });
       }
       document.getElementById('bacAddDrinkBtn').onclick = () => {
-        bacDrinks.push({ type: 'sor', ...BAC_DRINK_PRESETS.sor });
+        bacDrinks.push({ type: 'sor', ...BAC_DRINK_PRESETS.sor, minutesAgo: 0 });
         renderBacDrinks();
       };
 
@@ -10658,6 +10923,44 @@
     `;
       }
 
+      // Each drink is treated as its own independently-decaying dose rather
+      // than one lump sum eliminated only from "now" — the same "sum of
+      // decaying contributions" model real session BAC calculators (e.g.
+      // Promillerechner-style tools) use, and the only way the timing
+      // between drinks actually changes the result: a drink's own peak BAC
+      // (grams / (weight×r)) keeps shrinking at the elimination rate for
+      // every hour that's passed since IT was had, before being added to
+      // the total — so 3 beers 20 minutes apart barely decay before
+      // stacking, while 3 beers 3 hours apart mostly finish decaying before
+      // the next one even lands.
+      function computeCurrentBac(drinks, weight, r) {
+        return drinks.reduce((total, d) => {
+          const grams = d.volumeMl * (d.abv / 100) * 0.789;
+          const peak = grams / (weight * r);
+          const elapsedHours = (d.minutesAgo || 0) / 60;
+          const remaining = Math.max(0, peak - BAC_ELIMINATION_PER_HOUR * elapsedHours);
+          return total + remaining;
+        }, 0);
+      }
+
+      function validateBacDrinks(drinks) {
+        for (let i = 0; i < drinks.length; i++) {
+          const d = drinks[i];
+          if (!d.volumeMl && !d.abv) continue; // an untouched/empty row is skipped, not an error
+          const n = i + 1;
+          if (d.volumeMl <= 0 || d.volumeMl > BAC_MAX_VOLUME_ML) {
+            return `A(z) ${n}. ital mennyisége 1 és ${BAC_MAX_VOLUME_ML}ml között legyen`;
+          }
+          if (d.abv <= 0 || d.abv > BAC_MAX_ABV) {
+            return `A(z) ${n}. ital alkoholtartalma 0.1 és ${BAC_MAX_ABV}% között legyen`;
+          }
+          if (d.minutesAgo < 0 || d.minutesAgo > BAC_MAX_MINUTES_AGO) {
+            return `A(z) ${n}. italnál az "ezelőtt" legfeljebb ${BAC_MAX_MINUTES_AGO / 60} óra lehet`;
+          }
+        }
+        return null;
+      }
+
       document.getElementById('bacCalcBtn').onclick = () => {
         const height = Number(document.getElementById('bacHeight').value);
         const weight = Number(document.getElementById('bacWeight').value);
@@ -10665,18 +10968,23 @@
           showToast('Add meg helyesen a magasságod és a testsúlyod');
           return;
         }
-        if (!bacDrinks.length || bacDrinks.every(d => !d.volumeMl || !d.abv)) {
+        const validDrinks = bacDrinks.filter(d => d.volumeMl && d.abv);
+        if (!validDrinks.length) {
           showToast('Adj hozzá legalább egy italt');
+          return;
+        }
+        const drinkError = validateBacDrinks(bacDrinks);
+        if (drinkError) {
+          showToast(drinkError);
           return;
         }
         localStorage.setItem('sor-bac-height', height);
         localStorage.setItem('sor-bac-weight', weight);
 
-        const totalGrams = bacDrinks.reduce((sum, d) => sum + (d.volumeMl * (d.abv / 100) * 0.789), 0);
         const bmi = weight / ((height / 100) ** 2);
         const baseR = bacSex === 'female' ? 0.55 : 0.68;
         const r = Math.min(0.85, Math.max(0.45, baseR + (22 - bmi) * 0.004));
-        const bacPermille = totalGrams / (weight * r);
+        const bacPermille = computeCurrentBac(validDrinks, weight, r);
         const hoursToZero = bacPermille / BAC_ELIMINATION_PER_HOUR;
         renderBacResult(bacPermille, hoursToZero);
       };
@@ -11701,15 +12009,26 @@
           document.getElementById('chipPopupRedeemedInfo').style.display = 'block';
           document.getElementById('chipPopupRedeemedInfo').innerHTML =
             (chip.photoURL ? `<img src="${escapeHtml(chip.photoURL)}" class="chipPhotoPreview" style="margin-bottom:12px">` : '') +
-            (giver
-              ? `<div class="chipGiverRow">
-                <div class="userAvatar">${avatarInner(giver.name, giver.photoURL)}</div>
+            // `owner` (whose chips[] array this lives in) is who redeemed
+            // it — shown here explicitly since `givenByUid` below is a
+            // separate, purely cosmetic "spin the wheel" credit that can
+            // never point back at the owner (see buyChip/wheel code).
+            `<div class="chipGiverRow">
+                <div class="userAvatar">${avatarInner(owner?.name, owner?.photoURL)}</div>
                 <div>
-                  <div class="chipGiverName">${escapeHtml(giver.name || 'Anonymous')}</div>
+                  <div class="chipGiverName">${nameWithAdminTag(owner)}</div>
+                  <div class="chipGiverLabel">redeemed this</div>
+                </div>
+              </div>` +
+            (chip.givenByUid
+              ? `<div class="chipGiverRow" style="margin-top:8px">
+                <div class="userAvatar">${avatarInner(giver?.name, giver?.photoURL)}</div>
+                <div>
+                  <div class="chipGiverName">${giver ? escapeHtml(giver.name || 'Anonymous') : 'Unknown (account deleted)'}</div>
                   <div class="chipGiverLabel">bought this for you</div>
                 </div>
               </div>`
-              : `<div class="empty" style="padding:0">Redeemed</div>`) +
+              : '') +
             (party ? `<div class="chipGiverLabel" style="margin-top:8px">🎉 at ${escapeHtml(party.name || 'Unnamed party')}</div>` : '');
         } else {
           document.getElementById('chipPopupPhotoField').style.display = 'block';
@@ -11812,7 +12131,7 @@
           list.innerHTML = '<div class="empty" style="padding:14px 0">No parties yet — create one first</div>';
           return;
         }
-        const sorted = allParties.slice().sort((a, b) => (b.ts || 0) - (a.ts || 0));
+        const sorted = sortPartiesByDateDesc(allParties);
         list.innerHTML = sorted.map(p => {
           const cover = (p.photos && p.photos[0]) ? `<img src="${escapeHtml(p.photos[0].url)}">` : '🎉';
           return `<div class="partyRow" data-party="${p.id}">
@@ -13402,6 +13721,10 @@
         }
         if (chipPopupOverlay.classList.contains('show')) {
           hideChipPopup();
+          return;
+        }
+        if (ratersListOverlay.classList.contains('show')) {
+          hideRatersList();
           return;
         }
         if (formOverlay.classList.contains('show')) {

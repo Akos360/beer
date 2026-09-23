@@ -139,8 +139,12 @@ exports.mergeAccountData = onCall(async (request) => {
   }
 
   // Ratings subcollections — doc id IS the uid, so move by copy then delete.
+  // (Used to only cover beers/spirits — pubs, nikotin, and koffein ratings
+  // were silently left behind on every past migration as a result, which is
+  // exactly what produced ~121 "Anonymous" pub ratings found and repaired
+  // by hand in September 2026.)
   let ratingsMoved = 0;
-  for (const col of ['beers', 'spirits']) {
+  for (const col of ['beers', 'spirits', 'nikotin', 'koffein', 'pubs']) {
     const parents = await db.collection(col).get();
     for (const parent of parents.docs) {
       const oldRef = parent.ref.collection('ratings').doc(oldUid);
@@ -432,4 +436,54 @@ exports.onIdeaCreated = onDocumentCreated({ document: 'ideas/{id}', secrets: [VA
     `${idea.authorName || 'Someone'}: ${text.slice(0, 120)}`,
     idea.authorUid
   );
+});
+
+// Beers/spirits/nikotin/koffein/parties/pubs only store `createdBy` (a uid),
+// not a cached display name the way announcements/ideas do — so unlike
+// those, this needs one extra read to say who added it.
+async function getUserName(uid) {
+  if (!uid) return 'Someone';
+  const snap = await getFirestore().collection('users').doc(uid).get();
+  return snap.data()?.name || 'Someone';
+}
+
+// Same `name` (nickname) falling back to `realName` fallback used
+// client-side by itemLabel() in index.html — kept in sync with it.
+function itemLabel(data) {
+  return data?.name || data?.realName || 'something new';
+}
+
+async function notifyNewItem(title, data, label) {
+  const creatorName = await getUserName(data.createdBy);
+  return notifyEveryone(title, `${creatorName} added ${label}`, data.createdBy);
+}
+
+exports.onBeerCreated = onDocumentCreated({ document: 'beers/{id}', secrets: [VAPID_PUBLIC_KEY, VAPID_PRIVATE_KEY] }, event => {
+  const data = event.data.data();
+  return notifyNewItem('🍺 New beer added', data, `"${itemLabel(data)}"`);
+});
+
+exports.onSpiritCreated = onDocumentCreated({ document: 'spirits/{id}', secrets: [VAPID_PUBLIC_KEY, VAPID_PRIVATE_KEY] }, event => {
+  const data = event.data.data();
+  return notifyNewItem('🥃 New alko added', data, `"${itemLabel(data)}"`);
+});
+
+exports.onNikotinCreated = onDocumentCreated({ document: 'nikotin/{id}', secrets: [VAPID_PUBLIC_KEY, VAPID_PRIVATE_KEY] }, event => {
+  const data = event.data.data();
+  return notifyNewItem('🚬 New nikotin added', data, `"${itemLabel(data)}"`);
+});
+
+exports.onKoffeinCreated = onDocumentCreated({ document: 'koffein/{id}', secrets: [VAPID_PUBLIC_KEY, VAPID_PRIVATE_KEY] }, event => {
+  const data = event.data.data();
+  return notifyNewItem('⚡ New koffein added', data, `"${itemLabel(data)}"`);
+});
+
+exports.onPartyCreated = onDocumentCreated({ document: 'parties/{id}', secrets: [VAPID_PUBLIC_KEY, VAPID_PRIVATE_KEY] }, event => {
+  const data = event.data.data();
+  return notifyNewItem('🎉 New party added', data, `"${data.name || 'a party'}"`);
+});
+
+exports.onPubCreated = onDocumentCreated({ document: 'pubs/{id}', secrets: [VAPID_PUBLIC_KEY, VAPID_PRIVATE_KEY] }, event => {
+  const data = event.data.data();
+  return notifyNewItem('🍸 New pub added', data, `"${data.name || 'a pub'}"`);
 });
