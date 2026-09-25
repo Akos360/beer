@@ -8,8 +8,11 @@ self.addEventListener('push', e => {
   e.waitUntil(
     self.registration.showNotification(data.title || 'Söröm', {
       body: data.body || '',
-      icon: 'img/icon-192.png',
-      badge: 'img/icon-192.png',
+      icon: 'img/icon-512.png',
+      // Android masks this to its alpha channel and renders a flat,
+      // theme-tinted silhouette — must be a monochrome shape, never a
+      // full-color icon (a color image here renders as a garbled blob).
+      badge: 'img/icon-badge.png',
       vibrate: [200, 100, 200],
       data: { url: data.url || '/index.html' },
     })

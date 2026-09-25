@@ -1,5 +1,6 @@
 const { onDocumentCreated } = require('firebase-functions/v2/firestore');
 const { onCall, HttpsError } = require('firebase-functions/v2/https');
+const { onSchedule } = require('firebase-functions/v2/scheduler');
 const { defineSecret } = require('firebase-functions/params');
 const { initializeApp } = require('firebase-admin/app');
 const { getFirestore, FieldValue } = require('firebase-admin/firestore');
@@ -374,10 +375,16 @@ async function notifyUser(uid, title, body) {
 
   await Promise.all(unique.map(async doc => {
     try {
-      await webpush.sendNotification(doc.data().subscription, payload);
+      // High urgency + a short TTL tell the push service (and the phone's
+      // battery-saver/Doze scheduling) this is time-sensitive and to drop
+      // it rather than deliver it stale — without this it defaults to
+      // "normal" and can sit queued for minutes on a dozing device.
+      await webpush.sendNotification(doc.data().subscription, payload, { TTL: 300, urgency: 'high' });
     } catch (err) {
       if (err.statusCode === 404 || err.statusCode === 410) {
         await doc.ref.delete();
+      } else {
+        console.error('push send failed', doc.id, err.statusCode, err.body);
       }
     }
   }));
@@ -409,10 +416,12 @@ async function notifyEveryone(title, body, excludeUid) {
 
   await Promise.all(unique.map(async doc => {
     try {
-      await webpush.sendNotification(doc.data().subscription, payload);
+      await webpush.sendNotification(doc.data().subscription, payload, { TTL: 300, urgency: 'high' });
     } catch (err) {
       if (err.statusCode === 404 || err.statusCode === 410) {
         await doc.ref.delete();
+      } else {
+        console.error('push send failed', doc.id, err.statusCode, err.body);
       }
     }
   }));
@@ -486,4 +495,185 @@ exports.onPartyCreated = onDocumentCreated({ document: 'parties/{id}', secrets: 
 exports.onPubCreated = onDocumentCreated({ document: 'pubs/{id}', secrets: [VAPID_PUBLIC_KEY, VAPID_PRIVATE_KEY] }, event => {
   const data = event.data.data();
   return notifyNewItem('🍸 New pub added', data, `"${data.name || 'a pub'}"`);
+});
+
+// ─────────────────────────────────────────────────────────────────────────
+// Yearly Recap ("Your {year} in Sörök") — a once-per-year snapshot, not
+// something computed live on every profile view. Closing a year walks every
+// relevant collection, tallies each member's activity for that calendar
+// year specifically, and freezes the result into
+// yearlyRecaps/{year}/users/{uid} so it never silently changes later (e.g.
+// if someone edits an old rating). This now runs on its own — autoCloseYear
+// below fires every New Year's Day and closes whichever year just ended, so
+// nobody has to remember to trigger it by hand. closeYear stays as an
+// admin-only manual escape hatch (re-closing a year is safe and just
+// overwrites) in case the schedule ever misfires and someone needs to
+// re-run it from the console.
+async function performCloseYear(year, closedBy) {
+  const db = getFirestore();
+  const yearStart = new Date(year, 0, 1).getTime();
+  const yearEnd = new Date(year + 1, 0, 1).getTime();
+  const inYear = (ts) => typeof ts === 'number' && ts >= yearStart && ts < yearEnd;
+
+  const usersSnap = await db.collection('users').get();
+  const stats = {};
+  usersSnap.docs.forEach(d => {
+    stats[d.id] = {
+      beersAdded: 0, spiritsAdded: 0, nikotinAdded: 0, koffeinAdded: 0,
+      totalBeersDrunk: 0, totalShotsDrunk: 0, partiesJoined: 0,
+      ratingsGiven: 0, reviewsWritten: 0, chipsRedeemed: 0,
+      topRatedItem: null, // { label, rating, emoji }
+      beerBreakdown: {}, shotBreakdown: {}, // item id -> qty, 'generic' for unspecified
+    };
+  });
+
+  // Same id -> qty shape everywhere (party participant docs and manual
+  // drinkLogs/shotLogs docs both use it) — just sum matching keys together.
+  const mergeBreakdownInto = (target, source) => {
+    Object.entries(source || {}).forEach(([k, v]) => { target[k] = (target[k] || 0) + (v || 0); });
+  };
+
+  // Items added this year.
+  const itemTypes = [['beers', 'beersAdded'], ['spirits', 'spiritsAdded'], ['nikotin', 'nikotinAdded'], ['koffein', 'koffeinAdded']];
+  await Promise.all(itemTypes.map(async ([col, field]) => {
+    const snap = await db.collection(col).get();
+    snap.docs.forEach(doc => {
+      const d = doc.data();
+      if (inYear(d.ts) && stats[d.createdBy]) stats[d.createdBy][field]++;
+    });
+  }));
+
+  // Ratings + written reviews across every rateable type, plus each
+  // person's single highest-rated find of the year. Every parent doc's
+  // ratings subcollection is fetched concurrently (not one at a time) —
+  // with dozens of beers/spirits/pubs etc., sequential awaits here easily
+  // ran past the callable's 60s timeout on real data.
+  const RATING_EMOJI = { beers: '🍺', spirits: '🥃', nikotin: '🚬', koffein: '⚡', pubs: '🍸' };
+  for (const col of Object.keys(RATING_EMOJI)) {
+    const parents = await db.collection(col).get();
+    await Promise.all(parents.docs.map(async (parent) => {
+      const parentData = parent.data();
+      const label = parentData.name || parentData.realName || 'Unnamed';
+      const ratingsSnap = await parent.ref.collection('ratings').get();
+      ratingsSnap.docs.forEach(rDoc => {
+        const r = rDoc.data();
+        const s = stats[r.userId];
+        if (!s || !inYear(r.ts)) return;
+        if (typeof r.rating === 'number') {
+          s.ratingsGiven++;
+          if (!s.topRatedItem || r.rating > s.topRatedItem.rating) {
+            s.topRatedItem = { label, rating: r.rating, emoji: RATING_EMOJI[col] };
+          }
+        }
+        if ((r.comment || '').trim()) s.reviewsWritten++;
+      });
+    }));
+  }
+
+  // Pub and party comments are separate multi-comment subcollections (not
+  // folded into ratings the way a beer's written review is).
+  for (const col of ['pubs', 'parties']) {
+    const parents = await db.collection(col).get();
+    await Promise.all(parents.docs.map(async (parent) => {
+      const commentsSnap = await parent.ref.collection('comments').get();
+      commentsSnap.docs.forEach(cDoc => {
+        const c = cDoc.data();
+        if (stats[c.userId] && inYear(c.ts)) stats[c.userId].reviewsWritten++;
+      });
+    }));
+  }
+
+  // Drinks + party attendance — scoped by the party's own `year` field
+  // (when it actually happened), not by when someone got around to logging
+  // it, so a party logged late still counts for the right year.
+  const partiesSnap = await db.collection('parties').where('year', '==', year).get();
+  await Promise.all(partiesSnap.docs.map(async (party) => {
+    const participantsSnap = await party.ref.collection('participants').get();
+    participantsSnap.docs.forEach(pDoc => {
+      const p = pDoc.data();
+      const s = stats[pDoc.id];
+      if (!s) return;
+      s.totalBeersDrunk += p.count || 0;
+      s.totalShotsDrunk += p.shotCount || 0;
+      s.partiesJoined++;
+      mergeBreakdownInto(s.beerBreakdown, p.beerBreakdown);
+      mergeBreakdownInto(s.shotBreakdown, p.shotBreakdown);
+    });
+  }));
+
+  // The leaderboard's own total for a person is party attendance *plus*
+  // whatever they logged manually outside a party (see computeStandings on
+  // the client) — closeYear has to add the same two sources together or
+  // its "beers drunk" would quietly undercount anyone who ever used the
+  // leaderboard's own +/- instead of only ever logging through a party.
+  const [drinkLogsSnap, shotLogsSnap] = await Promise.all([
+    db.collection('drinkLogs').where('year', '==', year).get(),
+    db.collection('shotLogs').where('year', '==', year).get(),
+  ]);
+  drinkLogsSnap.docs.forEach(doc => {
+    const log = doc.data();
+    const s = stats[log.userId];
+    if (!s) return;
+    s.totalBeersDrunk += log.count || 0;
+    mergeBreakdownInto(s.beerBreakdown, log.breakdown);
+  });
+  shotLogsSnap.docs.forEach(doc => {
+    const log = doc.data();
+    const s = stats[log.userId];
+    if (!s) return;
+    s.totalShotsDrunk += log.count || 0;
+    mergeBreakdownInto(s.shotBreakdown, log.breakdown);
+  });
+
+  // Chips redeemed this year (embedded array on each user's own doc).
+  usersSnap.docs.forEach(doc => {
+    const s = stats[doc.id];
+    (doc.data().chips || []).forEach(c => {
+      if (s && c.status === 'redeemed' && inYear(c.redeemedAt)) s.chipsRedeemed++;
+    });
+  });
+
+  // Older data (logged before per-type breakdowns existed) has a real total
+  // with no matching detail behind some of it — same "unspecified means
+  // generic Sör/Alko" reasoning the party/leaderboard pickers already use
+  // (withUnspecifiedGap client-side), just applied once per person here.
+  Object.values(stats).forEach(s => {
+    const beerKnown = Object.values(s.beerBreakdown).reduce((sum, v) => sum + (v || 0), 0);
+    const beerGap = Math.max(0, s.totalBeersDrunk - beerKnown);
+    if (beerGap > 0) s.beerBreakdown.generic = (s.beerBreakdown.generic || 0) + beerGap;
+    const shotKnown = Object.values(s.shotBreakdown).reduce((sum, v) => sum + (v || 0), 0);
+    const shotGap = Math.max(0, s.totalShotsDrunk - shotKnown);
+    if (shotGap > 0) s.shotBreakdown.generic = (s.shotBreakdown.generic || 0) + shotGap;
+  });
+
+  const recapRef = db.collection('yearlyRecaps').doc(String(year));
+  const userIds = Object.keys(stats);
+  const CHUNK = 400; // stay under Firestore's 500-write batch limit
+  for (let i = 0; i < userIds.length; i += CHUNK) {
+    const batch = db.batch();
+    userIds.slice(i, i + CHUNK).forEach(uid => {
+      batch.set(recapRef.collection('users').doc(uid), stats[uid]);
+    });
+    await batch.commit();
+  }
+  await recapRef.set({ closed: true, closedAt: Date.now(), closedBy, userCount: userIds.length });
+
+  return { ok: true, year, userCount: userIds.length };
+}
+
+exports.closeYear = onCall(async (request) => {
+  if (!request.auth?.token?.isAdmin) throw new HttpsError('permission-denied', 'Admin only.');
+  const year = Number(request.data?.year);
+  if (!Number.isInteger(year) || year < 2020 || year > 2100) {
+    throw new HttpsError('invalid-argument', 'Give a real year.');
+  }
+  return performCloseYear(year, request.auth.uid);
+});
+
+// Fires once a year, right after midnight on January 1st, and closes
+// whichever year just ended — the only thing that actually keeps the
+// Wrapped cards up to date now; there's no more admin button for this.
+exports.autoCloseYear = onSchedule({ schedule: '0 2 1 1 *', timeZone: 'Europe/Budapest' }, async () => {
+  const justEndedYear = new Date().getFullYear() - 1;
+  await performCloseYear(justEndedYear, 'system');
 });

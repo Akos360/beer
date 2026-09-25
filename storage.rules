@@ -19,42 +19,48 @@ service firebase.storage {
       return request.resource.size < 10 * 1024 * 1024
         && request.resource.contentType.matches('image/.*');
     }
+    // Item photo strips also accept short video clips now — capped higher
+    // than a photo since even a few seconds of phone video runs well past
+    // 10MB, but still bounded to keep this free-tier-friendly.
+    function isValidMedia() {
+      return request.resource.size < 40 * 1024 * 1024
+        && (request.resource.contentType.matches('image/.*') || request.resource.contentType.matches('video/.*'));
+    }
 
     match /beers/{beerId}/{fileName} {
       allow read: if true;
-      allow create, update: if isMember() && isValidImage();
+      allow create, update: if isMember() && isValidMedia();
       allow delete: if isMember();
     }
     match /spirits/{spiritId}/{fileName} {
       allow read: if true;
-      allow create, update: if isMember() && isValidImage();
+      allow create, update: if isMember() && isValidMedia();
       allow delete: if isMember();
     }
     match /nikotin/{itemId}/{fileName} {
       allow read: if true;
-      allow create, update: if isMember() && isValidImage();
+      allow create, update: if isMember() && isValidMedia();
       allow delete: if isMember();
     }
     match /koffein/{itemId}/{fileName} {
       allow read: if true;
-      allow create, update: if isMember() && isValidImage();
+      allow create, update: if isMember() && isValidMedia();
       allow delete: if isMember();
     }
     match /users/{userId}/{fileName} {
       allow read: if true;
-      // A user's own photo folder, or an admin acting on it — either way
-      // only once they've verified the passcode (isMember()).
+      // A profile photo stays image-only — this path is never a video.
       allow create, update: if isMember() && (request.auth.uid == userId || isAdmin()) && isValidImage();
       allow delete: if isMember() && (request.auth.uid == userId || isAdmin());
     }
     match /parties/{partyId}/{fileName} {
       allow read: if true;
-      allow create, update: if isMember() && isValidImage();
+      allow create, update: if isMember() && isValidMedia();
       allow delete: if isMember();
     }
     match /pubs/{pubId}/{fileName} {
       allow read: if true;
-      allow create, update: if isMember() && isValidImage();
+      allow create, update: if isMember() && isValidMedia();
       allow delete: if isMember();
     }
   }

@@ -12,6 +12,7 @@
   <meta name="apple-mobile-web-app-status-bar-style" content="default">
   <meta name="apple-mobile-web-app-title" content="Sör">
   <link rel="apple-touch-icon" href="img/logo.png">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.css">
   <script>
     try {
       const saved = localStorage.getItem('beer-theme');
@@ -285,6 +286,82 @@
       white-space: nowrap
     }
 
+    .pubMapOpenBtn {
+      flex: 0 0 auto;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      width: 38px;
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      background: var(--bg-elev);
+      font-size: 1.1rem;
+      cursor: pointer
+    }
+
+    .pubMapOpenBtn:active {
+      filter: brightness(0.88)
+    }
+
+    .pubLocationStatus {
+      font-size: .78rem;
+      color: var(--text-dim);
+      margin-top: 6px
+    }
+
+    .pubLocationStatus.isSet {
+      color: var(--accent);
+      font-weight: 700
+    }
+
+    .locationPickerResults {
+      max-height: 160px;
+      overflow-y: auto;
+      margin-top: 6px
+    }
+
+    .locationPickerResult {
+      padding: 8px 10px;
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      background: var(--bg-elev);
+      font-size: .82rem;
+      margin-bottom: 6px;
+      cursor: pointer
+    }
+
+    .locationPickerResult:active {
+      filter: brightness(0.9)
+    }
+
+    .locationPickerMap {
+      height: 300px;
+      border-radius: 12px;
+      overflow: hidden;
+      margin-top: 10px;
+      background: var(--bg-elev)
+    }
+
+    #pubsMapPage {
+      padding: 10px 0;
+      box-sizing: border-box
+    }
+
+    #pubsMapContainer {
+      height: 55vh;
+      background: var(--bg-elev)
+    }
+
+    .pubMapPopup button {
+      margin-top: 6px;
+      padding: 4px 10px;
+      border-radius: 8px;
+      border: 1px solid #ccc;
+      background: #f5f5f5;
+      cursor: pointer;
+      font-size: .8rem
+    }
+
     #sortSelect,
     #typeSelect,
     #spiritSortSelect,
@@ -535,12 +612,19 @@
       display: flex;
       align-items: center;
       gap: 10px;
-      padding: 9px 0;
-      border-bottom: 1px solid var(--border)
+      padding: 10px 8px;
+      border-radius: 10px;
+      margin-bottom: 6px;
+      border: 1px solid var(--border);
+      background: var(--bg-elev)
     }
 
-    .partyParticipantRow:last-child {
-      border-bottom: none
+    .partyAvatarCol {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 4px;
+      flex: 0 0 auto
     }
 
     .partyParticipantRow .userName {
@@ -603,6 +687,104 @@
       gap: 8px
     }
 
+    .partyBreakdownBtn {
+      flex: 0 0 auto;
+      width: 28px;
+      height: 28px;
+      border-radius: 50%;
+      border: 1px solid var(--border);
+      background: var(--bg-elev);
+      color: var(--text);
+      font-size: .85rem;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center
+    }
+
+    .partyBreakdownBtn:active {
+      filter: brightness(0.85);
+      transform: scale(0.92)
+    }
+
+    .partyDrinkPickerList {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+      max-height: 50vh;
+      overflow-y: auto;
+      margin-top: 8px
+    }
+
+    .partyDrinkPickerRow {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+      padding: 8px 10px;
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      background: var(--bg-elev)
+    }
+
+    .partyDrinkPickerRow.isAdded {
+      background: color-mix(in srgb, var(--accent) 20%, var(--bg-elev));
+      border-color: var(--accent)
+    }
+
+    .partyDrinkPickerName {
+      font-size: .9rem;
+      font-weight: 600;
+      min-width: 0;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap
+    }
+
+    .partyDrinkPickerQtyRow {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      flex: 0 0 auto
+    }
+
+    .partyDrinkPickerQty {
+      font-weight: 800;
+      min-width: 20px;
+      text-align: center
+    }
+
+    .partyDrinkPickerPlus,
+    .partyDrinkPickerMinus {
+      flex: 0 0 auto;
+      width: 26px;
+      height: 26px;
+      border-radius: 50%;
+      border: none;
+      font-size: 1rem;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center
+    }
+
+    .partyDrinkPickerPlus {
+      background: var(--accent);
+      color: #1c1410
+    }
+
+    .partyDrinkPickerMinus {
+      background: var(--bg);
+      color: var(--text);
+      border: 1px solid var(--border)
+    }
+
+    .partyDrinkPickerPlus:active,
+    .partyDrinkPickerMinus:active {
+      filter: brightness(0.85);
+      transform: scale(0.92)
+    }
+
     .partyJoinBtn {
       flex: 0 0 auto;
       padding: 6px 14px;
@@ -616,18 +798,33 @@
       font-style: italic
     }
 
+    .leaderboardYearBlock {
+      border-bottom: 1px solid var(--border)
+    }
+
+    .leaderboardYearBlock:last-child {
+      border-bottom: none
+    }
+
     .leaderboardYearHead {
       font-size: 1.1rem;
       font-weight: 800;
-      padding: 14px 14px 4px;
+      padding: 14px 14px 12px;
       display: flex;
       align-items: center;
       justify-content: space-between;
-      gap: 10px
+      gap: 10px;
+      cursor: pointer;
+      list-style: none
+    }
+
+    .leaderboardYearHead::-webkit-details-marker {
+      display: none
     }
 
     .leaderboardYearTotals {
       display: flex;
+      align-items: center;
       gap: 6px;
       font-size: .75rem;
       font-weight: 700
@@ -642,8 +839,21 @@
       white-space: nowrap
     }
 
-    #leaderboardList {
-      padding: 0 14px
+    .leaderboardYearArrow {
+      font-size: .7rem;
+      color: var(--text-dim);
+      transition: transform .15s;
+      border: none;
+      background: none;
+      padding: 0
+    }
+
+    .leaderboardYearBlock[open] .leaderboardYearArrow {
+      transform: rotate(180deg)
+    }
+
+    .leaderboardYearList {
+      padding: 0 14px 14px
     }
 
     .leaderboardRow {
@@ -727,22 +937,6 @@
       font-size: .68rem;
       font-weight: 700;
       color: var(--text-dim)
-    }
-
-    .archiveRow {
-      display: flex;
-      gap: 12px;
-      padding: 10px;
-      background: var(--bg-card);
-      border: 1px solid var(--border);
-      border-radius: 14px;
-      cursor: pointer;
-      align-items: center;
-      margin-bottom: 10px
-    }
-
-    .archiveRow .partyThumb {
-      font-size: 1.6rem
     }
 
     .card {
@@ -1014,7 +1208,7 @@
       position: fixed;
       inset: 0;
       background: #fff;
-      z-index: 95;
+      z-index: 2030;
       display: none;
       flex-direction: column;
       align-items: center;
@@ -1065,7 +1259,12 @@
       display: none;
       align-items: flex-end;
       justify-content: center;
-      z-index: 50
+      /* Leaflet's own panes/controls (map tiles, zoom buttons) go up to
+         ~1000 by default, which used to poke through a page-level map left
+         open behind an overlay — this and the z-indexes below it are all
+         pushed comfortably past that range, keeping their original
+         relative order (uacOverlay > toast > lightbox > .overlay). */
+      z-index: 2000
     }
 
     .overlay.show {
@@ -1608,6 +1807,21 @@
       color: var(--text-dim)
     }
 
+    #yearlyRecapDownload {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      width: 29px;
+      height: 29px;
+      padding: 0;
+      border: 1px solid var(--border);
+      border-radius: 8px
+    }
+
+    #yearlyRecapDownload svg {
+      display: block
+    }
+
     form {
       display: flex;
       flex-direction: column;
@@ -2038,11 +2252,49 @@
       border: 1px solid var(--border)
     }
 
-    .thumb img {
+    .thumb img,
+    .thumb video {
       width: 100%;
       height: 100%;
       object-fit: cover;
       cursor: pointer
+    }
+
+    .mediaPlayBadge {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      width: 34px;
+      height: 34px;
+      border-radius: 50%;
+      background: rgba(0, 0, 0, .55);
+      color: #fff;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: .95rem;
+      pointer-events: none
+    }
+
+    .thumb .mediaPlayBadge {
+      width: 22px;
+      height: 22px;
+      font-size: .7rem
+    }
+
+    .carouselVideoSlide {
+      position: relative;
+      flex: 0 0 100%;
+      scroll-snap-align: center;
+      cursor: pointer
+    }
+
+    .carouselVideoSlide video {
+      width: 100%;
+      height: 340px;
+      object-fit: cover;
+      display: block
     }
 
     .thumb .rm {
@@ -2117,7 +2369,6 @@
     .creatorAvatar:active,
     .tttCell:not(.disabled):active,
     .partyRow:active,
-    .archiveRow:active,
     .viewCreatorRow:active,
     .lbProfileLink:active,
     .cardPickerCell:active,
@@ -2129,6 +2380,8 @@
        darken-via-filter's default look, reads better on a photo. */
     .viewCarousel img:active,
     .thumb img:active,
+    .thumb video:active,
+    .carouselVideoSlide:active,
     .partyChipPhotoThumb:active {
       opacity: .8
     }
@@ -2169,7 +2422,7 @@
       display: none;
       align-items: center;
       justify-content: center;
-      z-index: 80;
+      z-index: 2010;
       flex-direction: column
     }
 
@@ -2177,11 +2430,18 @@
       display: flex
     }
 
-    #lightbox img {
+    #lightbox img,
+    #lightbox video {
       max-width: 92vw;
       max-height: 74vh;
       object-fit: contain;
       border-radius: 8px
+    }
+
+    /* Only the photo gets custom pinch-zoom/pan — a video keeps its native
+       touch handling so its own play/pause/seek controls keep working. */
+    #lightbox img {
+      touch-action: none
     }
 
     .lbBar {
@@ -2191,6 +2451,7 @@
       right: 0;
       display: flex;
       justify-content: flex-end;
+      gap: 10px;
       padding: 0 16px
     }
 
@@ -2371,6 +2632,278 @@
       color: var(--text-dim);
       opacity: .85;
       margin-top: 8px
+    }
+
+    .profileViewRecapList {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      margin-top: 6px
+    }
+
+    .yearRecapRow {
+      display: flex;
+      align-items: center;
+      gap: 10px
+    }
+
+    .yearRecapYearLabel {
+      font-weight: 800;
+      font-size: .9rem;
+      color: var(--text);
+      min-width: 40px
+    }
+
+    .yearRecapChip {
+      padding: 8px 14px;
+      border-radius: 999px;
+      border: 1px solid var(--border);
+      background: var(--bg-elev);
+      color: var(--text);
+      font-weight: 700;
+      font-size: .85rem;
+      cursor: pointer
+    }
+
+    .yearRecapChip:active {
+      transform: scale(.96)
+    }
+
+    .yearRecapTag {
+      font-size: .68rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: .04em;
+      color: var(--text-dim);
+      background: var(--bg-elev);
+      border: 1px solid var(--border);
+      padding: 3px 9px;
+      border-radius: 999px
+    }
+
+    .yearlyRecapBody {
+      padding: 4px 2px 12px
+    }
+
+    #yearlyRecapHeading {
+      display: inline-block;
+      background: var(--accent);
+      color: #1a1200;
+      font-weight: 800;
+      font-size: .7rem;
+      letter-spacing: .06em;
+      text-transform: uppercase;
+      padding: 4px 10px;
+      border-radius: 999px;
+      margin: 0
+    }
+
+    .yearlyRecapCardTitle {
+      font-weight: 800;
+      font-size: 1.1rem;
+      margin-bottom: 14px
+    }
+
+    .yearlyRecapUser {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      margin-bottom: 18px
+    }
+
+    .yearlyRecapUserAvatar {
+      width: 84px;
+      height: 84px;
+      flex: 0 0 auto;
+      cursor: default;
+      font-size: 2rem
+    }
+
+    .yearlyRecapUserName {
+      font-weight: 800;
+      font-size: 1.15rem
+    }
+
+    .yearlyRecapYear {
+      color: var(--text-dim);
+      font-size: .85rem
+    }
+
+    .yearlyRecapTotalPoints {
+      font-weight: 800;
+      font-size: .95rem;
+      color: var(--accent);
+      margin-top: 4px
+    }
+
+    .yearlyRecapGrid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+      margin-bottom: 16px
+    }
+
+    .yearlyRecapTile {
+      background: var(--bg-elev);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 12px 10px;
+      text-align: center
+    }
+
+    .yearlyRecapTile.yearlyRecapTileAccent {
+      background: linear-gradient(135deg, var(--accent), var(--accent-2));
+      border: none
+    }
+
+    .yearlyRecapTileNum {
+      font-size: 1.5rem;
+      font-weight: 900;
+      color: var(--accent);
+      font-variant-numeric: tabular-nums
+    }
+
+    .yearlyRecapTile.yearlyRecapTileAccent .yearlyRecapTileNum {
+      color: #1a1200
+    }
+
+    .yearlyRecapTileLabel {
+      font-size: .68rem;
+      color: var(--text-dim);
+      text-transform: uppercase;
+      letter-spacing: .04em;
+      margin-top: 2px
+    }
+
+    .yearlyRecapTile.yearlyRecapTileAccent .yearlyRecapTileLabel {
+      color: rgba(26, 18, 0, .75)
+    }
+
+    .yearlyRecapHighlight {
+      background: var(--bg-elev);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 14px;
+      text-align: center
+    }
+
+    .yearlyRecapHighlightLabel {
+      font-size: .68rem;
+      color: var(--text-dim);
+      text-transform: uppercase;
+      letter-spacing: .04em
+    }
+
+    .yearlyRecapHighlightItem {
+      font-size: 1.1rem;
+      font-weight: 800;
+      margin-top: 6px
+    }
+
+    .yearlyRecapEmpty {
+      color: var(--text-dim);
+      text-align: center;
+      padding: 20px 0
+    }
+
+    .yearlyRecapBreakdown {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+      margin-bottom: 16px
+    }
+
+    .yearlyRecapBreakdownCol {
+      background: var(--bg-elev);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 10px 12px
+    }
+
+    .yearlyRecapBreakdownLabel {
+      font-size: .68rem;
+      color: var(--text-dim);
+      text-transform: uppercase;
+      letter-spacing: .04em;
+      margin-bottom: 6px
+    }
+
+    .yearlyRecapBreakdownItem {
+      display: flex;
+      justify-content: space-between;
+      gap: 8px;
+      font-size: .85rem;
+      padding: 3px 0
+    }
+
+    .yearlyRecapBreakdownItem b {
+      color: var(--accent);
+      font-variant-numeric: tabular-nums
+    }
+
+    /* Fiery Wrapped card themes — same family (dark ember base + a warm
+       radial/diagonal glow), a different palette per year so old recaps
+       stay visually distinct from whatever year is currently live. Locally
+       overrides the same --bg/--bg-elev/--text/--accent tokens every child
+       rule above already reads, same scoping trick #jackpotPage uses. */
+    .yearlyRecapBody.yearlyRecapFire {
+      border-radius: 16px;
+      padding: 16px 14px 18px;
+      margin: -4px -2px 0;
+      color: var(--text)
+    }
+
+    .yearlyRecapFireEmber {
+      --bg-elev: rgba(0, 0, 0, .32);
+      --text: #f7e7c4;
+      --text-dim: #d8b98a;
+      --border: #6b3a1a;
+      --accent: #ffcf4d;
+      --accent-2: #ff8a3d;
+      background:
+        radial-gradient(ellipse at 50% -10%, rgba(255, 207, 77, .28), transparent 55%),
+        repeating-linear-gradient(45deg, rgba(255, 207, 77, .04) 0 2px, transparent 2px 26px),
+        radial-gradient(circle at 50% 0%, #3a0d20 0%, #1a0510 55%, #0d0208 100%)
+    }
+
+    .yearlyRecapFireInferno {
+      --bg-elev: rgba(0, 0, 0, .32);
+      --text: #fff0e0;
+      --text-dim: #e8b199;
+      --border: #7a2810;
+      --accent: #ff7a2e;
+      --accent-2: #ffd23f;
+      background:
+        radial-gradient(ellipse at 50% 115%, rgba(255, 122, 46, .32), transparent 60%),
+        repeating-linear-gradient(-45deg, rgba(255, 210, 63, .045) 0 2px, transparent 2px 24px),
+        linear-gradient(160deg, #3a0f08 0%, #200604 60%, #0c0301 100%)
+    }
+
+    .yearlyRecapFireMolten {
+      --bg-elev: rgba(0, 0, 0, .34);
+      --text: #ffe9d6;
+      --text-dim: #c9a68e;
+      --border: #5a3420;
+      --accent: #ff5a36;
+      --accent-2: #ffb347;
+      background:
+        radial-gradient(circle at 28% 18%, rgba(255, 90, 54, .3), transparent 50%),
+        radial-gradient(circle at 78% 78%, rgba(255, 179, 71, .2), transparent 45%),
+        repeating-conic-gradient(from 0deg at 50% 50%, rgba(255, 90, 54, .035) 0deg 4deg, transparent 4deg 12deg),
+        #120c0a
+    }
+
+    .yearlyRecapFireWildfire {
+      --bg-elev: rgba(0, 0, 0, .30);
+      --text: #fff3d6;
+      --text-dim: #d9b980;
+      --border: #6b4a1c;
+      --accent: #ffb800;
+      --accent-2: #ff6a1a;
+      background:
+        radial-gradient(ellipse at 15% -20%, rgba(255, 184, 0, .3), transparent 55%),
+        radial-gradient(ellipse at 100% 100%, rgba(255, 106, 26, .28), transparent 55%),
+        linear-gradient(135deg, #34220c 0%, #1c1004 60%, #0d0702 100%)
     }
 
     .cardMini {
@@ -3718,7 +4251,8 @@
     }
 
     .chip-beer,
-    .chip-shot {
+    .chip-shot,
+    .chip-driver {
       border: 9px solid transparent;
       background:
         linear-gradient(#fff, #fff) content-box,
@@ -3733,9 +4267,48 @@
       --chip-stripe-color: #d6362f
     }
 
+    .chip-driver {
+      --chip-stripe-color: #2f7fd6
+    }
+
     .shopPreviewChip.redeemed {
       filter: grayscale(1);
       opacity: .75
+    }
+
+    .invGroupRow {
+      margin-top: 12px
+    }
+
+    .invGroupRow:first-of-type {
+      margin-top: 0
+    }
+
+    .invGroupLabel {
+      font-size: .68rem;
+      color: var(--text-dim);
+      text-transform: uppercase;
+      letter-spacing: .04em;
+      margin-bottom: 4px
+    }
+
+    .partyDriverBtn {
+      border: 1px solid var(--border);
+      background: var(--bg-elev);
+      color: var(--text-dim);
+      border-radius: 7px;
+      width: 40px;
+      height: 22px;
+      font-size: .8rem;
+      cursor: pointer;
+      line-height: 1;
+      padding: 0
+    }
+
+    .partyDriverBtn.isDriver {
+      border-color: #2f7fd6;
+      background: rgba(47, 127, 214, .18);
+      color: #2f7fd6
     }
 
     .chipGiverRow {
@@ -3975,7 +4548,7 @@
       opacity: 0;
       pointer-events: none;
       transition: opacity .25s;
-      z-index: 90
+      z-index: 2020
     }
 
     #toast.show {
@@ -4095,6 +4668,7 @@
       <div class="row">
         <input id="pubSearchInput" type="search" placeholder="Search name, city…">
         <span class="countBadge" id="pubCountBadge">0</span>
+        <button type="button" class="pubMapOpenBtn" id="pubMapOpenBtn" title="Map view">🗺️</button>
       </div>
       <div class="row">
         <select id="pubSortSelect">
@@ -4128,15 +4702,12 @@
   <div id="partyList" style="display:none"></div>
   <div id="pubList" style="display:none"></div>
   <div id="leaderboardPage" style="display:none">
-    <div class="leaderboardYearHead" id="leaderboardYearHead"></div>
-    <div class="tabSwitch" id="lbSubTabSwitch" style="grid-template-columns:1fr 1fr 1fr;margin:0 14px 10px">
+    <div class="tabSwitch" id="lbSubTabSwitch" style="grid-template-columns:1fr 1fr 1fr;margin:10px 14px 10px">
       <button type="button" class="tabBtn active" data-lbtab="beer">🍺 Beer</button>
       <button type="button" class="tabBtn" data-lbtab="shot">🥃 Shots</button>
       <button type="button" class="tabBtn" data-lbtab="all">🍻 All</button>
     </div>
-    <div id="leaderboardList"></div>
-    <div class="userListHead" style="margin:20px 14px 8px">Past Years</div>
-    <div id="archivesList" style="padding:0 14px 90px"></div>
+    <div id="leaderboardYearsContainer" style="padding-bottom:90px"></div>
   </div>
   <div id="jackpotPage" style="display:none">
     <div class="jackpotMarquee" id="jackpotMarquee"></div>
@@ -4429,6 +5000,21 @@
       <div id="bacResult" class="bacResult" style="display:none"></div>
     </div>
   </div>
+  <div id="pubsMapPage" style="display:none">
+    <div class="gameViewHeader">
+      <button type="button" id="pubsMapBackBtn" class="gameViewBackBtn" title="Back"><svg viewBox="0 0 24 24"
+          width="20" height="20" fill="none" stroke="currentColor" stroke-width="2.8" stroke-linecap="round"
+          stroke-linejoin="round">
+          <path d="M15 5l-7 7 7 7" />
+        </svg></button>
+      <div class="gameViewTitle">Pubs Map</div>
+    </div>
+    <div id="pubsMapContainer"></div>
+    <div id="pubsMapUnlocatedSection" style="display:none">
+      <div class="userListHead" style="margin:20px 14px 8px">Pubs without a location</div>
+      <div id="pubsMapUnlocatedList" style="padding:0 14px 90px"></div>
+    </div>
+  </div>
   <div id="gamesPage" style="display:none">
     <div class="tabSwitch" id="gamesTabSwitch" style="margin:10px 14px">
       <button type="button" class="tabBtn active" data-gtab="games">🎮 Games</button>
@@ -4465,16 +5051,6 @@
   <button id="uacFab" title="UAC">UAC</button>
   <button id="fab" title="Add beer">+</button>
 
-  <div class="overlay" id="archiveViewOverlay">
-    <div class="sheet">
-      <div class="sheetHead">
-        <h2 id="archiveViewTitle">Year</h2>
-        <button class="closeX" id="archiveViewClose">✕</button>
-      </div>
-      <div id="archiveViewList"></div>
-    </div>
-  </div>
-
   <div id="uacOverlay">
     <button id="uacClose">✕</button>
     <div class="uacText">UAC</div>
@@ -4490,7 +5066,7 @@
       <div class="viewCarousel" id="viewCarousel"></div>
       <div class="field" style="margin-top:-4px;margin-bottom:14px">
         <button type="button" class="btn ghost" id="viewAddPhotoBtn" style="padding:8px 14px">+ Add photo</button>
-        <input type="file" id="viewPhotoInput" accept="image/*" multiple style="display:none">
+        <input type="file" id="viewPhotoInput" accept="image/*,video/*" multiple style="display:none">
       </div>
       <div class="viewStats" id="viewStats"></div>
       <div class="field">
@@ -4516,7 +5092,7 @@
         <button class="closeX" id="formClose">✕</button>
       </div>
       <div id="photoStrip"></div>
-      <input type="file" id="photoInput" accept="image/*" multiple style="display:none">
+      <input type="file" id="photoInput" accept="image/*,video/*" multiple style="display:none">
       <form id="beerForm">
         <div class="field">
           <label>Real name</label>
@@ -4613,7 +5189,7 @@
       <div class="viewCarousel" id="spiritViewCarousel"></div>
       <div class="field" style="margin-top:-4px;margin-bottom:14px">
         <button type="button" class="btn ghost" id="spiritViewAddPhotoBtn" style="padding:8px 14px">+ Add photo</button>
-        <input type="file" id="spiritViewPhotoInput" accept="image/*" multiple style="display:none">
+        <input type="file" id="spiritViewPhotoInput" accept="image/*,video/*" multiple style="display:none">
       </div>
       <div class="viewStats" id="spiritViewStats"></div>
       <div class="field">
@@ -4640,7 +5216,7 @@
         <button class="closeX" id="spiritFormClose">✕</button>
       </div>
       <div id="spiritPhotoStrip"></div>
-      <input type="file" id="spiritPhotoInput" accept="image/*" multiple style="display:none">
+      <input type="file" id="spiritPhotoInput" accept="image/*,video/*" multiple style="display:none">
       <form id="spiritForm">
         <div class="field">
           <label>Real name</label>
@@ -4722,7 +5298,7 @@
       <div class="field" style="margin-top:-4px;margin-bottom:14px">
         <button type="button" class="btn ghost" id="nikotinViewAddPhotoBtn" style="padding:8px 14px">+ Add
           photo</button>
-        <input type="file" id="nikotinViewPhotoInput" accept="image/*" multiple style="display:none">
+        <input type="file" id="nikotinViewPhotoInput" accept="image/*,video/*" multiple style="display:none">
       </div>
       <div class="viewStats" id="nikotinViewStats"></div>
       <div class="field">
@@ -4749,7 +5325,7 @@
         <button class="closeX" id="nikotinFormClose">✕</button>
       </div>
       <div id="nikotinPhotoStrip"></div>
-      <input type="file" id="nikotinPhotoInput" accept="image/*" multiple style="display:none">
+      <input type="file" id="nikotinPhotoInput" accept="image/*,video/*" multiple style="display:none">
       <form id="nikotinForm">
         <div class="field">
           <label>Real name</label>
@@ -4833,7 +5409,7 @@
       <div class="field" style="margin-top:-4px;margin-bottom:14px">
         <button type="button" class="btn ghost" id="koffeinViewAddPhotoBtn" style="padding:8px 14px">+ Add
           photo</button>
-        <input type="file" id="koffeinViewPhotoInput" accept="image/*" multiple style="display:none">
+        <input type="file" id="koffeinViewPhotoInput" accept="image/*,video/*" multiple style="display:none">
       </div>
       <div class="viewStats" id="koffeinViewStats"></div>
       <div class="field">
@@ -4860,7 +5436,7 @@
         <button class="closeX" id="koffeinFormClose">✕</button>
       </div>
       <div id="koffeinPhotoStrip"></div>
-      <input type="file" id="koffeinPhotoInput" accept="image/*" multiple style="display:none">
+      <input type="file" id="koffeinPhotoInput" accept="image/*,video/*" multiple style="display:none">
       <form id="koffeinForm">
         <div class="field">
           <label>Real name</label>
@@ -4950,7 +5526,7 @@
       <div class="viewCarousel" id="partyViewCarousel"></div>
       <div class="field" style="margin-top:-4px;margin-bottom:14px">
         <button type="button" class="btn ghost" id="partyViewAddPhotoBtn" style="padding:8px 14px">+ Add photo</button>
-        <input type="file" id="partyViewPhotoInput" accept="image/*" multiple style="display:none">
+        <input type="file" id="partyViewPhotoInput" accept="image/*,video/*" multiple style="display:none">
       </div>
       <div class="viewTitleRow">
         <div class="viewTitle"><span id="partyViewName"></span></div>
@@ -4959,12 +5535,25 @@
       <div class="viewMeta" id="partyViewDate"></div>
       <div class="viewBadges" id="partyViewTotals" style="margin-top:10px"></div>
       <div class="field" style="margin-top:16px">
-        <label>Drinkers</label>
-        <div id="partyParticipants"></div>
+        <details class="variantDropdown viewVariants" open>
+          <summary>Drinkers</summary>
+          <div id="partyParticipants"></div>
+        </details>
       </div>
       <div class="field" style="margin-top:16px" id="partyViewChipsSection">
-        <label>Chips redeemed here</label>
-        <div id="partyViewChips"></div>
+        <details class="variantDropdown viewVariants" open>
+          <summary>Chips redeemed here</summary>
+          <div id="partyViewChips"></div>
+        </details>
+      </div>
+      <div class="field" style="margin-top:16px">
+        <label>Write a comment</label>
+        <textarea id="partyCommentInput" placeholder="Say something…"></textarea>
+        <button type="button" class="btn primary" id="partyCommentPostBtn" style="margin-top:8px">Post</button>
+      </div>
+      <div class="field" style="margin-top:14px">
+        <label>Comments</label>
+        <div class="viewReviews" id="partyComments"></div>
       </div>
     </div>
   </div>
@@ -4976,7 +5565,7 @@
         <button class="closeX" id="partyFormClose">✕</button>
       </div>
       <div id="partyPhotoStrip"></div>
-      <input type="file" id="partyPhotoInput" accept="image/*" multiple style="display:none">
+      <input type="file" id="partyPhotoInput" accept="image/*,video/*" multiple style="display:none">
       <form id="partyForm">
         <div class="field">
           <label>Name</label>
@@ -5005,12 +5594,15 @@
     <div class="sheet">
       <div class="sheetHead">
         <h2>Pub</h2>
-        <button class="closeX" id="pubViewClose">✕</button>
+        <div class="sheetHeadActions">
+          <button class="closeX" id="pubViewMapBtn" title="Show on map">🗺️</button>
+          <button class="closeX" id="pubViewClose">✕</button>
+        </div>
       </div>
       <div class="viewCarousel" id="pubViewCarousel"></div>
       <div class="field" style="margin-top:-4px;margin-bottom:14px">
         <button type="button" class="btn ghost" id="pubAddPhotoBtn" style="padding:8px 14px">+ Add photo</button>
-        <input type="file" id="pubPhotoInput" accept="image/*" multiple style="display:none">
+        <input type="file" id="pubPhotoInput" accept="image/*,video/*" multiple style="display:none">
       </div>
       <div class="viewTitleRow">
         <div class="viewTitle"><span id="pubViewName"></span></div>
@@ -5041,7 +5633,7 @@
         <button class="closeX" id="pubFormClose">✕</button>
       </div>
       <div id="pubPhotoStrip"></div>
-      <input type="file" id="pubFormPhotoInput" accept="image/*" multiple style="display:none">
+      <input type="file" id="pubFormPhotoInput" accept="image/*,video/*" multiple style="display:none">
       <form id="pubForm">
         <div class="field">
           <label>Name</label>
@@ -5050,6 +5642,11 @@
         <div class="field">
           <label>City</label>
           <input id="pubfCity" placeholder="e.g. Bratislava">
+        </div>
+        <div class="field">
+          <label>Location</label>
+          <button type="button" class="btn ghost" id="pubfLocationBtn">📍 Set location on map</button>
+          <div id="pubfLocationStatus" class="pubLocationStatus">No location set yet</div>
         </div>
         <div class="field">
           <label>Activities</label>
@@ -5069,6 +5666,7 @@
       <button id="lbClose">✕</button>
     </div>
     <img id="lbImg" src="" alt="">
+    <video id="lbVideo" playsinline controls style="display:none"></video>
     <div class="lbNav">
       <button id="lbPrev">‹</button>
       <button id="lbNext">›</button>
@@ -5122,12 +5720,37 @@
         </div>
       </div>
       <div class="field" style="margin-top:16px">
-        <label>Inventory</label>
-        <div id="profileViewInventory" class="profileViewInventory"></div>
+        <details class="variantDropdown viewVariants">
+          <summary>Inventory</summary>
+          <div class="invGroupRow">
+            <div class="invGroupLabel">Hats</div>
+            <div id="profileViewInventoryHats" class="profileViewInventory"></div>
+          </div>
+          <div class="invGroupRow">
+            <div class="invGroupLabel">Borders</div>
+            <div id="profileViewInventoryBorders" class="profileViewInventory"></div>
+          </div>
+          <div class="invGroupRow">
+            <div class="invGroupLabel">Skins</div>
+            <div id="profileViewInventorySkins" class="profileViewInventory"></div>
+          </div>
+        </details>
       </div>
       <div class="field" style="margin-top:16px" id="profileViewChipsSection">
-        <label>Chips</label>
+        <label>Alko Chips</label>
         <div id="profileViewChips" class="profileViewInventory"></div>
+      </div>
+      <div class="field" style="margin-top:16px" id="profileViewDriverChipsSection">
+        <label>Driver chips</label>
+        <div id="profileViewDriverChips" class="profileViewInventory"></div>
+        <div id="profileViewDriverExchangeRow" style="display:none;gap:8px;margin-top:8px;flex-wrap:wrap">
+          <button type="button" class="btn ghost" id="profileViewDriverExchangeBeerBtn">🍺 Exchange 3 for Beer</button>
+          <button type="button" class="btn ghost" id="profileViewDriverExchangeShotBtn">🥃 Exchange 3 for Shot</button>
+        </div>
+      </div>
+      <div class="field" style="margin-top:16px" id="profileViewRecapSection">
+        <label>Year in Review</label>
+        <div id="profileViewRecapList" class="profileViewRecapList"></div>
       </div>
       <div class="formActions" id="profileViewActions">
         <button type="button" class="btn primary" id="profileViewEditBtn">Edit</button>
@@ -5238,6 +5861,74 @@
         <button class="closeX" id="ratersListClose">✕</button>
       </div>
       <div id="ratersListBody"></div>
+    </div>
+  </div>
+
+  <div class="overlay" id="photoSourceOverlay">
+    <div class="sheet" style="max-width:320px">
+      <div class="sheetHead">
+        <h2>Add photo</h2>
+        <button class="closeX" id="photoSourceClose">✕</button>
+      </div>
+      <div style="display:flex;flex-direction:column;gap:10px;padding:4px 0 8px">
+        <button type="button" class="btn primary" id="photoSourceCameraBtn">📷 Take a photo</button>
+        <button type="button" class="btn ghost" id="photoSourceGalleryBtn">🖼️ Choose from gallery</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="overlay" id="partyDrinkPickerOverlay">
+    <div class="sheet">
+      <div class="sheetHead">
+        <h2 id="partyDrinkPickerTitle">Beers</h2>
+        <button class="closeX" id="partyDrinkPickerClose">✕</button>
+      </div>
+      <div class="field" id="partyDrinkPickerSearchField">
+        <input id="partyDrinkPickerSearch" type="search" placeholder="Search…">
+      </div>
+      <div id="partyDrinkPickerList" class="partyDrinkPickerList"></div>
+    </div>
+  </div>
+
+  <div class="overlay" id="locationPickerOverlay">
+    <div class="sheet" style="max-width:520px">
+      <div class="sheetHead">
+        <h2 id="locationPickerTitle">Set location</h2>
+        <button class="closeX" id="locationPickerClose">✕</button>
+      </div>
+      <div class="field">
+        <input id="locationPickerSearch" type="search" placeholder="Pub or place name…">
+      </div>
+      <div class="field">
+        <input id="locationPickerCitySearch" type="search" placeholder="City (narrows the search)…">
+        <div id="locationPickerResults" class="locationPickerResults"></div>
+      </div>
+      <div id="locationPickerMap" class="locationPickerMap"></div>
+      <div class="pubLocationStatus" id="locationPickerHint">Tap the map, drag the pin, or search above.</div>
+      <div class="formActions">
+        <button type="button" class="btn ghost" id="locationPickerCancelBtn">Cancel</button>
+        <button type="button" class="btn primary" id="locationPickerSaveBtn">Save location</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="overlay" id="yearlyRecapOverlay">
+    <div class="sheet">
+      <div class="sheetHead">
+        <h2 id="yearlyRecapHeading">Year in Review</h2>
+        <div class="sheetHeadActions">
+          <button class="closeX" id="yearlyRecapDownload" title="Download as image">
+            <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2"
+              stroke-linecap="round" stroke-linejoin="round">
+              <path d="M12 3v12" />
+              <path d="M7 10l5 5 5-5" />
+              <path d="M4 19h16" />
+            </svg>
+          </button>
+          <button class="closeX" id="yearlyRecapClose">✕</button>
+        </div>
+      </div>
+      <div id="yearlyRecapBody" class="yearlyRecapBody"></div>
     </div>
   </div>
 
@@ -5381,6 +6072,8 @@
   <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-storage-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-functions-compat.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js"></script>
   <script>
     (async function () {
       // ---------- Firebase ----------
@@ -5661,6 +6354,46 @@
       document.getElementById('ratersListClose').onclick = closeRatersList;
       ratersListOverlay.addEventListener('click', (e) => { if (e.target === ratersListOverlay) closeRatersList(); });
 
+      // Shared "camera or gallery" chooser used by every "+ add photo"
+      // button in the app (new-item forms and existing-item view pages
+      // alike). Needed because a plain <input type="file" accept="image/*">
+      // no longer reliably offers a camera option on its own — recent
+      // Android Chrome swaps in its own privacy-focused Photo Picker UI for
+      // that input, which only shows the gallery, no "take photo" choice,
+      // unless the input carries a `capture` attribute when it's opened.
+      // iOS Safari's native sheet already lists Camera/Library/Choose File
+      // either way, so this is just one extra (harmless) tap there.
+      const photoSourceOverlay = document.getElementById('photoSourceOverlay');
+      let photoSourcePendingInput = null;
+      function openPhotoChooser(input) {
+        photoSourcePendingInput = input;
+        pushOverlayState();
+        photoSourceOverlay.classList.add('show');
+      }
+      function hidePhotoChooser() {
+        photoSourceOverlay.classList.remove('show');
+        photoSourcePendingInput = null;
+      }
+      function closePhotoChooser() { history.back(); }
+      document.getElementById('photoSourceClose').onclick = closePhotoChooser;
+      photoSourceOverlay.addEventListener('click', (e) => { if (e.target === photoSourceOverlay) closePhotoChooser(); });
+      document.getElementById('photoSourceCameraBtn').onclick = () => {
+        const input = photoSourcePendingInput;
+        if (input) {
+          input.setAttribute('capture', 'environment');
+          input.click();
+        }
+        closePhotoChooser();
+      };
+      document.getElementById('photoSourceGalleryBtn').onclick = () => {
+        const input = photoSourcePendingInput;
+        if (input) {
+          input.removeAttribute('capture');
+          input.click();
+        }
+        closePhotoChooser();
+      };
+
       // Small "Added by [avatar] name" row shown on a beer/spirit's view
       // page — the grid card shows just the avatar (corner badge, tight on
       // space); the full view adds the name too, per how it's used there.
@@ -5895,21 +6628,74 @@
         });
       }
 
+      // ---------- Shared photo/video helpers ----------
+      // A stored item never carries an explicit media type (that field
+      // never existed), so a video is recognized the same way a <video>
+      // tag itself would guess from a bare URL — by its file extension.
+      function isVideoUrl(url) {
+        return /\.(mp4|mov|m4v|webm|3gp|avi)(\?|#|$)/i.test(url || '');
+      }
+      // Small thumbnail (photo strip in an add/edit form): a muted preview
+      // frame with a play badge, matching how phones show video thumbnails.
+      // A pending (not-yet-uploaded) file's preview is a blob: URL with no
+      // extension to sniff, so isVideo can be passed explicitly from the
+      // real File's MIME type instead of guessed from the url.
+      function mediaThumbInnerHtml(url, isVideo) {
+        const video = isVideo != null ? isVideo : isVideoUrl(url);
+        return video
+          ? `<video src="${escapeHtml(url)}" muted playsinline preload="metadata"></video><div class="mediaPlayBadge">▶</div>`
+          : `<img src="${escapeHtml(url)}">`;
+      }
+      // Big carousel slide (view page): same idea, sized to fill the slide.
+      function carouselSlideHtml(p, i) {
+        return isVideoUrl(p.url)
+          ? `<div class="carouselVideoSlide" data-i="${i}"><video src="${escapeHtml(p.url)}" muted playsinline preload="metadata"></video><div class="mediaPlayBadge">▶</div></div>`
+          : `<img src="${escapeHtml(p.url)}" data-i="${i}">`;
+      }
+      function wireCarouselClicks(carouselEl, photos) {
+        carouselEl.querySelectorAll('img[data-i], .carouselVideoSlide[data-i]').forEach(el => {
+          el.onclick = () => openLightbox(photos, Number(el.dataset.i));
+        });
+      }
+
+      // Matches storage.rules' isValidMedia() cap — checked here too so a
+      // rejected upload shows a real reason ("too big"/"not a photo or
+      // video") instead of Storage's generic, unhelpful "no permission"
+      // error, which is what any rules denial looks like from the client.
+      const MAX_MEDIA_MB = 40;
+      function mediaFileError(file) {
+        if (!file.type.startsWith('image/') && !file.type.startsWith('video/')) {
+          return `"${file.name}" isn't a photo or video`;
+        }
+        if (file.size > MAX_MEDIA_MB * 1024 * 1024) {
+          return `"${file.name}" is ${(file.size / (1024 * 1024)).toFixed(0)}MB — max is ${MAX_MEDIA_MB}MB`;
+        }
+        return null;
+      }
+      function partitionValidMedia(files) {
+        const valid = [];
+        files.forEach(file => {
+          const err = mediaFileError(file);
+          if (err) showToast(err); else valid.push(file);
+        });
+        return valid;
+      }
+
       function renderPhotoStrip(beer) {
         photoStrip.innerHTML = '';
         const photos = (beer && beer.photos) || [];
         photos.forEach((p, i) => {
           const div = document.createElement('div');
           div.className = 'thumb';
-          div.innerHTML = `<img src="${escapeHtml(p.url)}"><button class="rm" title="Remove">✕</button>`;
-          div.querySelector('img').onclick = () => openLightbox(photos, i);
+          div.innerHTML = `${mediaThumbInnerHtml(p.url)}<button class="rm" title="Remove">✕</button>`;
+          div.querySelector('img, video').onclick = () => openLightbox(photos, i);
           div.querySelector('.rm').onclick = () => removeExistingPhoto(beer.id, p);
           photoStrip.appendChild(div);
         });
         pendingPhotos.forEach((pp, i) => {
           const div = document.createElement('div');
           div.className = 'thumb';
-          div.innerHTML = `<img src="${pp.url}"><button class="rm" title="Remove">✕</button>`;
+          div.innerHTML = `${mediaThumbInnerHtml(pp.url, pp.file.type.startsWith('video/'))}<button class="rm" title="Remove">✕</button>`;
           div.querySelector('.rm').onclick = () => { pendingPhotos.splice(i, 1); renderPhotoStrip(beer); };
           photoStrip.appendChild(div);
         });
@@ -5917,12 +6703,12 @@
         addTile.type = 'button';
         addTile.className = 'addThumb';
         addTile.textContent = '+';
-        addTile.onclick = () => photoInput.click();
+        addTile.onclick = () => openPhotoChooser(photoInput);
         photoStrip.appendChild(addTile);
       }
 
       photoInput.onchange = async () => {
-        const files = Array.from(photoInput.files || []);
+        const files = partitionValidMedia(Array.from(photoInput.files || []));
         photoInput.value = '';
         if (!files.length) return;
         if (editingId) {
@@ -6289,6 +7075,9 @@
         refreshPartyViewIfOpen();
         if (activeTab === 'leaderboard') renderLeaderboard();
         refreshProfileDisplays();
+        if (drinkPickerCtx && partyDrinkPickerOverlay.classList.contains('show')) {
+          renderDrinkPickerList(partyDrinkPickerSearch.value);
+        }
       }, err => showToast('Sync error: ' + err.message));
 
       // ---------- Party view ----------
@@ -6298,6 +7087,49 @@
       const partyViewEditBtn = document.getElementById('partyViewEditBtn');
       const partyParticipantsEl = document.getElementById('partyParticipants');
       let currentPartyViewId = null;
+      const partyCommentsEl = document.getElementById('partyComments');
+      const partyCommentInput = document.getElementById('partyCommentInput');
+      const partyCommentPostBtn = document.getElementById('partyCommentPostBtn');
+      let partyCommentsCache = [];
+      let partyCommentsUnsub = null;
+
+      // Auto-ID docs (not doc(myUid)) — unlike ratings, a person can post
+      // more than one comment, same pattern as pub comments.
+      async function postPartyComment(partyId, text) {
+        if (!canWrite()) return promptInstallOrSignIn();
+        await partiesCol.doc(partyId).collection('comments').add({ userId: myUid, text: text.trim(), ts: Date.now() });
+      }
+      function renderPartyComments(comments) {
+        if (!comments.length) {
+          partyCommentsEl.innerHTML = '<div class="empty" style="padding:14px 0">No comments yet</div>';
+          return;
+        }
+        const sorted = comments.slice().sort((a, b) => (b.ts || 0) - (a.ts || 0));
+        partyCommentsEl.innerHTML = sorted.map(c => {
+          const u = allUsers.find(x => x.id === c.userId);
+          return `<div class="reviewRow">
+      <div class="userAvatar">${avatarInner(u?.name, u?.photoURL)}</div>
+      <div class="reviewBody">
+        <div class="reviewHead">
+          <span class="userName">${nameWithAdminTag(u)}</span>
+        </div>
+        <div class="reviewComment">${escapeHtml(c.text)}</div>
+      </div>
+    </div>`;
+        }).join('');
+      }
+      partyCommentPostBtn.onclick = async () => {
+        const partyId = currentPartyViewId;
+        const text = partyCommentInput.value.trim();
+        if (!text) return;
+        try {
+          await postPartyComment(partyId, text);
+          partyCommentInput.value = '';
+          showToast('Comment posted');
+        } catch (err) {
+          showToast('Comment failed: ' + err.message);
+        }
+      };
 
       function renderPartyParticipants(party) {
         const participants = allPartyParticipants[party.id] || [];
@@ -6307,26 +7139,32 @@
         participants.forEach(p => knownIds.add(p.id));
         if (myUid) knownIds.add(myUid);
         const allKnownUsers = [...knownIds].map(id => allUsers.find(u => u.id === id) || { id });
-        const joined = allKnownUsers.filter(u => byUser[u.id]).sort((a, b) => (byUser[b.id].count || 0) - (byUser[a.id].count || 0));
+        // "You" always lead the list if you've joined, regardless of count —
+        // everyone else below stays ranked by count like before.
+        const joined = allKnownUsers.filter(u => byUser[u.id]).sort((a, b) => {
+          if (a.id === myUid && b.id !== myUid) return -1;
+          if (b.id === myUid && a.id !== myUid) return 1;
+          return (byUser[b.id].count || 0) - (byUser[a.id].count || 0);
+        });
         const notJoined = allKnownUsers.filter(u => !byUser[u.id]);
 
         const rows = [];
         joined.forEach(u => {
           const p = byUser[u.id];
-          const canIncrement = u.id === myUid || isAdmin();
           rows.push(`<div class="partyParticipantRow${skinBgClass(u)}">
-      ${wrapAvatarWithHat(u, `<div class="userAvatar${avatarBorderClass(u)}">${avatarInner(u.name, u.photoURL)}</div>`)}
-      <div class="userName">${nameWithAdminTag(u)}</div>
+      <div class="partyAvatarCol">
+        ${wrapAvatarWithHat(u, `<div class="userAvatar lbProfileLink${avatarBorderClass(u)}" data-user="${u.id}">${avatarInner(u.name, u.photoURL)}</div>`)}
+        <button type="button" class="partyDriverBtn${p.isDriver ? ' isDriver' : ''}" data-party="${party.id}" data-user="${u.id}" title="${p.isDriver ? 'Designated driver — tap to undo' : 'Mark as designated driver'}">🚗</button>
+      </div>
+      <div class="userName lbProfileLink" data-user="${u.id}">${nameWithAdminTag(u)}</div>
       <div class="partyCounters">
         <div class="partyCounterLine">
-          ${canIncrement && (p.count || 0) > 0 ? `<button type="button" class="partyMinusBtn" data-user="${u.id}" data-kind="beer">–</button>` : ''}
           <div class="partyCount">${p.count || 0} 🍺</div>
-          ${canIncrement ? `<button type="button" class="partyPlusBtn" data-user="${u.id}" data-kind="beer">+</button>` : ''}
+          <button type="button" class="partyBreakdownBtn" data-party="${party.id}" data-user="${u.id}" data-kind="beer" title="Beer breakdown">▾</button>
         </div>
         <div class="partyCounterLine">
-          ${canIncrement && (p.shotCount || 0) > 0 ? `<button type="button" class="partyMinusBtn" data-user="${u.id}" data-kind="shot">–</button>` : ''}
           <div class="partyCount">${p.shotCount || 0} 🥃</div>
-          ${canIncrement ? `<button type="button" class="partyPlusBtn" data-user="${u.id}" data-kind="shot">+</button>` : ''}
+          <button type="button" class="partyBreakdownBtn" data-party="${party.id}" data-user="${u.id}" data-kind="shot" title="Shot breakdown">▾</button>
         </div>
       </div>
     </div>`);
@@ -6334,8 +7172,8 @@
         notJoined.forEach(u => {
           const isMe = u.id === myUid;
           rows.push(`<div class="partyParticipantRow${skinBgClass(u)}">
-      ${wrapAvatarWithHat(u, `<div class="userAvatar${avatarBorderClass(u)}">${avatarInner(u.name, u.photoURL)}</div>`)}
-      <div class="userName">${nameWithAdminTag(u)}</div>
+      ${wrapAvatarWithHat(u, `<div class="userAvatar lbProfileLink${avatarBorderClass(u)}" data-user="${u.id}">${avatarInner(u.name, u.photoURL)}</div>`)}
+      <div class="userName lbProfileLink" data-user="${u.id}">${nameWithAdminTag(u)}</div>
       ${isMe ? `<button type="button" class="btn ghost partyJoinBtn">Join</button>` : `<span class="notJoined">Not joined</span>`}
     </div>`);
         });
@@ -6346,33 +7184,28 @@
         }
         partyParticipantsEl.innerHTML = rows.join('');
 
-        partyParticipantsEl.querySelectorAll('.partyPlusBtn').forEach(btn => {
-          btn.onclick = async () => {
-            if (!canWrite()) return promptInstallOrSignIn();
-            const userId = btn.dataset.user;
-            const isShot = btn.dataset.kind === 'shot';
-            const field = isShot ? 'shotCount' : 'count';
-            try {
-              await partiesCol.doc(party.id).collection('participants').doc(userId).set(
-                { [field]: firebase.firestore.FieldValue.increment(1) }, { merge: true }
-              );
-            } catch (err) {
-              showToast(`Could not add ${isShot ? 'shot' : 'beer'}: ` + err.message);
-            }
-          };
+        partyParticipantsEl.querySelectorAll('.partyBreakdownBtn').forEach(btn => {
+          btn.onclick = () => openPartyDrinkPicker(btn.dataset.party, btn.dataset.user, btn.dataset.kind);
         });
-        partyParticipantsEl.querySelectorAll('.partyMinusBtn').forEach(btn => {
+        partyParticipantsEl.querySelectorAll('.lbProfileLink').forEach(el => {
+          el.style.cursor = 'pointer';
+          el.onclick = () => openProfileView(el.dataset.user);
+        });
+        partyParticipantsEl.querySelectorAll('.partyDriverBtn').forEach(btn => {
           btn.onclick = async () => {
+            const partyId = btn.dataset.party, uid = btn.dataset.user;
+            if (uid !== myUid && !isAdmin()) { showToast('Only that person or an admin can toggle this'); return; }
             if (!canWrite()) return promptInstallOrSignIn();
-            const userId = btn.dataset.user;
-            const isShot = btn.dataset.kind === 'shot';
-            const field = isShot ? 'shotCount' : 'count';
             try {
-              await partiesCol.doc(party.id).collection('participants').doc(userId).set(
-                { [field]: firebase.firestore.FieldValue.increment(-1) }, { merge: true }
-              );
+              if (btn.classList.contains('isDriver')) {
+                await revokeDriverChip(partyId, uid);
+                showToast('Driver chip removed');
+              } else {
+                await grantDriverChip(partyId, uid);
+                showToast('🚗 Driver chip added!');
+              }
             } catch (err) {
-              showToast(`Could not remove ${isShot ? 'shot' : 'beer'}: ` + err.message);
+              showToast('Failed: ' + err.message);
             }
           };
         });
@@ -6392,14 +7225,361 @@
         }
       }
 
+      // ---------- Driver chips ----------
+      // Free, never bought — granted straight to a party participant's own
+      // chips array, capped at one per (user, party) pair via the `isDriver`
+      // flag on that participant doc (the actual guard against granting a
+      // second one; toggling back off removes both the flag and that one
+      // chip, so re-toggling on gets exactly one fresh chip, never a stack).
+      const DRIVER_CHIPS_PER_EXCHANGE = 3;
+      async function grantDriverChip(partyId, uid) {
+        const participantRef = partiesCol.doc(partyId).collection('participants').doc(uid);
+        const userRef = usersCol.doc(uid);
+        await db.runTransaction(async (tx) => {
+          const [pSnap] = await Promise.all([tx.get(participantRef)]);
+          if (pSnap.data()?.isDriver) return;
+          const newChip = {
+            id: 'c' + Date.now() + Math.random().toString(36).slice(2, 7),
+            type: 'driver', status: 'unredeemed', partyId, ts: Date.now()
+          };
+          tx.set(participantRef, { isDriver: true }, { merge: true });
+          tx.set(userRef, { chips: firebase.firestore.FieldValue.arrayUnion(newChip) }, { merge: true });
+        });
+      }
+      async function revokeDriverChip(partyId, uid) {
+        const participantRef = partiesCol.doc(partyId).collection('participants').doc(uid);
+        const userRef = usersCol.doc(uid);
+        await db.runTransaction(async (tx) => {
+          const [pSnap, uSnap] = await Promise.all([tx.get(participantRef), tx.get(userRef)]);
+          if (!pSnap.data()?.isDriver) return;
+          const chips = uSnap.data()?.chips || [];
+          const chip = chips.find(c => c.type === 'driver' && c.partyId === partyId && c.status === 'unredeemed');
+          tx.set(participantRef, { isDriver: false }, { merge: true });
+          if (chip) tx.update(userRef, { chips: chips.filter(c => c.id !== chip.id) });
+        });
+      }
+      // Spends the oldest available (never-exchanged) driver chips first —
+      // marks exactly DRIVER_CHIPS_PER_EXCHANGE of them 'exchanged' (grey in
+      // the profile, but never removed — they still show as history) and
+      // adds one brand-new beer or shot chip, same shape buyChip() produces.
+      async function exchangeDriverChips(targetType) {
+        if (!canWrite()) return promptInstallOrSignIn();
+        try {
+          await db.runTransaction(async (tx) => {
+            const ref = usersCol.doc(myUid);
+            const snap = await tx.get(ref);
+            const chips = snap.data()?.chips || [];
+            const available = chips.filter(c => c.type === 'driver' && c.status !== 'exchanged').sort((a, b) => (a.ts || 0) - (b.ts || 0));
+            if (available.length < DRIVER_CHIPS_PER_EXCHANGE) throw new Error('Not enough driver chips');
+            const spendIds = new Set(available.slice(0, DRIVER_CHIPS_PER_EXCHANGE).map(c => c.id));
+            const newChips = chips.map(c => spendIds.has(c.id) ? { ...c, status: 'exchanged' } : c);
+            newChips.push({
+              id: 'c' + Date.now() + Math.random().toString(36).slice(2, 7),
+              type: targetType, status: 'unredeemed', photoURL: null, photoPath: null, givenByUid: null, ts: Date.now()
+            });
+            tx.update(ref, { chips: newChips });
+          });
+          showToast('Exchanged! New chip added to your chips.');
+        } catch (err) {
+          showToast(err.message === 'Not enough driver chips' ? 'Not enough driver chips' : 'Exchange failed: ' + err.message);
+        }
+      }
+
+      // ---------- Party drink breakdown picker ----------
+      // Per-party, per-user tally of exactly which reviewed beer/spirit was
+      // drunk and how many of each — `count`/`shotCount` stay the plain
+      // aggregate totals everywhere else in the app (leaderboard, yearly
+      // recap, etc.) already reads, while `beerBreakdown`/`shotBreakdown`
+      // (item id -> qty, plus a fixed 'generic' key for "just Sör/Alko, no
+      // need to specify") carry the detail. Kept in sync with the totals by
+      // incrementing both in the same write.
+      function drinkPickerItemsForKind(kind) { return kind === 'shot' ? allSpirits : allBeers; }
+      function drinkPickerEmojiForKind(kind) { return kind === 'shot' ? '🥃' : '🍺'; }
+
+      // Older data (logged before this breakdown feature existed — the
+      // simple +/- back then, with no per-type detail — or before someone
+      // had reloaded to pick up this feature) has a real total but no
+      // per-type detail behind some of it. That's exactly what "generic
+      // Sör/Alko" already means — no specific type recorded — so the gap
+      // is folded straight into the generic bucket rather than shown as
+      // its own separate line, and the picker's numbers always add up to
+      // whatever the row itself shows.
+      function withUnspecifiedGap(breakdown, total) {
+        const known = Object.values(breakdown).reduce((s, v) => s + (v || 0), 0);
+        const gap = Math.max(0, (total || 0) - known);
+        return gap > 0 ? { ...breakdown, generic: (breakdown.generic || 0) + gap } : breakdown;
+      }
+
+      // Shared by two callers: a party's per-drinker breakdown
+      // (openPartyDrinkPicker, writing to that party's participant doc) and
+      // the leaderboard's "log today" breakdown (openLeaderboardDrinkPicker,
+      // writing to today's drinkLogs/shotLogs doc). Each caller supplies
+      // where the live breakdown/pick-order data currently comes from and
+      // which doc + field names to write back to; the picker UI itself
+      // (search, brand-priority sort, recents-on-top, generic Sör/Alko
+      // pin, read-only mode for someone else) doesn't need to know which.
+      let drinkPickerCtx = null; // { kind, canEdit, ref, totalField, breakdownField, orderField, getBreakdown, getOrder }
+      const partyDrinkPickerOverlay = document.getElementById('partyDrinkPickerOverlay');
+      const partyDrinkPickerSearch = document.getElementById('partyDrinkPickerSearch');
+
+      function openDrinkPicker(opts) {
+        drinkPickerCtx = opts;
+        document.getElementById('partyDrinkPickerTitle').textContent = opts.title;
+        document.getElementById('partyDrinkPickerSearchField').style.display = opts.canEdit ? 'block' : 'none';
+        partyDrinkPickerSearch.value = '';
+        pushOverlayState();
+        partyDrinkPickerOverlay.classList.add('show');
+        renderDrinkPickerList('');
+      }
+      function hidePartyDrinkPicker() { partyDrinkPickerOverlay.classList.remove('show'); drinkPickerCtx = null; }
+      function closePartyDrinkPicker() { history.back(); }
+      document.getElementById('partyDrinkPickerClose').onclick = closePartyDrinkPicker;
+      partyDrinkPickerOverlay.addEventListener('click', (e) => { if (e.target === partyDrinkPickerOverlay) closePartyDrinkPicker(); });
+      partyDrinkPickerSearch.oninput = (e) => renderDrinkPickerList(e.target.value);
+
+      function openPartyDrinkPicker(partyId, userId, kind) {
+        const canEdit = userId === myUid || isAdmin();
+        const getParticipant = () => (allPartyParticipants[partyId] || []).find(p => p.id === userId) || {};
+        const breakdownField = kind === 'shot' ? 'shotBreakdown' : 'beerBreakdown';
+        const orderField = kind === 'shot' ? 'shotPickOrder' : 'beerPickOrder';
+        const totalField = kind === 'shot' ? 'shotCount' : 'count';
+        openDrinkPicker({
+          kind, canEdit,
+          title: (kind === 'shot' ? 'Shots' : 'Beers') + (canEdit ? '' : ` — ${allUsers.find(u => u.id === userId)?.name || 'this person'}`),
+          ref: partiesCol.doc(partyId).collection('participants').doc(userId),
+          totalField, breakdownField, orderField,
+          getBreakdown: () => {
+            const p = getParticipant();
+            return withUnspecifiedGap(p[breakdownField] || {}, p[totalField] || 0);
+          },
+          getOrder: () => getParticipant()[orderField] || [],
+          // Mutates the same live-synced object the app already renders
+          // from — the next real snapshot fully rebuilds
+          // allPartyParticipants anyway, so this can never drift
+          // permanently, it just removes the round-trip wait for feedback.
+          applyOptimistic: (itemId, delta) => {
+            const p = getParticipant();
+            if (p.id == null) return;
+            p[totalField] = (p[totalField] || 0) + delta;
+            p[breakdownField] = p[breakdownField] || {};
+            p[breakdownField][itemId] = (p[breakdownField][itemId] || 0) + delta;
+            if (delta > 0 && itemId !== 'generic') {
+              p[orderField] = p[orderField] || [];
+              if (!p[orderField].includes(itemId)) p[orderField].push(itemId);
+            }
+          }
+        });
+      }
+
+      // The leaderboard's own total is manual logs *plus* every party this
+      // person joined this year (see computeStandings) — so the breakdown
+      // shown here has to be the same combination, not just today's manual
+      // log, or it'd only ever account for a fraction of the row's number.
+      // Adding is still only ever possible against *today's* manual entry
+      // (there's no "add to a past party" from the leaderboard), so the
+      // minus button is gated on today's own qty specifically — otherwise
+      // tapping "-" on a party-sourced number would try to push today's
+      // own log for that item below zero.
+      function leaderboardBreakdownField(kind) { return kind === 'shot' ? 'shotBreakdown' : 'beerBreakdown'; }
+      function leaderboardTotalField(kind) { return kind === 'shot' ? 'shotCount' : 'count'; }
+
+      function aggregateLeaderboardBreakdown(userId, kind) {
+        const combined = {};
+        let genericGap = 0;
+        const addSource = (breakdownMap, total) => {
+          const known = Object.values(breakdownMap || {}).reduce((s, v) => s + (v || 0), 0);
+          Object.entries(breakdownMap || {}).forEach(([k, v]) => { combined[k] = (combined[k] || 0) + (v || 0); });
+          genericGap += Math.max(0, (total || 0) - known);
+        };
+        const partyField = leaderboardBreakdownField(kind);
+        const partyTotalField = leaderboardTotalField(kind);
+        allParties.forEach(party => {
+          if (party.year !== CURRENT_YEAR) return;
+          const participant = (allPartyParticipants[party.id] || []).find(p => p.id === userId);
+          if (!participant) return;
+          addSource(participant[partyField], participant[partyTotalField]);
+        });
+        const logsArr = kind === 'shot' ? currentYearShotLogs : currentYearLogs;
+        logsArr.forEach(log => {
+          if (log.userId !== userId) return;
+          addSource(log.breakdown, log.count);
+        });
+        // Same reasoning as withUnspecifiedGap — any undetailed leftover is
+        // just an old-style generic Sör/Alko entry, not its own category.
+        if (genericGap > 0) combined.generic = (combined.generic || 0) + genericGap;
+        return combined;
+      }
+
+      // The leaderboard's +/- always logs against *today*, regardless of
+      // which year's block it's shown under, so this always targets
+      // today's specific drinkLogs/shotLogs doc — same as logDrink/logShot.
+      function openLeaderboardDrinkPicker(userId, kind) {
+        const canEdit = userId === myUid || isAdmin();
+        const key = todayKey();
+        const col = kind === 'shot' ? shotLogsCol : drinkLogsCol;
+        // Re-read the outer currentYearLogs/currentYearShotLogs variable on
+        // every call rather than capturing today's array once — those
+        // variables get fully *reassigned* (not mutated) on every snapshot,
+        // so a captured reference goes stale the moment the next snapshot
+        // arrives, silently detaching this picker from live data.
+        const getLogsArr = () => kind === 'shot' ? currentYearShotLogs : currentYearLogs;
+        const getLog = () => getLogsArr().find(l => l.userId === userId && l.date === key) || {};
+        openDrinkPicker({
+          kind, canEdit,
+          title: (kind === 'shot' ? 'Shots' : 'Beers') + ' this year' + (canEdit ? '' : ` — ${allUsers.find(u => u.id === userId)?.name || 'this person'}`),
+          ref: col.doc(`${userId}_${key}`),
+          totalField: 'count',
+          breakdownField: 'breakdown', orderField: 'pickOrder',
+          // This aggregates across the whole year (every party + every
+          // day), so "what did they add today" isn't a meaningful ordering
+          // signal the way it is on a single party — instead, whatever
+          // they've actually got some count in (from any source) floats up
+          // top, ranked by how much, and only genuinely untouched items
+          // fall back to alphabetical.
+          sortAddedByCount: true,
+          // The doc may not exist yet (first log of the day) — these need
+          // to land alongside the very first increment so the leaderboard's
+          // `.where('year','==',...)` query and per-user attribution
+          // (computeStandings reads log.userId/log.date) still work, same
+          // as the old logDrink/logShot helpers this replaces.
+          extraFields: { userId, date: key, year: CURRENT_YEAR },
+          getBreakdown: () => aggregateLeaderboardBreakdown(userId, kind),
+          getOwnBreakdown: () => getLog().breakdown || {},
+          getOrder: () => getLog().pickOrder || [],
+          // Same reasoning as the party picker's applyOptimistic — mutate
+          // (or, first time today, create and insert) the live array entry
+          // the leaderboard already reads from, so the picker responds
+          // instantly instead of waiting on a round trip.
+          applyOptimistic: (itemId, delta) => {
+            const arr = getLogsArr();
+            let log = arr.find(l => l.userId === userId && l.date === key);
+            if (!log) {
+              log = { userId, date: key, year: CURRENT_YEAR, count: 0, breakdown: {}, pickOrder: [] };
+              arr.push(log);
+            }
+            log.count = (log.count || 0) + delta;
+            log.breakdown = log.breakdown || {};
+            log.breakdown[itemId] = (log.breakdown[itemId] || 0) + delta;
+            if (delta > 0 && itemId !== 'generic') {
+              log.pickOrder = log.pickOrder || [];
+              if (!log.pickOrder.includes(itemId)) log.pickOrder.push(itemId);
+            }
+          }
+        });
+      }
+
+      function drinkPickerLabel(id, kind, items) {
+        if (id === 'generic') return `${drinkPickerEmojiForKind(kind)} ${kind === 'shot' ? 'Alko' : 'Sör'}`;
+        return escapeHtml(items.find(x => x.id === id)?.name || 'Unknown item');
+      }
+
+      function renderDrinkPickerList(query) {
+        const ctx = drinkPickerCtx;
+        if (!ctx) return;
+        const listEl = document.getElementById('partyDrinkPickerList');
+        const breakdown = ctx.getBreakdown();
+        const items = drinkPickerItemsForKind(ctx.kind);
+
+        if (!ctx.canEdit) {
+          // Read-only: only what they actually logged, not the full catalog.
+          const entries = Object.entries(breakdown).filter(([, qty]) => qty > 0);
+          if (!entries.length) {
+            listEl.innerHTML = '<div class="empty" style="padding:10px 0">Nothing logged yet</div>';
+            return;
+          }
+          entries.sort((a, b) => b[1] - a[1]);
+          listEl.innerHTML = entries.map(([id, qty]) => `<div class="partyDrinkPickerRow">
+              <div class="partyDrinkPickerName">${drinkPickerLabel(id, ctx.kind, items)}</div>
+              <div class="partyDrinkPickerQty">${qty}</div>
+            </div>`).join('');
+          return;
+        }
+
+        // The displayed number can combine several sources (e.g. the
+        // leaderboard's is party + manual logs combined), but "-" can only
+        // ever remove what's actually editable from here — own-source qty,
+        // not the combined total — so it doesn't push some other source's
+        // contribution negative.
+        const ownBreakdown = ctx.getOwnBreakdown ? ctx.getOwnBreakdown() : breakdown;
+        const q = query.trim().toLowerCase();
+        let recentItems;
+        if (ctx.sortAddedByCount) {
+          recentItems = items.filter(it => (breakdown[it.id] || 0) > 0)
+            .sort((a, b) => (breakdown[b.id] || 0) - (breakdown[a.id] || 0));
+        } else {
+          const recentIds = [...ctx.getOrder()].reverse();
+          recentItems = recentIds.map(id => items.find(x => x.id === id)).filter(Boolean);
+        }
+        const recentIdSet = new Set(recentItems.map(it => it.id));
+        let rest = items.filter(x => !recentIdSet.has(x.id));
+        if (q) rest = rest.filter(x => (x.name || '').toLowerCase().includes(q));
+        rest.sort((a, b) => (a.name || '').localeCompare(b.name || ''));
+
+        const rowHtml = (id, qty, ownQty) => `<div class="partyDrinkPickerRow${qty > 0 ? ' isAdded' : ''}" data-id="${id}">
+          <div class="partyDrinkPickerName">${drinkPickerLabel(id, ctx.kind, items)}</div>
+          <div class="partyDrinkPickerQtyRow">
+            ${ownQty > 0 ? `<button type="button" class="partyDrinkPickerMinus" data-id="${id}">–</button>` : ''}
+            <div class="partyDrinkPickerQty">${qty}</div>
+            <button type="button" class="partyDrinkPickerPlus" data-id="${id}">+</button>
+          </div>
+        </div>`;
+
+        let html = rowHtml('generic', breakdown.generic || 0, ownBreakdown.generic || 0);
+        if (!q) html += recentItems.map(it => rowHtml(it.id, breakdown[it.id] || 0, ownBreakdown[it.id] || 0)).join('');
+        html += rest.map(it => rowHtml(it.id, breakdown[it.id] || 0, ownBreakdown[it.id] || 0)).join('');
+        listEl.innerHTML = html;
+
+        listEl.querySelectorAll('.partyDrinkPickerPlus').forEach(btn => {
+          btn.onclick = () => adjustDrinkPick(btn.dataset.id, 1);
+        });
+        listEl.querySelectorAll('.partyDrinkPickerMinus').forEach(btn => {
+          btn.onclick = () => adjustDrinkPick(btn.dataset.id, -1);
+        });
+      }
+
+      async function adjustDrinkPick(itemId, delta) {
+        const ctx = drinkPickerCtx;
+        if (!ctx || !ctx.canEdit) return;
+        if (!canWrite()) return promptInstallOrSignIn();
+
+        // Applied to the same live cache the picker reads from, then
+        // re-rendered immediately — otherwise the tap only visibly does
+        // anything once the write round-trips and the snapshot listener
+        // echoes back, which reads as the whole picker being slow.
+        ctx.applyOptimistic(itemId, delta);
+        renderDrinkPickerList(partyDrinkPickerSearch.value);
+
+        const updates = {
+          [ctx.totalField]: firebase.firestore.FieldValue.increment(delta),
+          // A nested plain object (not a dotted string key) is required so
+          // this merges into the breakdown map instead of creating a
+          // literal field literally named e.g. "beerBreakdown.generic" —
+          // .set(..., {merge:true}) deep-merges nested objects field by
+          // field, which also means it works whether the target doc
+          // already exists (a party participant, guaranteed by the time
+          // this runs) or not yet (today's drinkLogs/shotLogs doc, created
+          // lazily on first log of the day).
+          [ctx.breakdownField]: { [itemId]: firebase.firestore.FieldValue.increment(delta) }
+        };
+        if (delta > 0 && itemId !== 'generic') {
+          updates[ctx.orderField] = firebase.firestore.FieldValue.arrayUnion(itemId);
+        }
+        if (ctx.extraFields) Object.assign(updates, ctx.extraFields);
+        try {
+          await ctx.ref.set(updates, { merge: true });
+        } catch (err) {
+          ctx.applyOptimistic(itemId, -delta); // roll back the optimistic guess
+          if (drinkPickerCtx === ctx) renderDrinkPickerList(partyDrinkPickerSearch.value);
+          showToast(`Could not update: ` + err.message);
+        }
+      }
+
       function renderPartyViewContent(party) {
         const photos = party.photos || [];
         partyViewCarousel.innerHTML = photos.length
-          ? photos.map((p, i) => `<img src="${escapeHtml(p.url)}" data-i="${i}">`).join('')
+          ? photos.map((p, i) => carouselSlideHtml(p, i)).join('')
           : '<div class="placeholder">🎉</div>';
-        partyViewCarousel.querySelectorAll('img').forEach(img => {
-          img.onclick = () => openLightbox(photos, Number(img.dataset.i));
-        });
+        wireCarouselClicks(partyViewCarousel, photos);
         partyViewName.textContent = party.name || 'Unnamed party';
         document.getElementById('partyViewDate').textContent = [party.date, party.year].filter(Boolean).join(' · ');
         const totals = partyTotals(party.id);
@@ -6460,7 +7640,16 @@
       function showPartyView(party) {
         currentPartyViewId = party.id;
         renderPartyViewContent(party);
+        partyCommentInput.value = '';
+        partyCommentsCache = [];
+        partyCommentsEl.innerHTML = '';
         partyViewOverlay.classList.add('show');
+
+        if (partyCommentsUnsub) { partyCommentsUnsub(); partyCommentsUnsub = null; }
+        partyCommentsUnsub = partiesCol.doc(party.id).collection('comments').onSnapshot(snap => {
+          partyCommentsCache = snap.docs.map(d => ({ id: d.id, ...d.data() }));
+          renderPartyComments(partyCommentsCache);
+        }, err => showToast('Sync error: ' + err.message));
       }
       function openPartyView(party) {
         pushOverlayState();
@@ -6469,6 +7658,7 @@
       function hidePartyView() {
         partyViewOverlay.classList.remove('show');
         currentPartyViewId = null;
+        if (partyCommentsUnsub) { partyCommentsUnsub(); partyCommentsUnsub = null; }
       }
       function closePartyView() { history.back(); }
       document.getElementById('partyViewClose').onclick = closePartyView;
@@ -6478,10 +7668,10 @@
         hidePartyView();
         if (party) openPartyForm(party);
       };
-      document.getElementById('partyViewAddPhotoBtn').onclick = () => document.getElementById('partyViewPhotoInput').click();
+      document.getElementById('partyViewAddPhotoBtn').onclick = () => openPhotoChooser(document.getElementById('partyViewPhotoInput'));
       document.getElementById('partyViewPhotoInput').onchange = async () => {
         const input = document.getElementById('partyViewPhotoInput');
-        const files = Array.from(input.files || []);
+        const files = partitionValidMedia(Array.from(input.files || []));
         input.value = '';
         if (!files.length || !currentPartyViewId) return;
         try {
@@ -6509,15 +7699,15 @@
         photos.forEach((p, i) => {
           const div = document.createElement('div');
           div.className = 'thumb';
-          div.innerHTML = `<img src="${escapeHtml(p.url)}"><button class="rm" title="Remove">✕</button>`;
-          div.querySelector('img').onclick = () => openLightbox(photos, i);
+          div.innerHTML = `${mediaThumbInnerHtml(p.url)}<button class="rm" title="Remove">✕</button>`;
+          div.querySelector('img, video').onclick = () => openLightbox(photos, i);
           div.querySelector('.rm').onclick = () => removePartyPhoto(party.id, p);
           partyPhotoStrip.appendChild(div);
         });
         partyPendingPhotos.forEach((pp, i) => {
           const div = document.createElement('div');
           div.className = 'thumb';
-          div.innerHTML = `<img src="${pp.url}"><button class="rm" title="Remove">✕</button>`;
+          div.innerHTML = `${mediaThumbInnerHtml(pp.url, pp.file.type.startsWith('video/'))}<button class="rm" title="Remove">✕</button>`;
           div.querySelector('.rm').onclick = () => { partyPendingPhotos.splice(i, 1); renderPartyPhotoStrip(party); };
           partyPhotoStrip.appendChild(div);
         });
@@ -6525,7 +7715,7 @@
         addTile.type = 'button';
         addTile.className = 'addThumb';
         addTile.textContent = '+';
-        addTile.onclick = () => partyPhotoInput.click();
+        addTile.onclick = () => openPhotoChooser(partyPhotoInput);
         partyPhotoStrip.appendChild(addTile);
       }
 
@@ -6550,7 +7740,7 @@
       }
 
       partyPhotoInput.onchange = async () => {
-        const files = Array.from(partyPhotoInput.files || []);
+        const files = partitionValidMedia(Array.from(partyPhotoInput.files || []));
         partyPhotoInput.value = '';
         if (!files.length) return;
         if (partyEditingId) {
@@ -6649,6 +7839,10 @@
           }
           const partSnap = await partiesCol.doc(party.id).collection('participants').get();
           for (const doc of partSnap.docs) {
+            try { await doc.ref.delete(); } catch (e) { }
+          }
+          const commentsSnap = await partiesCol.doc(party.id).collection('comments').get();
+          for (const doc of commentsSnap.docs) {
             try { await doc.ref.delete(); } catch (e) { }
           }
           await partiesCol.doc(party.id).delete();
@@ -6858,11 +8052,9 @@
       function renderPubViewContent(pub) {
         const photos = pub.photos || [];
         pubViewCarousel.innerHTML = photos.length
-          ? photos.map((p, i) => `<img src="${escapeHtml(p.url)}" data-i="${i}">`).join('')
+          ? photos.map((p, i) => carouselSlideHtml(p, i)).join('')
           : '<div class="placeholder">🍸</div>';
-        pubViewCarousel.querySelectorAll('img').forEach(img => {
-          img.onclick = () => openLightbox(photos, Number(img.dataset.i));
-        });
+        wireCarouselClicks(pubViewCarousel, photos);
         pubViewName.textContent = pub.name || 'Unnamed pub';
         document.getElementById('pubViewCity').textContent = pub.city || '';
         renderPubViewBadges(pub);
@@ -6924,6 +8116,17 @@
         if (pub) openPubForm(pub);
       };
 
+      document.getElementById('pubViewMapBtn').onclick = () => {
+        const pub = allPubs.find(p => p.id === currentPubViewId);
+        if (!pub) return;
+        if (pub.lat == null || pub.lng == null) {
+          showToast('This pub has no location set yet');
+          return;
+        }
+        hidePubView();
+        openPubsMapPage(pub.id);
+      };
+
       pubCommentPostBtn.onclick = async () => {
         const pubId = currentPubViewId;
         const text = pubCommentInput.value.trim();
@@ -6939,7 +8142,7 @@
 
       pubAddPhotoBtn.onclick = () => pubPhotoInputView.click();
       pubPhotoInputView.onchange = async () => {
-        const files = Array.from(pubPhotoInputView.files || []);
+        const files = partitionValidMedia(Array.from(pubPhotoInputView.files || []));
         pubPhotoInputView.value = '';
         if (!files.length || !currentPubViewId) return;
         try {
@@ -6960,6 +8163,21 @@
       let pubEditingId = null;
       let pubPendingPhotos = [];
       let pubFormOpenedFromId = null;
+      let pubFormPendingLocation = null; // {lat, lng} | null — set via the map picker, written on save
+
+      function updatePubfLocationStatus() {
+        const el = document.getElementById('pubfLocationStatus');
+        el.textContent = pubFormPendingLocation ? '📍 Location set' : 'No location set yet';
+        el.classList.toggle('isSet', !!pubFormPendingLocation);
+      }
+      document.getElementById('pubfLocationBtn').onclick = () => {
+        const name = document.getElementById('pubfName').value.trim();
+        const city = document.getElementById('pubfCity').value.trim();
+        openLocationPicker('Set pub location', pubFormPendingLocation, name, city, (latLng) => {
+          pubFormPendingLocation = latLng;
+          updatePubfLocationStatus();
+        });
+      };
 
       function renderPubPhotoStrip(pub) {
         pubPhotoStrip.innerHTML = '';
@@ -6967,15 +8185,15 @@
         photos.forEach((p, i) => {
           const div = document.createElement('div');
           div.className = 'thumb';
-          div.innerHTML = `<img src="${escapeHtml(p.url)}"><button class="rm" title="Remove">✕</button>`;
-          div.querySelector('img').onclick = () => openLightbox(photos, i);
+          div.innerHTML = `${mediaThumbInnerHtml(p.url)}<button class="rm" title="Remove">✕</button>`;
+          div.querySelector('img, video').onclick = () => openLightbox(photos, i);
           div.querySelector('.rm').onclick = () => removePubPhoto(pub.id, p);
           pubPhotoStrip.appendChild(div);
         });
         pubPendingPhotos.forEach((pp, i) => {
           const div = document.createElement('div');
           div.className = 'thumb';
-          div.innerHTML = `<img src="${pp.url}"><button class="rm" title="Remove">✕</button>`;
+          div.innerHTML = `${mediaThumbInnerHtml(pp.url, pp.file.type.startsWith('video/'))}<button class="rm" title="Remove">✕</button>`;
           div.querySelector('.rm').onclick = () => { pubPendingPhotos.splice(i, 1); renderPubPhotoStrip(pub); };
           pubPhotoStrip.appendChild(div);
         });
@@ -6983,12 +8201,12 @@
         addTile.type = 'button';
         addTile.className = 'addThumb';
         addTile.textContent = '+';
-        addTile.onclick = () => pubFormPhotoInput.click();
+        addTile.onclick = () => openPhotoChooser(pubFormPhotoInput);
         pubPhotoStrip.appendChild(addTile);
       }
 
       pubFormPhotoInput.onchange = async () => {
-        const files = Array.from(pubFormPhotoInput.files || []);
+        const files = partitionValidMedia(Array.from(pubFormPhotoInput.files || []));
         pubFormPhotoInput.value = '';
         if (!files.length) return;
         if (pubEditingId) {
@@ -7030,6 +8248,8 @@
         pubDeleteBtn.style.display = pub ? 'block' : 'none';
         document.getElementById('pubfName').value = pub?.name || '';
         document.getElementById('pubfCity').value = pub?.city || '';
+        pubFormPendingLocation = (pub && pub.lat != null && pub.lng != null) ? { lat: pub.lat, lng: pub.lng } : null;
+        updatePubfLocationStatus();
         pubFormSelectedTags = pubTagsOf(pub).slice();
         renderPubTagPicker();
         renderPubPhotoStrip(pub);
@@ -7060,12 +8280,13 @@
         }
         const saveBtn = document.getElementById('pubSaveBtn');
         saveBtn.disabled = true;
+        const locationFields = pubFormPendingLocation ? { lat: pubFormPendingLocation.lat, lng: pubFormPendingLocation.lng } : {};
         try {
           if (pubEditingId) {
-            await pubsCol.doc(pubEditingId).update({ name, city, tags });
+            await pubsCol.doc(pubEditingId).update({ name, city, tags, ...locationFields });
             showToast('Pub updated');
           } else {
-            const ref = await pubsCol.add({ name, city, tags, photos: [], createdBy: myUid, ts: Date.now() });
+            const ref = await pubsCol.add({ name, city, tags, photos: [], createdBy: myUid, ts: Date.now(), ...locationFields });
             for (const pp of pubPendingPhotos) await uploadPhotoToPub(ref.id, pp.file);
             showToast('Pub added');
           }
@@ -7096,6 +8317,293 @@
         confirmDeletePub(pub);
       };
 
+      // ---------- Pubs map + location picker ----------
+      // Free, no-API-key stack: Leaflet + OpenStreetMap tiles for the map
+      // itself, Nominatim for search-by-name/address — both are the
+      // standard free/open alternative to Google Maps for exactly this.
+      const OSM_TILE_URL = 'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png';
+      const OSM_ATTRIBUTION = '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors';
+      const MAP_DEFAULT_CENTER = [48.15, 17.11]; // Bratislava area — where most of this group's pubs are
+      let locationPickerMap = null;
+      let locationPickerMarker = null;
+      let locationPickerPendingLatLng = null;
+      let locationPickerOnSave = null;
+      let locationPickerSearchTimer = null;
+
+      function ensureLocationPickerMap() {
+        if (locationPickerMap) return locationPickerMap;
+        locationPickerMap = L.map('locationPickerMap');
+        L.tileLayer(OSM_TILE_URL, { attribution: OSM_ATTRIBUTION, maxZoom: 19 }).addTo(locationPickerMap);
+        locationPickerMap.on('click', (e) => setLocationPickerMarker(e.latlng.lat, e.latlng.lng));
+        return locationPickerMap;
+      }
+
+      function setLocationPickerMarker(lat, lng) {
+        locationPickerPendingLatLng = { lat, lng };
+        const map = ensureLocationPickerMap();
+        if (locationPickerMarker) {
+          locationPickerMarker.setLatLng([lat, lng]);
+        } else {
+          locationPickerMarker = L.marker([lat, lng], { draggable: true }).addTo(map);
+          locationPickerMarker.on('dragend', () => {
+            const p = locationPickerMarker.getLatLng();
+            locationPickerPendingLatLng = { lat: p.lat, lng: p.lng };
+          });
+        }
+        map.setView([lat, lng], 16);
+      }
+
+      async function searchNominatim(query, opts) {
+        const params = new URLSearchParams({ format: 'json', limit: '5', addressdetails: '1', q: query });
+        if (opts && opts.viewbox) { params.set('viewbox', opts.viewbox); params.set('bounded', '1'); }
+        if (opts && opts.countrycodes) params.set('countrycodes', opts.countrycodes);
+        const res = await fetch(`https://nominatim.openstreetmap.org/search?${params}`, { headers: { 'Accept-Language': 'en' } });
+        if (!res.ok) throw new Error('Search failed');
+        return res.json();
+      }
+
+      // Hungarian/Slovak venue names are often typed without their
+      // diacritics (ő, ű, ö, á…) — stripping them and retrying is cheap
+      // insurance against a query that would otherwise match nothing.
+      function stripDiacritics(s) { return s.normalize('NFD').replace(/[̀-ͯ]/g, ''); }
+
+      // Resolved once per distinct city name typed (cached) so repeated
+      // keystrokes don't re-geocode the same city over and over.
+      const locationPickerCityBBoxCache = {};
+      async function resolveCityViewbox(cityQuery) {
+        const key = cityQuery.trim().toLowerCase();
+        if (!key) return null;
+        if (key in locationPickerCityBBoxCache) return locationPickerCityBBoxCache[key];
+        let viewbox = null;
+        try {
+          // This group's pubs are all in Slovakia/Hungary, and several city
+          // names used here (e.g. "Senec") also name unrelated places
+          // elsewhere in the world — without a country hint, Nominatim's
+          // top hit for the bare name can silently be the wrong country's
+          // same-named town, quietly scoping the whole search to nowhere
+          // near the actual pub.
+          const [hit] = await searchNominatim(cityQuery, { countrycodes: 'sk,hu' });
+          if (hit && hit.boundingbox) {
+            const [south, north, west, east] = hit.boundingbox.map(Number);
+            viewbox = `${west},${north},${east},${south}`;
+          }
+        } catch (e) { /* fall through with no scoping */ }
+        locationPickerCityBBoxCache[key] = viewbox;
+        return viewbox;
+      }
+
+      const locationPickerSearchInput = document.getElementById('locationPickerSearch');
+      const locationPickerCityInput = document.getElementById('locationPickerCitySearch');
+      const locationPickerResultsEl = document.getElementById('locationPickerResults');
+
+      // As-typed, then de-accented if that's actually a different string —
+      // never widens past whatever scope it's given. Silently falling back
+      // to an unscoped, worldwide search once a city was specified would
+      // defeat the whole point of asking for that city: a short generic
+      // word (plenty of pub names are, or contain one) reliably matches
+      // *something* somewhere, and a same-named venue in the wrong city is
+      // worse than no result at all — it looks like a confirmed match.
+      async function runPubNameSearch(name, viewbox) {
+        const variants = [name];
+        const stripped = stripDiacritics(name);
+        if (stripped !== name) variants.push(stripped);
+        for (const variant of variants) {
+          const results = await searchNominatim(variant, viewbox ? { viewbox } : undefined);
+          if (results.length) return results;
+        }
+        return [];
+      }
+
+      function performLocationPickerSearch() {
+        clearTimeout(locationPickerSearchTimer);
+        locationPickerSearchTimer = setTimeout(async () => {
+          const nameQuery = locationPickerSearchInput.value.trim();
+          const cityQuery = locationPickerCityInput.value.trim();
+          if (!nameQuery) { locationPickerResultsEl.innerHTML = ''; return; }
+          locationPickerResultsEl.innerHTML = '<div class="empty" style="padding:6px 0">Searching…</div>';
+          try {
+            const viewbox = cityQuery ? await resolveCityViewbox(cityQuery) : null;
+            const results = await runPubNameSearch(nameQuery, viewbox);
+            const emptyMsg = viewbox
+              ? `No results in "${escapeHtml(cityQuery)}" — try clearing the city to search wider, or tap the map to place it manually`
+              : 'No results — tap the map to place it manually';
+            locationPickerResultsEl.innerHTML = results.length
+              ? results.map((r, i) => `<div class="locationPickerResult" data-i="${i}">${escapeHtml(r.display_name)}</div>`).join('')
+              : `<div class="empty" style="padding:6px 0">${emptyMsg}</div>`;
+            locationPickerResultsEl.querySelectorAll('.locationPickerResult').forEach(row => {
+              row.onclick = () => {
+                const r = results[Number(row.dataset.i)];
+                setLocationPickerMarker(Number(r.lat), Number(r.lon));
+              };
+            });
+          } catch (e) {
+            locationPickerResultsEl.innerHTML = '<div class="empty" style="padding:6px 0">Search failed</div>';
+          }
+        }, 600); // Nominatim's usage policy asks for roughly one request per second
+      }
+      function seedLocationPickerSearch(name, city) {
+        locationPickerSearchInput.value = name || '';
+        locationPickerCityInput.value = city || '';
+        performLocationPickerSearch();
+      }
+      locationPickerSearchInput.oninput = performLocationPickerSearch;
+      locationPickerCityInput.oninput = performLocationPickerSearch;
+
+      function openLocationPicker(title, initialLatLng, seedName, seedCity, onSave) {
+        document.getElementById('locationPickerTitle').textContent = title;
+        locationPickerResultsEl.innerHTML = '';
+        locationPickerPendingLatLng = initialLatLng || null;
+        locationPickerOnSave = onSave;
+        pushOverlayState();
+        document.getElementById('locationPickerOverlay').classList.add('show');
+        setTimeout(() => {
+          const map = ensureLocationPickerMap();
+          map.invalidateSize();
+          if (locationPickerMarker) { map.removeLayer(locationPickerMarker); locationPickerMarker = null; }
+          if (initialLatLng) {
+            setLocationPickerMarker(initialLatLng.lat, initialLatLng.lng);
+            locationPickerSearchInput.value = '';
+            locationPickerCityInput.value = '';
+          } else {
+            map.setView(MAP_DEFAULT_CENTER, 13);
+            if (seedName || seedCity) seedLocationPickerSearch(seedName, seedCity);
+            else { locationPickerSearchInput.value = ''; locationPickerCityInput.value = ''; }
+          }
+        }, 60);
+      }
+      function hideLocationPicker() { document.getElementById('locationPickerOverlay').classList.remove('show'); }
+      function closeLocationPicker() { history.back(); }
+      document.getElementById('locationPickerClose').onclick = closeLocationPicker;
+      document.getElementById('locationPickerCancelBtn').onclick = closeLocationPicker;
+      document.getElementById('locationPickerOverlay').addEventListener('click', (e) => {
+        if (e.target === document.getElementById('locationPickerOverlay')) closeLocationPicker();
+      });
+      document.getElementById('locationPickerSaveBtn').onclick = () => {
+        if (!locationPickerPendingLatLng) { showToast('Tap the map or search to pick a spot first'); return; }
+        const cb = locationPickerOnSave;
+        const latLng = locationPickerPendingLatLng;
+        closeLocationPicker();
+        if (cb) cb(latLng);
+      };
+
+      function pubPopupHtml(pub) {
+        const ratingLine = pub.avgRating != null ? `${pub.avgRating.toFixed(1)}/10${pub.ratingCount ? ` (${pub.ratingCount})` : ''}` : 'Not rated yet';
+        return `<div class="pubMapPopup"><strong>${escapeHtml(pub.name || 'Unnamed pub')}</strong><br>${ratingLine}<br>
+          <button type="button" onclick="window.__openPubFromMap('${pub.id}')">Open pub</button></div>`;
+      }
+      window.__openPubFromMap = (pubId) => {
+        const pub = allPubs.find(p => p.id === pubId);
+        if (pub) openPubView(pub);
+      };
+
+      let pubsMap = null;
+      let pubsMapMarkers = null;
+      // Set right before opening the map from a specific pub's "show on
+      // map" button — one-shot: renderPubsMap consumes and clears it, so a
+      // later re-render (e.g. an admin placing another pin) doesn't keep
+      // snapping back to whichever pub was focused last time.
+      let pubsMapFocusPubId = null;
+      function renderPubsMap() {
+        const container = document.getElementById('pubsMapContainer');
+        if (!pubsMap) {
+          pubsMap = L.map(container);
+          L.tileLayer(OSM_TILE_URL, { attribution: OSM_ATTRIBUTION, maxZoom: 19 }).addTo(pubsMap);
+          pubsMapMarkers = L.layerGroup().addTo(pubsMap);
+        }
+        pubsMap.invalidateSize();
+        pubsMapMarkers.clearLayers();
+        const located = allPubs.filter(p => p.lat != null && p.lng != null);
+        const markersById = {};
+        located.forEach(p => {
+          markersById[p.id] = L.marker([p.lat, p.lng]).addTo(pubsMapMarkers).bindPopup(pubPopupHtml(p));
+        });
+        const focusPub = pubsMapFocusPubId ? located.find(p => p.id === pubsMapFocusPubId) : null;
+        pubsMapFocusPubId = null;
+        if (focusPub) {
+          pubsMap.setView([focusPub.lat, focusPub.lng], 17);
+          markersById[focusPub.id].openPopup();
+          return;
+        }
+        // Otherwise always opens centered on Bratislava at a normal zoom,
+        // regardless of how many pins there are — a small handful of
+        // far-away outliers (e.g. a pub in Siófok) used to force fitBounds
+        // to zoom out to fit everything, making the map useless for the
+        // cluster that actually matters. Panning out to see a distant pin
+        // is one pinch away.
+        pubsMap.setView(MAP_DEFAULT_CENTER, 12);
+      }
+
+      // Admin-only — placing a pub's real location for the first time is
+      // the same "owner or admin" edit permission as changing its name/city,
+      // so this reuses that boundary rather than opening it to everyone.
+      function renderPubsMapUnlocatedSection() {
+        const section = document.getElementById('pubsMapUnlocatedSection');
+        if (!isAdmin()) { section.style.display = 'none'; return; }
+        const unlocated = allPubs.filter(p => p.lat == null || p.lng == null);
+        if (!unlocated.length) { section.style.display = 'none'; return; }
+        section.style.display = 'block';
+        const listEl = document.getElementById('pubsMapUnlocatedList');
+        listEl.innerHTML = unlocated.map(p => `<div class="partyRow pubRow" data-pub="${p.id}">
+      <div class="partyThumb">🍸</div>
+      <div class="partyInfo">
+        <div class="partyName">${escapeHtml(p.name || 'Unnamed pub')}</div>
+        <div class="partyMeta">${p.city ? escapeHtml(p.city) : 'No city set'}</div>
+      </div>
+    </div>`).join('');
+        listEl.querySelectorAll('.pubRow').forEach(row => {
+          row.onclick = () => {
+            const pub = allPubs.find(p => p.id === row.dataset.pub);
+            if (!pub) return;
+            openLocationPicker(`Place "${pub.name || 'this pub'}"`, null, pub.name, pub.city, async (latLng) => {
+              try {
+                await pubsCol.doc(pub.id).update({ lat: latLng.lat, lng: latLng.lng });
+                showToast('Location saved');
+                renderPubsMapUnlocatedSection();
+                renderPubsMap();
+              } catch (err) { showToast('Could not save location: ' + err.message); }
+            });
+          };
+        });
+      }
+
+      let pubsMapPageOpen = false;
+      function showPubsMapPage() {
+        pubsMapPageOpen = true;
+        document.getElementById('toolbar').style.display = 'none';
+        document.getElementById('reviewsSubTabSwitch').style.display = 'none';
+        beerToolbarRows.style.display = 'none';
+        document.getElementById('spiritToolbarRows').style.display = 'none';
+        document.getElementById('nikotinToolbarRows').style.display = 'none';
+        document.getElementById('koffeinToolbarRows').style.display = 'none';
+        document.getElementById('pubToolbarRows').style.display = 'none';
+        beerList.style.display = 'none';
+        document.getElementById('spiritList').style.display = 'none';
+        document.getElementById('nikotinList').style.display = 'none';
+        document.getElementById('koffeinList').style.display = 'none';
+        partyListEl.style.display = 'none';
+        document.getElementById('partyListHead').style.display = 'none';
+        document.getElementById('pubList').style.display = 'none';
+        document.getElementById('leaderboardPage').style.display = 'none';
+        document.getElementById('fab').style.display = 'none';
+        document.getElementById('pubsMapPage').style.display = 'block';
+        renderPubsMapUnlocatedSection();
+        setTimeout(renderPubsMap, 60);
+      }
+      function openPubsMapPage(focusPubId) {
+        pubsMapFocusPubId = focusPubId || null;
+        pushOverlayState();
+        showPubsMapPage();
+      }
+      function hidePubsMapPage() {
+        pubsMapPageOpen = false;
+        document.getElementById('pubsMapPage').style.display = 'none';
+        document.getElementById('toolbar').style.display = 'flex';
+        setActiveTab(activeTab);
+      }
+      function closePubsMapPage() { history.back(); }
+      document.getElementById('pubsMapBackBtn').onclick = closePubsMapPage;
+      document.getElementById('pubMapOpenBtn').onclick = openPubsMapPage;
+
       // ---------- Leaderboard ----------
       const CURRENT_YEAR = new Date().getFullYear();
       const drinkLogsCol = db.collection('drinkLogs');
@@ -7110,26 +8618,6 @@
         return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
       }
       function todayKey() { return dateKeyFromTs(Date.now()); }
-
-      async function logDrink(userId, delta, dateKey) {
-        const key = dateKey || todayKey();
-        await drinkLogsCol.doc(`${userId}_${key}`).set({
-          userId,
-          date: key,
-          year: Number(key.slice(0, 4)),
-          count: firebase.firestore.FieldValue.increment(delta)
-        }, { merge: true });
-      }
-
-      async function logShot(userId, delta, dateKey) {
-        const key = dateKey || todayKey();
-        await shotLogsCol.doc(`${userId}_${key}`).set({
-          userId,
-          date: key,
-          year: Number(key.slice(0, 4)),
-          count: firebase.firestore.FieldValue.increment(delta)
-        }, { merge: true });
-      }
 
       // Party beer/shot counts are never copied into drinkLogs/shotLogs — they live
       // only on each party's participant doc. The leaderboard total is party
@@ -7152,25 +8640,6 @@
             map[p.id].dates.add(dateKey);
           });
         });
-        return map;
-      }
-
-      async function fetchPartyContributionsForYear(year) {
-        const map = {};
-        const partiesSnap = await partiesCol.get();
-        for (const doc of partiesSnap.docs) {
-          const party = doc.data();
-          const dateKey = dateKeyFromTs(party.ts || Date.now());
-          if (Number(dateKey.slice(0, 4)) !== year) continue;
-          const partSnap = await partiesCol.doc(doc.id).collection('participants').get();
-          partSnap.docs.forEach(p => {
-            const count = p.data().count || 0;
-            if (count <= 0) return;
-            if (!map[p.id]) map[p.id] = { total: 0, dates: new Set() };
-            map[p.id].total += count;
-            map[p.id].dates.add(dateKey);
-          });
-        }
         return map;
       }
 
@@ -7215,43 +8684,36 @@
         b.onclick = () => setLbSubTab(b.dataset.lbtab);
       });
 
-      function renderLeaderboard() {
-        const mode = activeLbSubTab;
-        const standings = computeStandings(
-          currentYearLogs, currentYearShotLogs, allUsers,
-          livePartyContributionsForYear(CURRENT_YEAR, 'count'),
-          livePartyContributionsForYear(CURRENT_YEAR, 'shotCount')
-        );
-        const grandBeers = standings.reduce((s, x) => s + x.totalBeers, 0);
-        const grandShots = standings.reduce((s, x) => s + x.totalShots, 0);
-        document.getElementById('leaderboardYearHead').innerHTML =
-          `<span>${CURRENT_YEAR} Leaderboard</span>` +
-          `<span class="leaderboardYearTotals"><span>${grandBeers} 🍺</span><span>${grandShots} 🥃</span></span>`;
-        standings.sort((a, b) => {
-          const av = mode === 'shot' ? a.totalShots : mode === 'all' ? a.totalBeers + a.totalShots : a.totalBeers;
-          const bv = mode === 'shot' ? b.totalShots : mode === 'all' ? b.totalBeers + b.totalShots : b.totalBeers;
-          return bv - av || (a.name || '').localeCompare(b.name || '');
-        });
-        const listEl = document.getElementById('leaderboardList');
-        if (!standings.length) {
-          listEl.innerHTML = `<div class="empty">No ${mode === 'shot' ? 'shots' : mode === 'all' ? 'drinks' : 'beers'} logged yet this year</div>`;
-        } else {
-          const showBeer = mode === 'beer' || mode === 'all';
-          const showShot = mode === 'shot' || mode === 'all';
-          listEl.innerHTML = standings.map((s, i) => {
-            const canControl = s.id === myUid || isAdmin();
-            const u = allUsers.find(x => x.id === s.id);
-            const beerLine = showBeer ? `<div class="leaderboardCounterLine">
-          ${canControl && s.manualTotal > 0 ? `<button type="button" class="partyMinusBtn" data-user="${s.id}" data-kind="beer">–</button>` : ''}
+      // Non-current years' manual logs rarely change, so they're fetched
+      // once and cached — the current year alone stays wired to a live
+      // onSnapshot (currentYearLogs/currentYearShotLogs) and never needs this.
+      let historicalYearLogsCache = {};
+      async function getYearManualLogs(year) {
+        if (year === CURRENT_YEAR) return { logs: currentYearLogs, shotLogs: currentYearShotLogs };
+        if (historicalYearLogsCache[year]) return historicalYearLogsCache[year];
+        const [logsSnap, shotSnap] = await Promise.all([
+          drinkLogsCol.where('year', '==', year).get(),
+          shotLogsCol.where('year', '==', year).get()
+        ]);
+        const result = { logs: logsSnap.docs.map(d => d.data()), shotLogs: shotSnap.docs.map(d => d.data()) };
+        historicalYearLogsCache[year] = result;
+        return result;
+      }
+
+      function leaderboardRowHtml(s, i, mode, canEditThisYear) {
+        const canControl = canEditThisYear && (s.id === myUid || isAdmin());
+        const u = allUsers.find(x => x.id === s.id);
+        const showBeer = mode === 'beer' || mode === 'all';
+        const showShot = mode === 'shot' || mode === 'all';
+        const beerLine = showBeer ? `<div class="leaderboardCounterLine">
           <div class="leaderboardTotal">${s.totalBeers} 🍺</div>
-          ${canControl ? `<button type="button" class="partyPlusBtn" data-user="${s.id}" data-kind="beer">+</button>` : ''}
+          ${canControl ? `<button type="button" class="partyBreakdownBtn" data-user="${s.id}" data-kind="beer" title="Beer breakdown">▾</button>` : ''}
         </div>` : '';
-            const shotLine = showShot ? `<div class="leaderboardCounterLine">
-          ${canControl && s.manualShotTotal > 0 ? `<button type="button" class="partyMinusBtn" data-user="${s.id}" data-kind="shot">–</button>` : ''}
+        const shotLine = showShot ? `<div class="leaderboardCounterLine">
           <div class="leaderboardTotal">${s.totalShots} 🥃</div>
-          ${canControl ? `<button type="button" class="partyPlusBtn" data-user="${s.id}" data-kind="shot">+</button>` : ''}
+          ${canControl ? `<button type="button" class="partyBreakdownBtn" data-user="${s.id}" data-kind="shot" title="Shot breakdown">▾</button>` : ''}
         </div>` : '';
-            return `<div class="leaderboardRow${i < 3 ? ' rank-' + (i + 1) : ''}${skinBgClass(u)}">
+        return `<div class="leaderboardRow${i < 3 ? ' rank-' + (i + 1) : ''}${skinBgClass(u)}">
         <div class="leaderboardRank">${RANK_MEDALS[i] || (i + 1)}</div>
         ${wrapAvatarWithHat(u, `<div class="userAvatar lbProfileLink${avatarBorderClass(u)}" data-user="${s.id}">${avatarInner(s.name, s.photoURL)}</div>`)}
         <div class="leaderboardInfo">
@@ -7260,128 +8722,188 @@
         </div>
         <div class="leaderboardCounters">${beerLine}${shotLine}</div>
       </div>`;
-          }).join('');
-          listEl.querySelectorAll('.partyPlusBtn').forEach(btn => {
-            btn.onclick = async () => {
-              const isShot = btn.dataset.kind === 'shot';
-              try { await (isShot ? logShot : logDrink)(btn.dataset.user, 1); } catch (err) { showToast(`Could not add ${isShot ? 'shot' : 'beer'}: ` + err.message); }
-            };
-          });
-          listEl.querySelectorAll('.partyMinusBtn').forEach(btn => {
-            btn.onclick = async () => {
-              const isShot = btn.dataset.kind === 'shot';
-              try { await (isShot ? logShot : logDrink)(btn.dataset.user, -1); } catch (err) { showToast(`Could not remove ${isShot ? 'shot' : 'beer'}: ` + err.message); }
-            };
-          });
-          listEl.querySelectorAll('.lbProfileLink').forEach(el => {
-            el.onclick = () => openProfileView(el.dataset.user);
-          });
+      }
+
+      // Manual +/- editing only ever makes sense for the current year — the
+      // buttons always log against today's date regardless of which year's
+      // dropdown they're clicked from, so past years render read-only.
+      function renderStandingsListInto(listEl, standings, mode, canEditThisYear) {
+        if (!standings.length) {
+          listEl.innerHTML = `<div class="empty">No ${mode === 'shot' ? 'shots' : mode === 'all' ? 'drinks' : 'beers'} logged this year</div>`;
+          return;
         }
-        renderArchivesList();
+        listEl.innerHTML = standings.map((s, i) => leaderboardRowHtml(s, i, mode, canEditThisYear)).join('');
+        listEl.querySelectorAll('.partyBreakdownBtn').forEach(btn => {
+          btn.onclick = () => openLeaderboardDrinkPicker(btn.dataset.user, btn.dataset.kind);
+        });
+        listEl.querySelectorAll('.lbProfileLink').forEach(el => {
+          el.onclick = () => openProfileView(el.dataset.user);
+        });
+      }
+
+      // The year row's own totals pill mirrors whichever metric the active
+      // sub-tab is about — just beers on the Beer tab, just shots on Shots,
+      // both on All — instead of always showing both regardless of tab.
+      function leaderboardYearTotalsHtml(mode, beers, shots) {
+        const beerSpan = `<span>${beers} 🍺</span>`;
+        const shotSpan = `<span>${shots} 🥃</span>`;
+        const totals = mode === 'shot' ? shotSpan : mode === 'all' ? beerSpan + shotSpan : beerSpan;
+        return `${totals}<span class="leaderboardYearArrow">▾</span>`;
+      }
+
+      // Every year from 2025 through the current one gets its own
+      // collapsible row — current year starts open, past years start
+      // collapsed (state remembered per year across re-renders/tab
+      // switches), and a past year with zero activity still shows up as
+      // "0 🍺 0 🥃" rather than being hidden.
+      let lbYearExpanded = {};
+      let lbRenderToken = 0;
+
+      async function renderLeaderboard() {
+        const mode = activeLbSubTab;
+        const years = [];
+        for (let y = CURRENT_YEAR; y >= YEARLY_RECAP_START_YEAR; y--) years.push(y);
+        if (!(CURRENT_YEAR in lbYearExpanded)) lbYearExpanded[CURRENT_YEAR] = true;
+
+        const renderToken = ++lbRenderToken; // guards against a slower, superseded render finishing late
+        const container = document.getElementById('leaderboardYearsContainer');
+        container.innerHTML = years.map(year => `
+          <details class="leaderboardYearBlock" data-year="${year}"${lbYearExpanded[year] ? ' open' : ''}>
+            <summary class="leaderboardYearHead">
+              <span>${year} Leaderboard</span>
+              <span class="leaderboardYearTotals" id="lbYearTotals-${year}">
+                ${leaderboardYearTotalsHtml(mode, '…', '…')}
+              </span>
+            </summary>
+            <div class="leaderboardYearList" id="lbYearList-${year}"></div>
+          </details>
+        `).join('');
+        container.querySelectorAll('.leaderboardYearBlock').forEach(details => {
+          details.addEventListener('toggle', () => { lbYearExpanded[Number(details.dataset.year)] = details.open; });
+        });
+
+        for (const year of years) {
+          const { logs, shotLogs } = await getYearManualLogs(year);
+          if (renderToken !== lbRenderToken) return;
+          const partyMap = livePartyContributionsForYear(year, 'count');
+          const partyShotMap = livePartyContributionsForYear(year, 'shotCount');
+          const standings = computeStandings(logs, shotLogs, allUsers, partyMap, partyShotMap);
+          const grandBeers = standings.reduce((s, x) => s + x.totalBeers, 0);
+          const grandShots = standings.reduce((s, x) => s + x.totalShots, 0);
+          const totalsEl = document.getElementById(`lbYearTotals-${year}`);
+          if (totalsEl) totalsEl.innerHTML = leaderboardYearTotalsHtml(mode, grandBeers, grandShots);
+
+          standings.sort((a, b) => {
+            const av = mode === 'shot' ? a.totalShots : mode === 'all' ? a.totalBeers + a.totalShots : a.totalBeers;
+            const bv = mode === 'shot' ? b.totalShots : mode === 'all' ? b.totalBeers + b.totalShots : b.totalBeers;
+            return bv - av || (a.name || '').localeCompare(b.name || '');
+          });
+          const listEl = document.getElementById(`lbYearList-${year}`);
+          if (listEl) renderStandingsListInto(listEl, standings, mode, year === CURRENT_YEAR);
+        }
       }
 
       drinkLogsCol.where('year', '==', CURRENT_YEAR).onSnapshot(snap => {
         currentYearLogs = snap.docs.map(d => d.data());
         if (activeTab === 'leaderboard') renderLeaderboard();
+        if (drinkPickerCtx && drinkPickerCtx.kind === 'beer' && partyDrinkPickerOverlay.classList.contains('show')) {
+          renderDrinkPickerList(partyDrinkPickerSearch.value);
+        }
       }, err => showToast('Sync error: ' + err.message));
 
       shotLogsCol.where('year', '==', CURRENT_YEAR).onSnapshot(snap => {
         currentYearShotLogs = snap.docs.map(d => d.data());
         if (activeTab === 'leaderboard') renderLeaderboard();
-      }, err => showToast('Sync error: ' + err.message));
-
-      // ---------- Year-end archiving ----------
-      async function checkAndArchivePreviousYear() {
-        const prevYear = CURRENT_YEAR - 1;
-        try {
-          const archiveRef = db.collection('leaderboardArchives').doc(String(prevYear));
-          const existing = await archiveRef.get();
-          if (existing.exists) return;
-          const snap = await drinkLogsCol.where('year', '==', prevYear).get();
-          const logs = snap.docs.map(d => d.data());
-          const partyMap = await fetchPartyContributionsForYear(prevYear);
-          if (snap.empty && !Object.keys(partyMap).length) return;
-          const usersSnap = await usersCol.get();
-          const usersList = usersSnap.docs.map(d => ({ id: d.id, ...d.data() }));
-          const standings = computeStandings(logs, usersList, partyMap).filter(s => s.totalBeers > 0 || s.totalDays > 0);
-          if (!standings.length) return;
-          await archiveRef.set({ year: prevYear, standings, archivedAt: Date.now() });
-        } catch (e) { /* another device may already be archiving, or we're offline — safe to ignore */ }
-      }
-
-      let allArchives = [];
-      db.collection('leaderboardArchives').onSnapshot(snap => {
-        allArchives = snap.docs.map(d => ({ id: d.id, ...d.data() })).sort((a, b) => b.year - a.year);
-        if (activeTab === 'leaderboard') renderArchivesList();
-      }, err => showToast('Sync error: ' + err.message));
-
-      function renderArchivesList() {
-        const el = document.getElementById('archivesList');
-        if (!allArchives.length) {
-          el.innerHTML = '<div class="empty" style="padding:10px 0">No past years yet</div>';
-          return;
+        if (drinkPickerCtx && drinkPickerCtx.kind === 'shot' && partyDrinkPickerOverlay.classList.contains('show')) {
+          renderDrinkPickerList(partyDrinkPickerSearch.value);
         }
-        el.innerHTML = allArchives.map(a => `<div class="archiveRow" data-year="${a.year}">
-    <div class="partyThumb">🏆</div>
-    <div class="partyInfo">
-      <div class="partyName">${a.year}</div>
-      <div class="partyMeta">${a.standings.length} drinkers</div>
-    </div>
-  </div>`).join('');
-        el.querySelectorAll('.archiveRow').forEach(row => {
-          row.onclick = () => openArchiveView(allArchives.find(a => String(a.year) === row.dataset.year));
-        });
-      }
-
-      const archiveViewOverlay = document.getElementById('archiveViewOverlay');
-      function openArchiveView(archive) {
-        pushOverlayState();
-        document.getElementById('archiveViewTitle').textContent = `${archive.year} Final Standings`;
-        const listEl = document.getElementById('archiveViewList');
-        listEl.innerHTML = archive.standings.map((s, i) => `<div class="leaderboardRow${i < 3 ? ' rank-' + (i + 1) : ''}">
-    <div class="leaderboardRank">${RANK_MEDALS[i] || (i + 1)}</div>
-    <div class="userAvatar lbProfileLink" data-user="${s.id}">${avatarInner(s.name, s.photoURL)}</div>
-    <div class="leaderboardInfo">
-      <div class="leaderboardName lbProfileLink" data-user="${s.id}">${escapeHtml(s.name || 'Anonymous')}</div>
-      <div class="leaderboardMeta">${s.totalDays} day${s.totalDays === 1 ? '' : 's'}</div>
-    </div>
-    <div class="leaderboardTotal">${s.totalBeers} 🍺</div>
-  </div>`).join('');
-        listEl.querySelectorAll('.lbProfileLink').forEach(el => {
-          el.onclick = () => openProfileView(el.dataset.user);
-        });
-        archiveViewOverlay.classList.add('show');
-      }
-      function hideArchiveView() { archiveViewOverlay.classList.remove('show'); }
-      function closeArchiveView() { history.back(); }
-      document.getElementById('archiveViewClose').onclick = closeArchiveView;
-      archiveViewOverlay.addEventListener('click', (e) => { if (e.target === archiveViewOverlay) closeArchiveView(); });
-
-      checkAndArchivePreviousYear();
+      }, err => showToast('Sync error: ' + err.message));
 
       // ---------- Lightbox ----------
       const lightbox = document.getElementById('lightbox');
       const lbImg = document.getElementById('lbImg');
+      const lbVideo = document.getElementById('lbVideo');
+
+      let lbScale = 1, lbPanX = 0, lbPanY = 0;
+      function lbApplyTransform() {
+        lbImg.style.transform = `translate(${lbPanX}px, ${lbPanY}px) scale(${lbScale})`;
+      }
+      function lbResetZoom() { lbScale = 1; lbPanX = 0; lbPanY = 0; lbApplyTransform(); }
+
+      function lbShow() {
+        lbResetZoom();
+        const p = lbPhotos[lbIdx];
+        if (isVideoUrl(p.url)) {
+          lbImg.style.display = 'none';
+          lbVideo.style.display = 'block';
+          // Starts muted so autoplay is actually allowed by the browser —
+          // the video's own native controls (already has a speaker icon)
+          // are what let them unmute from there.
+          lbVideo.muted = true;
+          lbVideo.src = p.url;
+          lbVideo.play().catch(() => { }); // autoplay can be blocked — controls still let them tap play
+        } else {
+          lbVideo.pause();
+          lbVideo.removeAttribute('src');
+          lbVideo.style.display = 'none';
+          lbImg.style.display = 'block';
+          lbImg.src = p.url;
+        }
+      }
       function openLightbox(photos, idx) {
         pushOverlayState();
         lbPhotos = photos; lbIdx = idx;
-        lbImg.src = photos[idx].url;
+        lbShow();
         lightbox.classList.add('show');
       }
-      function hideLightbox() { lightbox.classList.remove('show'); }
-      function lbShow() { lbImg.src = lbPhotos[lbIdx].url; }
+      function hideLightbox() {
+        lightbox.classList.remove('show');
+        lbVideo.pause();
+      }
       document.getElementById('lbClose').onclick = () => history.back();
       document.getElementById('lbPrev').onclick = () => { lbIdx = (lbIdx - 1 + lbPhotos.length) % lbPhotos.length; lbShow(); };
       document.getElementById('lbNext').onclick = () => { lbIdx = (lbIdx + 1) % lbPhotos.length; lbShow(); };
 
+      // Swipe-to-navigate, pinch-to-zoom and pan-while-zoomed all share the
+      // same touch listeners on the lightbox itself — a video keeps its own
+      // native touch handling instead (see the #lightbox video CSS comment),
+      // so all of this is skipped whenever one is showing.
       let lbTouchStartX = null;
       let lbTouchStartY = null;
+      let lbPinchStartDist = null;
+      let lbPinchStartScale = 1;
+      let lbPanStart = null;
+      function lbTouchDist(touches) {
+        return Math.hypot(touches[0].clientX - touches[1].clientX, touches[0].clientY - touches[1].clientY);
+      }
       lightbox.addEventListener('touchstart', (e) => {
-        const t = e.touches[0];
-        lbTouchStartX = t.clientX;
-        lbTouchStartY = t.clientY;
+        lbTouchStartX = null;
+        lbPanStart = null;
+        if (e.target.closest('button') || lbVideo.style.display !== 'none') return;
+        if (e.touches.length === 2) {
+          lbPinchStartDist = lbTouchDist(e.touches);
+          lbPinchStartScale = lbScale;
+        } else if (e.touches.length === 1) {
+          if (lbScale > 1.01) {
+            lbPanStart = { x: e.touches[0].clientX, y: e.touches[0].clientY, panX: lbPanX, panY: lbPanY };
+          } else {
+            lbTouchStartX = e.touches[0].clientX;
+            lbTouchStartY = e.touches[0].clientY;
+          }
+        }
+      }, { passive: true });
+      lightbox.addEventListener('touchmove', (e) => {
+        if (e.touches.length === 2 && lbPinchStartDist) {
+          lbScale = Math.min(4, Math.max(1, lbPinchStartScale * (lbTouchDist(e.touches) / lbPinchStartDist)));
+          lbApplyTransform();
+        } else if (e.touches.length === 1 && lbPanStart) {
+          lbPanX = lbPanStart.panX + (e.touches[0].clientX - lbPanStart.x);
+          lbPanY = lbPanStart.panY + (e.touches[0].clientY - lbPanStart.y);
+          lbApplyTransform();
+        }
       }, { passive: true });
       lightbox.addEventListener('touchend', (e) => {
+        if (e.touches.length === 0) { lbPinchStartDist = null; lbPanStart = null; }
         if (lbTouchStartX == null || lbPhotos.length < 2) { lbTouchStartX = null; return; }
         const t = e.changedTouches[0];
         const dx = t.clientX - lbTouchStartX;
@@ -7486,11 +9008,9 @@
         currentViewBeer = beer;
         const photos = beer.photos || [];
         viewCarousel.innerHTML = photos.length
-          ? photos.map((p, i) => `<img src="${escapeHtml(p.url)}" data-i="${i}">`).join('')
+          ? photos.map((p, i) => carouselSlideHtml(p, i)).join('')
           : '<div class="placeholder">🍺</div>';
-        viewCarousel.querySelectorAll('img').forEach(img => {
-          img.onclick = () => openLightbox(photos, Number(img.dataset.i));
-        });
+        wireCarouselClicks(viewCarousel, photos);
         renderViewStats(beer);
         myViewRating = null;
         renderViewRatingButtons();
@@ -7533,10 +9053,10 @@
       };
       document.getElementById('viewClose').onclick = closeView;
       viewOverlay.addEventListener('click', (e) => { if (e.target === viewOverlay) closeView(); });
-      document.getElementById('viewAddPhotoBtn').onclick = () => document.getElementById('viewPhotoInput').click();
+      document.getElementById('viewAddPhotoBtn').onclick = () => openPhotoChooser(document.getElementById('viewPhotoInput'));
       document.getElementById('viewPhotoInput').onchange = async () => {
         const input = document.getElementById('viewPhotoInput');
-        const files = Array.from(input.files || []);
+        const files = partitionValidMedia(Array.from(input.files || []));
         input.value = '';
         if (!files.length || !currentViewId) return;
         try {
@@ -7742,15 +9262,15 @@
         photos.forEach((p, i) => {
           const div = document.createElement('div');
           div.className = 'thumb';
-          div.innerHTML = `<img src="${escapeHtml(p.url)}"><button class="rm" title="Remove">✕</button>`;
-          div.querySelector('img').onclick = () => openLightbox(photos, i);
+          div.innerHTML = `${mediaThumbInnerHtml(p.url)}<button class="rm" title="Remove">✕</button>`;
+          div.querySelector('img, video').onclick = () => openLightbox(photos, i);
           div.querySelector('.rm').onclick = () => removeExistingSpiritPhoto(spirit.id, p);
           spiritPhotoStrip.appendChild(div);
         });
         spiritPendingPhotos.forEach((pp, i) => {
           const div = document.createElement('div');
           div.className = 'thumb';
-          div.innerHTML = `<img src="${pp.url}"><button class="rm" title="Remove">✕</button>`;
+          div.innerHTML = `${mediaThumbInnerHtml(pp.url, pp.file.type.startsWith('video/'))}<button class="rm" title="Remove">✕</button>`;
           div.querySelector('.rm').onclick = () => { spiritPendingPhotos.splice(i, 1); renderSpiritPhotoStrip(spirit); };
           spiritPhotoStrip.appendChild(div);
         });
@@ -7758,12 +9278,12 @@
         addTile.type = 'button';
         addTile.className = 'addThumb';
         addTile.textContent = '+';
-        addTile.onclick = () => spiritPhotoInput.click();
+        addTile.onclick = () => openPhotoChooser(spiritPhotoInput);
         spiritPhotoStrip.appendChild(addTile);
       }
 
       spiritPhotoInput.onchange = async () => {
-        const files = Array.from(spiritPhotoInput.files || []);
+        const files = partitionValidMedia(Array.from(spiritPhotoInput.files || []));
         spiritPhotoInput.value = '';
         if (!files.length) return;
         if (spiritEditingId) {
@@ -8017,11 +9537,9 @@
         currentSpiritViewBeer = spirit;
         const photos = spirit.photos || [];
         spiritViewCarousel.innerHTML = photos.length
-          ? photos.map((p, i) => `<img src="${escapeHtml(p.url)}" data-i="${i}">`).join('')
+          ? photos.map((p, i) => carouselSlideHtml(p, i)).join('')
           : '<div class="placeholder">🥃</div>';
-        spiritViewCarousel.querySelectorAll('img').forEach(img => {
-          img.onclick = () => openLightbox(photos, Number(img.dataset.i));
-        });
+        wireCarouselClicks(spiritViewCarousel, photos);
         renderSpiritViewStats(spirit);
         mySpiritViewRating = null;
         renderSpiritViewRatingButtons();
@@ -8064,10 +9582,10 @@
       };
       document.getElementById('spiritViewClose').onclick = closeSpiritView;
       spiritViewOverlay.addEventListener('click', (e) => { if (e.target === spiritViewOverlay) closeSpiritView(); });
-      document.getElementById('spiritViewAddPhotoBtn').onclick = () => document.getElementById('spiritViewPhotoInput').click();
+      document.getElementById('spiritViewAddPhotoBtn').onclick = () => openPhotoChooser(document.getElementById('spiritViewPhotoInput'));
       document.getElementById('spiritViewPhotoInput').onchange = async () => {
         const input = document.getElementById('spiritViewPhotoInput');
-        const files = Array.from(input.files || []);
+        const files = partitionValidMedia(Array.from(input.files || []));
         input.value = '';
         if (!files.length || !currentSpiritViewId) return;
         try {
@@ -8259,15 +9777,15 @@
         photos.forEach((p, i) => {
           const div = document.createElement('div');
           div.className = 'thumb';
-          div.innerHTML = `<img src="${escapeHtml(p.url)}"><button class="rm" title="Remove">✕</button>`;
-          div.querySelector('img').onclick = () => openLightbox(photos, i);
+          div.innerHTML = `${mediaThumbInnerHtml(p.url)}<button class="rm" title="Remove">✕</button>`;
+          div.querySelector('img, video').onclick = () => openLightbox(photos, i);
           div.querySelector('.rm').onclick = () => removeExistingNikotinPhoto(item.id, p);
           nikotinPhotoStrip.appendChild(div);
         });
         nikotinPendingPhotos.forEach((pp, i) => {
           const div = document.createElement('div');
           div.className = 'thumb';
-          div.innerHTML = `<img src="${pp.url}"><button class="rm" title="Remove">✕</button>`;
+          div.innerHTML = `${mediaThumbInnerHtml(pp.url, pp.file.type.startsWith('video/'))}<button class="rm" title="Remove">✕</button>`;
           div.querySelector('.rm').onclick = () => { nikotinPendingPhotos.splice(i, 1); renderNikotinPhotoStrip(item); };
           nikotinPhotoStrip.appendChild(div);
         });
@@ -8275,12 +9793,12 @@
         addTile.type = 'button';
         addTile.className = 'addThumb';
         addTile.textContent = '+';
-        addTile.onclick = () => nikotinPhotoInput.click();
+        addTile.onclick = () => openPhotoChooser(nikotinPhotoInput);
         nikotinPhotoStrip.appendChild(addTile);
       }
 
       nikotinPhotoInput.onchange = async () => {
-        const files = Array.from(nikotinPhotoInput.files || []);
+        const files = partitionValidMedia(Array.from(nikotinPhotoInput.files || []));
         nikotinPhotoInput.value = '';
         if (!files.length) return;
         if (nikotinEditingId) {
@@ -8533,11 +10051,9 @@
         currentNikotinViewItem = item;
         const photos = item.photos || [];
         nikotinViewCarousel.innerHTML = photos.length
-          ? photos.map((p, i) => `<img src="${escapeHtml(p.url)}" data-i="${i}">`).join('')
+          ? photos.map((p, i) => carouselSlideHtml(p, i)).join('')
           : '<div class="placeholder">🚬</div>';
-        nikotinViewCarousel.querySelectorAll('img').forEach(img => {
-          img.onclick = () => openLightbox(photos, Number(img.dataset.i));
-        });
+        wireCarouselClicks(nikotinViewCarousel, photos);
         renderNikotinViewStats(item);
         myNikotinViewRating = null;
         renderNikotinViewRatingButtons();
@@ -8580,10 +10096,10 @@
       };
       document.getElementById('nikotinViewClose').onclick = closeNikotinView;
       nikotinViewOverlay.addEventListener('click', (e) => { if (e.target === nikotinViewOverlay) closeNikotinView(); });
-      document.getElementById('nikotinViewAddPhotoBtn').onclick = () => document.getElementById('nikotinViewPhotoInput').click();
+      document.getElementById('nikotinViewAddPhotoBtn').onclick = () => openPhotoChooser(document.getElementById('nikotinViewPhotoInput'));
       document.getElementById('nikotinViewPhotoInput').onchange = async () => {
         const input = document.getElementById('nikotinViewPhotoInput');
-        const files = Array.from(input.files || []);
+        const files = partitionValidMedia(Array.from(input.files || []));
         input.value = '';
         if (!files.length || !currentNikotinViewId) return;
         try {
@@ -8775,15 +10291,15 @@
         photos.forEach((p, i) => {
           const div = document.createElement('div');
           div.className = 'thumb';
-          div.innerHTML = `<img src="${escapeHtml(p.url)}"><button class="rm" title="Remove">✕</button>`;
-          div.querySelector('img').onclick = () => openLightbox(photos, i);
+          div.innerHTML = `${mediaThumbInnerHtml(p.url)}<button class="rm" title="Remove">✕</button>`;
+          div.querySelector('img, video').onclick = () => openLightbox(photos, i);
           div.querySelector('.rm').onclick = () => removeExistingKoffeinPhoto(item.id, p);
           koffeinPhotoStrip.appendChild(div);
         });
         koffeinPendingPhotos.forEach((pp, i) => {
           const div = document.createElement('div');
           div.className = 'thumb';
-          div.innerHTML = `<img src="${pp.url}"><button class="rm" title="Remove">✕</button>`;
+          div.innerHTML = `${mediaThumbInnerHtml(pp.url, pp.file.type.startsWith('video/'))}<button class="rm" title="Remove">✕</button>`;
           div.querySelector('.rm').onclick = () => { koffeinPendingPhotos.splice(i, 1); renderKoffeinPhotoStrip(item); };
           koffeinPhotoStrip.appendChild(div);
         });
@@ -8791,12 +10307,12 @@
         addTile.type = 'button';
         addTile.className = 'addThumb';
         addTile.textContent = '+';
-        addTile.onclick = () => koffeinPhotoInput.click();
+        addTile.onclick = () => openPhotoChooser(koffeinPhotoInput);
         koffeinPhotoStrip.appendChild(addTile);
       }
 
       koffeinPhotoInput.onchange = async () => {
-        const files = Array.from(koffeinPhotoInput.files || []);
+        const files = partitionValidMedia(Array.from(koffeinPhotoInput.files || []));
         koffeinPhotoInput.value = '';
         if (!files.length) return;
         if (koffeinEditingId) {
@@ -9060,11 +10576,9 @@
         currentKoffeinViewItem = item;
         const photos = item.photos || [];
         koffeinViewCarousel.innerHTML = photos.length
-          ? photos.map((p, i) => `<img src="${escapeHtml(p.url)}" data-i="${i}">`).join('')
+          ? photos.map((p, i) => carouselSlideHtml(p, i)).join('')
           : '<div class="placeholder">⚡</div>';
-        koffeinViewCarousel.querySelectorAll('img').forEach(img => {
-          img.onclick = () => openLightbox(photos, Number(img.dataset.i));
-        });
+        wireCarouselClicks(koffeinViewCarousel, photos);
         renderKoffeinViewStats(item);
         myKoffeinViewRating = null;
         renderKoffeinViewRatingButtons();
@@ -9107,10 +10621,10 @@
       };
       document.getElementById('koffeinViewClose').onclick = closeKoffeinView;
       koffeinViewOverlay.addEventListener('click', (e) => { if (e.target === koffeinViewOverlay) closeKoffeinView(); });
-      document.getElementById('koffeinViewAddPhotoBtn').onclick = () => document.getElementById('koffeinViewPhotoInput').click();
+      document.getElementById('koffeinViewAddPhotoBtn').onclick = () => openPhotoChooser(document.getElementById('koffeinViewPhotoInput'));
       document.getElementById('koffeinViewPhotoInput').onchange = async () => {
         const input = document.getElementById('koffeinViewPhotoInput');
-        const files = Array.from(input.files || []);
+        const files = partitionValidMedia(Array.from(input.files || []));
         input.value = '';
         if (!files.length || !currentKoffeinViewId) return;
         try {
@@ -9178,6 +10692,285 @@
       }
       function statsBreakdownText(stats) {
         return statsBreakdownItems(stats).join(' · ');
+      }
+
+      // ---------- Yearly Recap ("Beer Wrapped") ----------
+      // A frozen per-user snapshot, computed once by the closeYear Cloud
+      // Function (Admin SDK — clients can never write yearlyRecaps/*, see
+      // firestore.rules) and just read back here. The sample-preview path
+      // never touches Firestore at all, so the card design can be checked
+      // before any real year is ever closed.
+      const yearlyRecapOverlay = document.getElementById('yearlyRecapOverlay');
+      const yearlyRecapBody = document.getElementById('yearlyRecapBody');
+      const yearlyRecapHeading = document.getElementById('yearlyRecapHeading');
+      const yearlyRecapsCol = db.collection('yearlyRecaps');
+
+      const SAMPLE_YEARLY_STATS = {
+        beersAdded: 14, spiritsAdded: 3, nikotinAdded: 2, koffeinAdded: 5,
+        totalBeersDrunk: 87, totalShotsDrunk: 22, partiesJoined: 11,
+        ratingsGiven: 39, reviewsWritten: 9, chipsRedeemed: 4,
+        topRatedItem: { label: 'Zamatos Kézműves Fokhagymás Sör', rating: 5, emoji: '🍺' },
+        // The sample preview has no real beer/spirit ids to point a
+        // breakdown map at, so it skips straight to the already-resolved
+        // {label, qty} shape yearlyRecapTopBreakdown() also produces from
+        // real data — same rendering path either way.
+        beerBreakdownResolved: [
+          { label: 'Kozel', qty: 22 }, { label: 'Šariš', qty: 16 }, { label: 'Sör', qty: 14 }
+        ],
+        shotBreakdownResolved: [
+          { label: 'Fernet', qty: 9 }, { label: 'Alko', qty: 7 }, { label: 'Jägermeister', qty: 4 }
+        ]
+      };
+
+      // Every user's recap list starts at 2025 and grows by one each real
+      // year — never a free-text year picker on the client. A year with no
+      // frozen closeYear snapshot yet shows a stand-in instead: 2025 (fully
+      // in the past) falls back to the same sample numbers everyone sees,
+      // while the current year shows this person's own real, still-live
+      // totals computed straight from the already-loaded in-memory data
+      // (mirrors closeYear's own field-by-field logic, just unfrozen).
+      const YEARLY_RECAP_START_YEAR = 2025;
+      const YEARLY_RECAP_BADGES = {
+        sample: 'Sample data — preview only',
+        live: 'Live preview — year not closed yet'
+      };
+
+      function computeLiveYearStats(userId, year) {
+        const yearStart = new Date(year, 0, 1).getTime();
+        const yearEnd = new Date(year + 1, 0, 1).getTime();
+        const inYear = (ts) => typeof ts === 'number' && ts >= yearStart && ts < yearEnd;
+        const stats = {
+          beersAdded: 0, spiritsAdded: 0, nikotinAdded: 0, koffeinAdded: 0,
+          totalBeersDrunk: 0, totalShotsDrunk: 0, partiesJoined: 0,
+          ratingsGiven: 0, reviewsWritten: 0, chipsRedeemed: 0,
+          topRatedItem: null, beerBreakdown: {}, shotBreakdown: {}
+        };
+        const mergeBreakdownInto = (target, source) => {
+          Object.entries(source || {}).forEach(([k, v]) => { target[k] = (target[k] || 0) + (v || 0); });
+        };
+        const countAdded = (list, field) => list.forEach(item => { if (item.createdBy === userId && inYear(item.ts)) stats[field]++; });
+        countAdded(allBeers, 'beersAdded');
+        countAdded(allSpirits, 'spiritsAdded');
+        countAdded(allNikotin, 'nikotinAdded');
+        countAdded(allKoffein, 'koffeinAdded');
+
+        const RATING_EMOJI = { beers: '🍺', spirits: '🥃', nikotin: '🚬', koffein: '⚡', pubs: '🍸' };
+        const ratingSources = [['beers', allBeers], ['spirits', allSpirits], ['nikotin', allNikotin], ['koffein', allKoffein], ['pubs', allPubs]];
+        function findRatedParent(itemId) {
+          for (const [col, list] of ratingSources) {
+            const item = list.find(x => x.id === itemId);
+            if (item) return { label: item.name || item.realName || 'Unnamed', emoji: RATING_EMOJI[col] };
+          }
+          return null;
+        }
+        allRatings.forEach(r => {
+          if (r.userId !== userId || !inYear(r.ts)) return;
+          if (typeof r.rating === 'number') {
+            stats.ratingsGiven++;
+            if (!stats.topRatedItem || r.rating > stats.topRatedItem.rating) {
+              const parent = findRatedParent(r.beerId);
+              if (parent) stats.topRatedItem = { label: parent.label, rating: r.rating, emoji: parent.emoji };
+            }
+          }
+          if ((r.comment || '').trim()) stats.reviewsWritten++;
+        });
+        allComments.forEach(c => {
+          if (c.userId === userId && inYear(c.ts)) stats.reviewsWritten++;
+        });
+        allParties.forEach(party => {
+          if (party.year !== year) return;
+          (allPartyParticipants[party.id] || []).forEach(p => {
+            if (p.id !== userId) return;
+            stats.totalBeersDrunk += p.count || 0;
+            stats.totalShotsDrunk += p.shotCount || 0;
+            stats.partiesJoined++;
+            mergeBreakdownInto(stats.beerBreakdown, p.beerBreakdown);
+            mergeBreakdownInto(stats.shotBreakdown, p.shotBreakdown);
+          });
+        });
+        // computeLiveYearStats is only ever called for the current, still-open
+        // year (see renderProfileViewRecapList) — currentYearLogs/
+        // currentYearShotLogs are exactly that year's manual leaderboard logs.
+        currentYearLogs.forEach(log => {
+          if (log.userId !== userId) return;
+          stats.totalBeersDrunk += log.count || 0;
+          mergeBreakdownInto(stats.beerBreakdown, log.breakdown);
+        });
+        currentYearShotLogs.forEach(log => {
+          if (log.userId !== userId) return;
+          stats.totalShotsDrunk += log.count || 0;
+          mergeBreakdownInto(stats.shotBreakdown, log.breakdown);
+        });
+        stats.beerBreakdown = withUnspecifiedGap(stats.beerBreakdown, stats.totalBeersDrunk);
+        stats.shotBreakdown = withUnspecifiedGap(stats.shotBreakdown, stats.totalShotsDrunk);
+        const me = allUsers.find(u => u.id === userId);
+        (me?.chips || []).forEach(c => {
+          if (c.status === 'redeemed' && inYear(c.redeemedAt)) stats.chipsRedeemed++;
+        });
+        return stats;
+      }
+
+      function yearlyRecapTotal(stats) {
+        return (stats.beersAdded || 0) + (stats.spiritsAdded || 0) + (stats.nikotinAdded || 0) + (stats.koffeinAdded || 0) +
+          (stats.totalBeersDrunk || 0) + (stats.totalShotsDrunk || 0) + (stats.partiesJoined || 0) +
+          (stats.ratingsGiven || 0) + (stats.reviewsWritten || 0) + (stats.chipsRedeemed || 0);
+      }
+      // Ordered as rows of two — beers/shots drunk lead with their own
+      // color treatment, then joined/redeemed, written/given, added counts.
+      function yearlyRecapTileItems(stats) {
+        return [
+          { n: stats.totalBeersDrunk || 0, label: 'Beers drunk', emoji: '🍺', accent: true },
+          { n: stats.totalShotsDrunk || 0, label: 'Shots drunk', emoji: '🥃', accent: true },
+          { n: stats.partiesJoined || 0, label: 'Parties joined' },
+          { n: stats.chipsRedeemed || 0, label: 'Chips redeemed' },
+          { n: stats.reviewsWritten || 0, label: 'Reviews written' },
+          { n: stats.ratingsGiven || 0, label: 'Ratings given' },
+          { n: stats.beersAdded || 0, label: 'Beers added' },
+          { n: stats.spiritsAdded || 0, label: 'Spirits added' },
+          { n: stats.nikotinAdded || 0, label: 'Nikotin added' },
+          { n: stats.koffeinAdded || 0, label: 'Koffein added' }
+        ];
+      }
+
+      // Real/live stats keep raw id -> qty maps (same shape the drink
+      // pickers already write), resolved against whichever beers/spirits
+      // are currently known; the sample preview instead ships an
+      // already-resolved {label, qty} list directly (see SAMPLE_YEARLY_STATS)
+      // since it has no real item ids to point at.
+      function yearlyRecapTopBreakdown(stats, kind, limit = 3) {
+        const resolvedKey = kind === 'shot' ? 'shotBreakdownResolved' : 'beerBreakdownResolved';
+        if (Array.isArray(stats[resolvedKey])) return stats[resolvedKey].slice(0, limit);
+        const breakdown = (kind === 'shot' ? stats.shotBreakdown : stats.beerBreakdown) || {};
+        const items = drinkPickerItemsForKind(kind);
+        return Object.entries(breakdown)
+          .filter(([, qty]) => qty > 0)
+          .sort((a, b) => b[1] - a[1])
+          .slice(0, limit)
+          .map(([id, qty]) => ({ label: drinkPickerLabel(id, kind, items), qty }));
+      }
+
+      // Every closed/live year gets its own look — same fiery family, never
+      // the exact same palette twice in a row, so old recap screenshots
+      // stay visually tied to the year they're from.
+      const YEARLY_RECAP_FIRE_THEMES = ['yearlyRecapFireEmber', 'yearlyRecapFireInferno', 'yearlyRecapFireMolten', 'yearlyRecapFireWildfire'];
+      function yearlyRecapFireThemeClass(year) {
+        return YEARLY_RECAP_FIRE_THEMES[((year % YEARLY_RECAP_FIRE_THEMES.length) + YEARLY_RECAP_FIRE_THEMES.length) % YEARLY_RECAP_FIRE_THEMES.length];
+      }
+
+      function renderYearlyRecapCard(year, user, stats, mode) {
+        const total = yearlyRecapTotal(stats);
+        const tiles = yearlyRecapTileItems(stats).map(t => `
+          <div class="yearlyRecapTile${t.accent ? ' yearlyRecapTileAccent' : ''}">
+            <div class="yearlyRecapTileNum">${t.emoji ? `${t.emoji} ` : ''}${t.n}</div>
+            <div class="yearlyRecapTileLabel">${t.label}</div>
+          </div>`).join('');
+        const beerTop = yearlyRecapTopBreakdown(stats, 'beer');
+        const shotTop = yearlyRecapTopBreakdown(stats, 'shot');
+        const breakdownCol = (title, entries) => entries.length ? `
+          <div class="yearlyRecapBreakdownCol">
+            <div class="yearlyRecapBreakdownLabel">${title}</div>
+            ${entries.map(e => `<div class="yearlyRecapBreakdownItem"><span>${escapeHtml(e.label)}</span><b>${e.qty}×</b></div>`).join('')}
+          </div>` : '';
+        const breakdownHtml = (beerTop.length || shotTop.length) ? `
+          <div class="yearlyRecapBreakdown">
+            ${breakdownCol('🍺 Top beers', beerTop)}
+            ${breakdownCol('🥃 Top alko', shotTop)}
+          </div>` : '';
+        const highlight = stats.topRatedItem
+          ? `<div class="yearlyRecapHighlight">
+              <div class="yearlyRecapHighlightLabel">Top rated find of ${year}</div>
+              <div class="yearlyRecapHighlightItem">${stats.topRatedItem.emoji || ''} ${escapeHtml(stats.topRatedItem.label)} — ${stats.topRatedItem.rating}★</div>
+            </div>`
+          : '';
+        // The sheetHead h2 sits outside what the download button captures,
+        // so the status line (sample/live) lives there — it's chrome about
+        // this viewing session, not part of the card. The actual "20XX
+        // Personal Beer Wrapped" title moves inside yearlyRecapBody instead,
+        // so a downloaded image always shows what year it is, never the
+        // transient status text.
+        yearlyRecapHeading.textContent = YEARLY_RECAP_BADGES[mode] || 'Year in Review';
+        // The photo has to load in CORS mode (crossorigin attribute) or
+        // html2canvas can't read its pixels back out for the download and
+        // silently leaves the avatar blank — the shared avatarInner() helper
+        // doesn't set this since normal <img> display never needed it.
+        const avatarHtml = user?.photoURL
+          ? `<img src="${escapeHtml(user.photoURL)}" alt="" crossorigin="anonymous">`
+          : avatarInner(user?.name, user?.photoURL);
+        yearlyRecapBody.className = 'yearlyRecapBody yearlyRecapFire ' + yearlyRecapFireThemeClass(year);
+        yearlyRecapBody.innerHTML = `
+          <div class="yearlyRecapCardTitle">${year} Personal Beer Wrapped</div>
+          <div class="yearlyRecapUser">
+            <div class="bigAvatarBtn yearlyRecapUserAvatar">${avatarHtml}</div>
+            <div>
+              <div class="yearlyRecapUserName">${escapeHtml(user?.name || 'Drinker')}</div>
+              <div class="yearlyRecapYear">${year} in review</div>
+              <div class="yearlyRecapTotalPoints">${total} total points</div>
+            </div>
+          </div>
+          <div class="yearlyRecapGrid">${tiles}</div>
+          ${breakdownHtml}
+          ${highlight}
+        `;
+      }
+
+      function openYearlyRecapOverlay() {
+        pushOverlayState();
+        yearlyRecapOverlay.classList.add('show');
+      }
+      function hideYearlyRecapOverlay() { yearlyRecapOverlay.classList.remove('show'); }
+      function closeYearlyRecapOverlay() { history.back(); }
+      document.getElementById('yearlyRecapClose').onclick = closeYearlyRecapOverlay;
+      yearlyRecapOverlay.addEventListener('click', (e) => { if (e.target === yearlyRecapOverlay) closeYearlyRecapOverlay(); });
+
+      document.getElementById('yearlyRecapDownload').onclick = async () => {
+        try {
+          const sheetBg = getComputedStyle(document.querySelector('#yearlyRecapOverlay .sheet')).backgroundColor;
+          const canvas = await html2canvas(yearlyRecapBody, { backgroundColor: sheetBg, scale: 2, useCORS: true });
+          const link = document.createElement('a');
+          const titleText = document.querySelector('.yearlyRecapCardTitle')?.textContent || 'Beer_Wrapped';
+          link.download = `${titleText.replace(/\s+/g, '_')}.png`;
+          link.href = canvas.toDataURL('image/png');
+          link.click();
+        } catch (e) {
+          showToast('Could not create the image');
+        }
+      };
+
+      async function renderProfileViewRecapList(userId) {
+        const listEl = document.getElementById('profileViewRecapList');
+        listEl.innerHTML = '<div class="yearlyRecapEmpty" style="padding:6px 0">Loading…</div>';
+        const currentYear = new Date().getFullYear();
+        const years = [];
+        for (let y = YEARLY_RECAP_START_YEAR; y <= currentYear; y++) years.push(y);
+        try {
+          const entries = await Promise.all(years.map(async (year) => {
+            const snap = await yearlyRecapsCol.doc(String(year)).collection('users').doc(userId).get();
+            if (snap.exists) return { year, mode: 'real', stats: snap.data() };
+            if (year === currentYear) return { year, mode: 'live', stats: computeLiveYearStats(userId, year) };
+            return { year, mode: 'sample', stats: SAMPLE_YEARLY_STATS };
+          }));
+          entries.sort((a, b) => b.year - a.year); // newest year on top
+          listEl.innerHTML = entries.map(e => {
+            const tagText = e.mode === 'sample' ? 'Sample' : e.mode === 'live' ? 'Live' : 'Closed';
+            const tag = `<span class="yearRecapTag">${tagText}</span>`;
+            const label = e.mode === 'real' ? 'Wrapped' : 'Wrapped Preview';
+            return `<div class="yearRecapRow">
+              <span class="yearRecapYearLabel">${e.year}</span>
+              <button type="button" class="yearRecapChip" data-year="${e.year}">${label}</button>
+              ${tag}
+            </div>`;
+          }).join('');
+          listEl.querySelectorAll('.yearRecapChip').forEach(btn => {
+            btn.onclick = () => {
+              const entry = entries.find(e => e.year === Number(btn.dataset.year));
+              const user = allUsers.find(u => u.id === userId);
+              renderYearlyRecapCard(entry.year, user, entry.stats, entry.mode);
+              openYearlyRecapOverlay();
+            };
+          });
+        } catch (e) {
+          listEl.innerHTML = '<div class="yearlyRecapEmpty" style="padding:6px 0">Could not load recap data</div>';
+        }
       }
 
       // ---------- Collectible cards ----------
@@ -9334,7 +11127,7 @@
             btn.disabled = true;
             err.textContent = '';
             try {
-              const updates = { name };
+              const updates = { name, joinedAt: Date.now() };
               if (photoFile) {
                 const path = `users/${myUid}/${Date.now()}_${photoFile.name}`;
                 const ref = storage.ref(path);
@@ -9459,13 +11252,23 @@
         profileBtn.innerHTML = avatarInner(me?.name, me?.photoURL);
       }
 
+      // Most recently joined first, admins always last regardless of when
+      // they joined (there's usually just the one, but this holds up if
+      // that ever changes).
+      function sortedDrinkersList() {
+        return [...allUsers].sort((a, b) => {
+          if (!!a.isAdmin !== !!b.isAdmin) return a.isAdmin ? 1 : -1;
+          return (b.joinedAt || 0) - (a.joinedAt || 0);
+        });
+      }
+
       function renderUserList() {
         document.getElementById('userListHead').textContent = `All Drinkers (${allUsers.length})`;
         if (!allUsers.length) {
           userListEl.innerHTML = '<div class="empty" style="padding:16px 0">No drinkers yet 🍺</div>';
           return;
         }
-        userListEl.innerHTML = allUsers.map(u => {
+        userListEl.innerHTML = sortedDrinkersList().map(u => {
           const stats = getUserStats(u.id);
           return `<div class="userRow${skinBgClass(u)}" data-user="${u.id}">
       ${wrapAvatarWithHat(u, `<div class="userAvatar${avatarBorderClass(u)}">${avatarInner(u.name, u.photoURL)}</div>`)}
@@ -9728,6 +11531,7 @@
         document.getElementById('profileCalcBtn').style.display = isMe ? 'flex' : 'none';
         profileViewListWrap.style.display = isMe ? 'block' : 'none';
         if (isMe) renderUserList();
+        renderProfileViewRecapList(userId);
         profileViewOverlay.classList.add('show');
       }
       function openProfileView(userId) {
@@ -9804,7 +11608,7 @@
         closeCardPicker();
       }
 
-      myAvatarBtn.onclick = () => profilePhotoInput.click();
+      myAvatarBtn.onclick = () => openPhotoChooser(profilePhotoInput);
       profilePhotoInput.onchange = async () => {
         const file = profilePhotoInput.files[0];
         profilePhotoInput.value = '';
@@ -10179,24 +11983,30 @@
       }
       function renderProfileViewInventory(u, isOwn) {
         const inv = u?.inventory || [];
-        const el = document.getElementById('profileViewInventory');
-        if (!inv.length) {
-          el.innerHTML = '<div class="empty" style="padding:6px 0;font-size:.8rem">No items yet</div>';
-        } else {
-          const allItems = SHOP_BORDERS.map(b => ({ ...b, type: 'border' })).concat(SHOP_HATS.map(h => ({ ...h, type: 'hat' }))).concat(SHOP_SKINS.map(s => ({ ...s, type: 'skin' })));
-          el.innerHTML = inv.map(id => {
-            const it = allItems.find(x => x.id === id);
-            if (!it) return '';
-            const equipped = (it.type === 'border' ? u.equippedBorder : it.type === 'hat' ? u.equippedHat : u.equippedSkin) === id;
-            const isHat = it.type === 'hat';
-            const shape = it.type === 'skin' ? 'shopPreviewSquare' : 'shopPreviewCircle';
-            const cls = isHat ? '' : (it.type === 'border' ? `uBorder-${id}` : `uSkin-${id}`);
-            const inner = isHat ? `<div class="avatarHatBadge hat-${id}"></div>` : (it.type === 'border' ? SHOP_BORDER_PLACEHOLDER_ICON : '');
-            return `<div class="invItem ${equipped ? 'equipped' : ''}" data-id="${id}" data-type="${it.type}" title="${escapeHtml(it.name)}">
+        const allItems = SHOP_BORDERS.map(b => ({ ...b, type: 'border' })).concat(SHOP_HATS.map(h => ({ ...h, type: 'hat' }))).concat(SHOP_SKINS.map(s => ({ ...s, type: 'skin' })));
+        function invItemHtml(it) {
+          const id = it.id;
+          const equipped = (it.type === 'border' ? u.equippedBorder : it.type === 'hat' ? u.equippedHat : u.equippedSkin) === id;
+          const isHat = it.type === 'hat';
+          const shape = it.type === 'skin' ? 'shopPreviewSquare' : 'shopPreviewCircle';
+          const cls = isHat ? '' : (it.type === 'border' ? `uBorder-${id}` : `uSkin-${id}`);
+          const inner = isHat ? `<div class="avatarHatBadge hat-${id}"></div>` : (it.type === 'border' ? SHOP_BORDER_PLACEHOLDER_ICON : '');
+          return `<div class="invItem ${equipped ? 'equipped' : ''}" data-id="${id}" data-type="${it.type}" title="${escapeHtml(it.name)}">
             <div class="shopPreview ${shape} ${cls}">${inner}</div>
             <div class="invItemPrice">${abbreviatePrice(it.price)} ${JACKPOT_COIN_ICON}</div>
           </div>`;
-          }).join('');
+        }
+        // Grouped into their own row per type (hats/borders/skins) rather
+        // than one flat mixed grid — each group keeps the owner's own
+        // purchase order within that type.
+        [['profileViewInventoryHats', 'hat'], ['profileViewInventoryBorders', 'border'], ['profileViewInventorySkins', 'skin']].forEach(([elId, type]) => {
+          const el = document.getElementById(elId);
+          const ids = inv.filter(id => allItems.some(x => x.id === id && x.type === type));
+          if (!ids.length) {
+            el.innerHTML = '<div class="empty" style="padding:2px 0;font-size:.78rem">None yet</div>';
+            return;
+          }
+          el.innerHTML = ids.map(id => invItemHtml(allItems.find(x => x.id === id))).join('');
           if (isOwn) {
             el.querySelectorAll('.invItem').forEach(elm => {
               elm.style.cursor = 'pointer';
@@ -10205,9 +12015,11 @@
           } else {
             el.querySelectorAll('.invItem').forEach(elm => { elm.style.cursor = 'default'; });
           }
-        }
+        });
 
-        const chips = u?.chips || [];
+        // Driver chips are earned, not bought, and get their own row below —
+        // they never mix into this (buyable beer/shot) chips grid.
+        const chips = (u?.chips || []).filter(c => c.type !== 'driver');
         const chipsSection = document.getElementById('profileViewChipsSection');
         const chipsEl = document.getElementById('profileViewChips');
         if (!chips.length) {
@@ -10251,6 +12063,65 @@
               };
             });
           }
+        }
+
+        const driverChips = (u?.chips || []).filter(c => c.type === 'driver');
+        const driverSection = document.getElementById('profileViewDriverChipsSection');
+        const driverEl = document.getElementById('profileViewDriverChips');
+        const exchangeRow = document.getElementById('profileViewDriverExchangeRow');
+        if (!driverChips.length) {
+          driverSection.style.display = 'none';
+        } else {
+          driverSection.style.display = 'block';
+          driverEl.innerHTML = driverChips.slice().sort((a, b) => (b.ts || 0) - (a.ts || 0)).map(c => {
+            // 'exchanged' reuses the same grey/desaturated .redeemed look the
+            // beer/shot chips use for "already used up" — a different status
+            // name (this was never redeemed at a party), same visual meaning.
+            const used = c.status === 'exchanged';
+            const removeBtn = isAdmin() ? `<button type="button" class="invItemRemoveBtn" data-chip-id="${c.id}" title="Remove chip">✕</button>` : '';
+            return `<div class="invItem" data-chip-id="${c.id}" title="Designated driver${used ? ' (used)' : ''}">
+            ${removeBtn}
+            <div class="shopPreview shopPreviewChip chip-driver${used ? ' redeemed' : ''}">🚗<br>DRIVER</div>
+          </div>`;
+          }).join('');
+          if (isAdmin()) {
+            driverEl.querySelectorAll('.invItemRemoveBtn').forEach(btn => {
+              btn.onclick = (e) => {
+                e.stopPropagation();
+                const chipId = btn.dataset.chipId;
+                askConfirm('Remove this driver chip? This cannot be undone.', async () => {
+                  await adminDeleteDriverChip(u.id, chipId);
+                }, false);
+              };
+            });
+          }
+          const availableCount = driverChips.filter(c => c.status !== 'exchanged').length;
+          exchangeRow.style.display = (isOwn && availableCount >= DRIVER_CHIPS_PER_EXCHANGE) ? 'flex' : 'none';
+        }
+      }
+      document.getElementById('profileViewDriverExchangeBeerBtn').onclick = () => exchangeDriverChips('beer');
+      document.getElementById('profileViewDriverExchangeShotBtn').onclick = () => exchangeDriverChips('shot');
+
+      // Unlike adminDeleteChip, this also clears the source party's
+      // `isDriver` flag — without that, removing the chip wouldn't remove
+      // the one-per-party gate, permanently blocking a fresh grant there.
+      async function adminDeleteDriverChip(ownerUid, chipId) {
+        try {
+          const ref = usersCol.doc(ownerUid);
+          let partyId = null;
+          await db.runTransaction(async (tx) => {
+            const snap = await tx.get(ref);
+            const chips = snap.data()?.chips || [];
+            const chip = chips.find(c => c.id === chipId);
+            partyId = chip?.partyId || null;
+            tx.update(ref, { chips: chips.filter(c => c.id !== chipId) });
+          });
+          if (partyId) {
+            try { await partiesCol.doc(partyId).collection('participants').doc(ownerUid).set({ isDriver: false }, { merge: true }); } catch (e) { }
+          }
+          showToast('Driver chip removed');
+        } catch (err) {
+          showToast('Failed: ' + err.message);
         }
       }
 
@@ -12057,7 +13928,7 @@
       document.getElementById('chipPopupClose').onclick = closeChipPopup;
       chipPopupOverlay.addEventListener('click', (e) => { if (e.target === chipPopupOverlay) closeChipPopup(); });
 
-      document.getElementById('chipPopupAddPhotoBtn').onclick = () => document.getElementById('chipPopupPhotoInput').click();
+      document.getElementById('chipPopupAddPhotoBtn').onclick = () => openPhotoChooser(document.getElementById('chipPopupPhotoInput'));
       document.getElementById('chipPopupPhotoInput').onchange = async () => {
         const input = document.getElementById('chipPopupPhotoInput');
         const file = input.files[0];
@@ -13727,6 +15598,22 @@
           hideRatersList();
           return;
         }
+        if (photoSourceOverlay.classList.contains('show')) {
+          hidePhotoChooser();
+          return;
+        }
+        if (yearlyRecapOverlay.classList.contains('show')) {
+          hideYearlyRecapOverlay();
+          return;
+        }
+        if (document.getElementById('locationPickerOverlay').classList.contains('show')) {
+          hideLocationPicker();
+          return;
+        }
+        if (partyDrinkPickerOverlay.classList.contains('show')) {
+          hidePartyDrinkPicker();
+          return;
+        }
         if (formOverlay.classList.contains('show')) {
           hideForm();
           if (formOpenedFromBeerId) {
@@ -13813,16 +15700,16 @@
           }
           return;
         }
-        if (archiveViewOverlay.classList.contains('show')) {
-          hideArchiveView();
-          return;
-        }
         if (mailPageOpen) {
           hideMailPage();
           return;
         }
         if (bacCalcPageOpen) {
           hideBacCalcPage();
+          return;
+        }
+        if (pubsMapPageOpen) {
+          hidePubsMapPage();
           return;
         }
         if (jackpotPageOpen) {

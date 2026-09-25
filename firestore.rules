@@ -254,6 +254,12 @@ service cloud.firestore {
         allow read: if true;
         allow write: if isMember() && (request.auth.uid == userId || isAdmin());
       }
+      match /comments/{commentId} {
+        allow read: if true;
+        allow create: if isMember() && request.resource.data.userId == request.auth.uid
+          && request.resource.data.text is string && request.resource.data.text.size() < 2000;
+        allow update, delete: if isAdmin() || (isSignedIn() && resource.data.userId == request.auth.uid);
+      }
     }
 
     match /pubs/{pubId} {
@@ -354,6 +360,20 @@ service cloud.firestore {
     // Rate-limit bookkeeping for lookupVariants — same pattern, Admin-SDK-only.
     match /lookupAttempts/{uid} {
       allow read, write: if false;
+    }
+
+    // Yearly Recap snapshots — only the closeYear Cloud Function (Admin
+    // SDK, bypasses these rules) ever writes them, so a client can never
+    // fabricate or edit its own stats. Read is open so anyone can view a
+    // closed year's card, and so the client can tell whether a year has
+    // been closed yet at all.
+    match /yearlyRecaps/{year} {
+      allow read: if true;
+      allow write: if false;
+      match /users/{uid} {
+        allow read: if true;
+        allow write: if false;
+      }
     }
 
     // Required in addition to the nested rules above so that
