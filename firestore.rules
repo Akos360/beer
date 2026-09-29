@@ -216,6 +216,14 @@ service cloud.firestore {
         && (skin == null || newInv.hasAny([skin]));
     }
 
+    // realName is visible to everyone (see index.html's renderRealNameTag),
+    // but an admin still has to be the one to set it — otherwise anyone
+    // could write it into their own doc directly via devtools, same as any
+    // other client-trusted field would be without a check like this.
+    function realNameUnchanged() {
+      return !request.resource.data.diff(resource.data).affectedKeys().hasAny(['realName']);
+    }
+
     match /users/{userId} {
       allow read: if true;
       // A user doc only ever gets created by the verifyPasscode Cloud
@@ -236,7 +244,7 @@ service cloud.firestore {
       // beyond this pass.
       allow update: if isMember() && (request.auth.uid == userId || isAdmin())
         && !request.resource.data.diff(resource.data).affectedKeys().hasAny(['isAdmin', 'passcodeVerified'])
-        && (isAdmin() || (inventoryChangeIsPaidFor() && equipsAreOwned()));
+        && (isAdmin() || (inventoryChangeIsPaidFor() && equipsAreOwned() && realNameUnchanged()));
       allow delete: if isAdmin();
     }
 

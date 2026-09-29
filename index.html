@@ -2634,6 +2634,18 @@
       margin-top: 8px
     }
 
+    .profileViewTotalTag {
+      display: inline-block;
+      font-size: .72rem;
+      font-weight: 700;
+      color: var(--accent);
+      background: var(--bg-elev);
+      border: 1px solid var(--border);
+      border-radius: 999px;
+      padding: 3px 10px;
+      margin-top: 8px
+    }
+
     .profileViewRecapList {
       display: flex;
       flex-direction: column;
@@ -2679,6 +2691,145 @@
       border: 1px solid var(--border);
       padding: 3px 9px;
       border-radius: 999px
+    }
+
+    .yearRecapCompareBtn {
+      flex: 0 0 auto;
+      width: 28px;
+      height: 28px;
+      border-radius: 50%;
+      border: 1px solid var(--border);
+      background: var(--bg-elev);
+      color: var(--text);
+      font-size: .85rem;
+      cursor: pointer
+    }
+
+    .yearRecapCompareBtn:active {
+      filter: brightness(0.85);
+      transform: scale(0.92)
+    }
+
+    .h2hPickerRow {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 8px 10px;
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      margin-bottom: 6px;
+      cursor: pointer
+    }
+
+    .h2hPickerRow:active {
+      filter: brightness(0.9)
+    }
+
+    .h2hPickerRow .userAvatar {
+      width: 36px;
+      height: 36px;
+      flex: 0 0 auto
+    }
+
+    .h2hBody {
+      padding: 4px 2px 12px
+    }
+
+    .h2hHeader {
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      gap: 8px;
+      margin-bottom: 14px
+    }
+
+    .h2hHeaderSide {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 5px;
+      flex: 1;
+      min-width: 0
+    }
+
+    .h2hAvatar {
+      width: 64px;
+      height: 64px;
+      font-size: 1.5rem;
+      cursor: default
+    }
+
+    .h2hName {
+      font-weight: 700;
+      font-size: .82rem;
+      text-align: center;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+      max-width: 100%
+    }
+
+    .h2hTotal {
+      font-weight: 800;
+      font-size: .95rem;
+      color: var(--text-dim)
+    }
+
+    .h2hTotal.h2hWin {
+      color: var(--accent)
+    }
+
+    .h2hVs {
+      font-weight: 800;
+      font-size: 1.05rem;
+      color: var(--text-dim);
+      flex: 0 0 auto;
+      padding: 18px 4px 0
+    }
+
+    .h2hVerdict {
+      text-align: center;
+      font-weight: 800;
+      font-size: 1rem;
+      margin-bottom: 16px;
+      color: var(--accent)
+    }
+
+    .h2hRows {
+      display: flex;
+      flex-direction: column;
+      gap: 6px
+    }
+
+    .h2hRow {
+      display: grid;
+      grid-template-columns: 1fr auto 1fr;
+      align-items: center;
+      gap: 8px;
+      background: var(--bg-elev);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 8px 10px
+    }
+
+    .h2hVal {
+      font-weight: 800;
+      font-size: 1rem;
+      text-align: center;
+      font-variant-numeric: tabular-nums;
+      color: var(--text-dim)
+    }
+
+    .h2hVal.h2hWin {
+      color: var(--accent)
+    }
+
+    .h2hLabel {
+      font-size: .68rem;
+      color: var(--text-dim);
+      text-align: center;
+      text-transform: uppercase;
+      letter-spacing: .03em
     }
 
     .yearlyRecapBody {
@@ -5716,6 +5867,7 @@
           <div id="profileViewBadge" class="profileViewBadge"></div>
           <div id="profileViewCards" class="profileViewCards"></div>
           <div id="profileViewCoins" class="profileViewCoins"></div>
+          <div id="profileViewTotalTag" class="profileViewTotalTag"></div>
           <div id="profileViewStats" class="profileViewStats"></div>
         </div>
       </div>
@@ -5929,6 +6081,29 @@
         </div>
       </div>
       <div id="yearlyRecapBody" class="yearlyRecapBody"></div>
+    </div>
+  </div>
+
+  <div class="overlay" id="h2hPickerOverlay">
+    <div class="sheet">
+      <div class="sheetHead">
+        <h2>Compare with…</h2>
+        <button class="closeX" id="h2hPickerClose">✕</button>
+      </div>
+      <div class="field">
+        <input id="h2hPickerSearch" type="search" placeholder="Search a friend…">
+      </div>
+      <div id="h2hPickerList"></div>
+    </div>
+  </div>
+
+  <div class="overlay" id="h2hOverlay">
+    <div class="sheet">
+      <div class="sheetHead">
+        <h2 id="h2hHeading">Head to Head</h2>
+        <button class="closeX" id="h2hClose">✕</button>
+      </div>
+      <div id="h2hBody" class="h2hBody"></div>
     </div>
   </div>
 
@@ -7146,7 +7321,15 @@
           if (b.id === myUid && a.id !== myUid) return 1;
           return (byUser[b.id].count || 0) - (byUser[a.id].count || 0);
         });
-        const notJoined = allKnownUsers.filter(u => !byUser[u.id]);
+        // Same reasoning as the joined list above — if you haven't joined
+        // yet, your own "Join" button should be the first thing you see in
+        // this section too, not buried wherever the roster order happens to
+        // put you.
+        const notJoined = allKnownUsers.filter(u => !byUser[u.id]).sort((a, b) => {
+          if (a.id === myUid && b.id !== myUid) return -1;
+          if (b.id === myUid && a.id !== myUid) return 1;
+          return 0;
+        });
 
         const rows = [];
         joined.forEach(u => {
@@ -7468,9 +7651,16 @@
         });
       }
 
+      // A beer/spirit's nickname (`name`) is optional — only `realName` is
+      // required when adding one (see isValidRealName() in firestore.rules)
+      // — so anything shown here has to fall back to the real name instead
+      // of a blank/placeholder for the many items nobody ever gave a nickname.
+      function drinkPickerItemName(it) {
+        return it?.name || it?.realName || 'Unnamed';
+      }
       function drinkPickerLabel(id, kind, items) {
         if (id === 'generic') return `${drinkPickerEmojiForKind(kind)} ${kind === 'shot' ? 'Alko' : 'Sör'}`;
-        return escapeHtml(items.find(x => x.id === id)?.name || 'Unknown item');
+        return escapeHtml(drinkPickerItemName(items.find(x => x.id === id)));
       }
 
       function renderDrinkPickerList(query) {
@@ -7512,8 +7702,8 @@
         }
         const recentIdSet = new Set(recentItems.map(it => it.id));
         let rest = items.filter(x => !recentIdSet.has(x.id));
-        if (q) rest = rest.filter(x => (x.name || '').toLowerCase().includes(q));
-        rest.sort((a, b) => (a.name || '').localeCompare(b.name || ''));
+        if (q) rest = rest.filter(x => drinkPickerItemName(x).toLowerCase().includes(q));
+        rest.sort((a, b) => drinkPickerItemName(a).localeCompare(drinkPickerItemName(b)));
 
         const rowHtml = (id, qty, ownQty) => `<div class="partyDrinkPickerRow${qty > 0 ? ' isAdded' : ''}" data-id="${id}">
           <div class="partyDrinkPickerName">${drinkPickerLabel(id, ctx.kind, items)}</div>
@@ -10936,28 +11126,42 @@
         }
       };
 
+      // Shared by the recap list below and the head-to-head compare feature
+      // — same "closed snapshot, else live for the current year, else the
+      // shared sample" fallback either caller needs.
+      async function getYearStatsFor(userId, year) {
+        const currentYear = new Date().getFullYear();
+        const snap = await yearlyRecapsCol.doc(String(year)).collection('users').doc(userId).get();
+        if (snap.exists) return { year, mode: 'real', stats: snap.data() };
+        if (year === currentYear) return { year, mode: 'live', stats: computeLiveYearStats(userId, year) };
+        return { year, mode: 'sample', stats: SAMPLE_YEARLY_STATS };
+      }
+
       async function renderProfileViewRecapList(userId) {
         const listEl = document.getElementById('profileViewRecapList');
         listEl.innerHTML = '<div class="yearlyRecapEmpty" style="padding:6px 0">Loading…</div>';
         const currentYear = new Date().getFullYear();
         const years = [];
         for (let y = YEARLY_RECAP_START_YEAR; y <= currentYear; y++) years.push(y);
+        const isOwn = userId === myUid;
         try {
-          const entries = await Promise.all(years.map(async (year) => {
-            const snap = await yearlyRecapsCol.doc(String(year)).collection('users').doc(userId).get();
-            if (snap.exists) return { year, mode: 'real', stats: snap.data() };
-            if (year === currentYear) return { year, mode: 'live', stats: computeLiveYearStats(userId, year) };
-            return { year, mode: 'sample', stats: SAMPLE_YEARLY_STATS };
-          }));
+          const entries = await Promise.all(years.map(year => getYearStatsFor(userId, year)));
           entries.sort((a, b) => b.year - a.year); // newest year on top
           listEl.innerHTML = entries.map(e => {
             const tagText = e.mode === 'sample' ? 'Sample' : e.mode === 'live' ? 'Live' : 'Closed';
             const tag = `<span class="yearRecapTag">${tagText}</span>`;
             const label = e.mode === 'real' ? 'Wrapped' : 'Wrapped Preview';
+            // Comparing sample data against sample data is meaningless (it's
+            // the same fabricated placeholder for everyone), so the compare
+            // button only shows once a year has real or live numbers behind it.
+            const compareBtn = (isOwn && e.mode !== 'sample')
+              ? `<button type="button" class="yearRecapCompareBtn" data-year="${e.year}" title="Compare with a friend">⚔️</button>`
+              : '';
             return `<div class="yearRecapRow">
               <span class="yearRecapYearLabel">${e.year}</span>
               <button type="button" class="yearRecapChip" data-year="${e.year}">${label}</button>
               ${tag}
+              ${compareBtn}
             </div>`;
           }).join('');
           listEl.querySelectorAll('.yearRecapChip').forEach(btn => {
@@ -10968,10 +11172,131 @@
               openYearlyRecapOverlay();
             };
           });
+          listEl.querySelectorAll('.yearRecapCompareBtn').forEach(btn => {
+            btn.onclick = (e) => {
+              e.stopPropagation();
+              openH2hPicker(Number(btn.dataset.year));
+            };
+          });
         } catch (e) {
           listEl.innerHTML = '<div class="yearlyRecapEmpty" style="padding:6px 0">Could not load recap data</div>';
         }
       }
+
+      // ---------- Head to Head ----------
+      let h2hYear = null;
+      const h2hPickerOverlay = document.getElementById('h2hPickerOverlay');
+      const h2hPickerSearch = document.getElementById('h2hPickerSearch');
+      function renderH2hPickerList(query) {
+        const q = query.trim().toLowerCase();
+        const listEl = document.getElementById('h2hPickerList');
+        const candidates = sortedDrinkersList().filter(u => u.id !== myUid && (!q || (u.name || '').toLowerCase().includes(q)));
+        if (!candidates.length) { listEl.innerHTML = '<div class="empty" style="padding:14px 0">No one found</div>'; return; }
+        listEl.innerHTML = candidates.map(u => `<div class="h2hPickerRow" data-user="${u.id}">
+            ${wrapAvatarWithHat(u, `<div class="userAvatar${avatarBorderClass(u)}">${avatarInner(u.name, u.photoURL)}</div>`)}
+            <div class="userName">${nameWithAdminTag(u)}</div>
+          </div>`).join('');
+        listEl.querySelectorAll('.h2hPickerRow').forEach(row => {
+          row.onclick = () => {
+            // A direct hide, not closeH2hPicker()/history.back() — that
+            // schedules a popstate asynchronously, which would otherwise
+            // fire *after* openHeadToHead below has already pushed its own
+            // state and shown the h2h overlay, incorrectly closing that
+            // instead of the picker it was actually meant for.
+            hideH2hPicker();
+            openHeadToHead(h2hYear, row.dataset.user);
+          };
+        });
+      }
+      function openH2hPicker(year) {
+        h2hYear = year;
+        h2hPickerSearch.value = '';
+        renderH2hPickerList('');
+        pushOverlayState();
+        h2hPickerOverlay.classList.add('show');
+      }
+      function hideH2hPicker() { h2hPickerOverlay.classList.remove('show'); }
+      function closeH2hPicker() { history.back(); }
+      document.getElementById('h2hPickerClose').onclick = closeH2hPicker;
+      h2hPickerOverlay.addEventListener('click', (e) => { if (e.target === h2hPickerOverlay) closeH2hPicker(); });
+      h2hPickerSearch.oninput = (e) => renderH2hPickerList(e.target.value);
+
+      // Only the same handful of year-scoped counts every Wrapped card
+      // already shows — no per-type breakdown here, to keep a side-by-side
+      // comparison scannable at a glance instead of duplicating the full
+      // Wrapped card twice.
+      const H2H_ROWS = [
+        { key: 'totalBeersDrunk', label: '🍺 Beers drunk' },
+        { key: 'totalShotsDrunk', label: '🥃 Shots drunk' },
+        { key: 'partiesJoined', label: 'Parties joined' },
+        { key: 'chipsRedeemed', label: 'Chips redeemed' },
+        { key: 'reviewsWritten', label: 'Reviews written' },
+        { key: 'ratingsGiven', label: 'Ratings given' },
+        { key: 'beersAdded', label: 'Beers added' },
+        { key: 'spiritsAdded', label: 'Spirits added' },
+        { key: 'nikotinAdded', label: 'Nikotin added' },
+        { key: 'koffeinAdded', label: 'Koffein added' }
+      ];
+      const h2hOverlay = document.getElementById('h2hOverlay');
+      function renderHeadToHead(year, mine, theirs, opponentUid) {
+        const me = allUsers.find(u => u.id === myUid);
+        const opp = allUsers.find(u => u.id === opponentUid);
+        const myTotal = yearlyRecapTotal(mine.stats);
+        const oppTotal = yearlyRecapTotal(theirs.stats);
+        document.getElementById('h2hHeading').textContent = `${year} Head to Head`;
+
+        const rowsHtml = H2H_ROWS.map(r => {
+          const a = mine.stats[r.key] || 0;
+          const b = theirs.stats[r.key] || 0;
+          return `<div class="h2hRow">
+            <div class="h2hVal${a > b ? ' h2hWin' : ''}">${a}</div>
+            <div class="h2hLabel">${r.label}</div>
+            <div class="h2hVal${b > a ? ' h2hWin' : ''}">${b}</div>
+          </div>`;
+        }).join('');
+
+        const verdict = myTotal === oppTotal
+          ? "It's a tie!"
+          : myTotal > oppTotal
+            ? `🏆 ${escapeHtml(me?.name || 'You')} leads!`
+            : `🏆 ${escapeHtml(opp?.name || 'They')} lead!`;
+
+        document.getElementById('h2hBody').innerHTML = `
+          <div class="h2hHeader">
+            <div class="h2hHeaderSide">
+              <div class="bigAvatarBtn h2hAvatar">${avatarInner(me?.name, me?.photoURL)}</div>
+              <div class="h2hName">${escapeHtml(me?.name || 'You')}</div>
+              <div class="h2hTotal${myTotal > oppTotal ? ' h2hWin' : ''}">${myTotal} pts</div>
+            </div>
+            <div class="h2hVs">VS</div>
+            <div class="h2hHeaderSide">
+              <div class="bigAvatarBtn h2hAvatar">${avatarInner(opp?.name, opp?.photoURL)}</div>
+              <div class="h2hName">${escapeHtml(opp?.name || 'Them')}</div>
+              <div class="h2hTotal${oppTotal > myTotal ? ' h2hWin' : ''}">${oppTotal} pts</div>
+            </div>
+          </div>
+          <div class="h2hVerdict">${verdict}</div>
+          <div class="h2hRows">${rowsHtml}</div>
+        `;
+      }
+      async function openHeadToHead(year, opponentUid) {
+        document.getElementById('h2hBody').innerHTML = '<div class="yearlyRecapEmpty" style="padding:20px 0">Loading…</div>';
+        pushOverlayState();
+        h2hOverlay.classList.add('show');
+        try {
+          const [mine, theirs] = await Promise.all([
+            getYearStatsFor(myUid, year),
+            getYearStatsFor(opponentUid, year)
+          ]);
+          renderHeadToHead(year, mine, theirs, opponentUid);
+        } catch (e) {
+          document.getElementById('h2hBody').innerHTML = '<div class="yearlyRecapEmpty" style="padding:20px 0">Could not load comparison</div>';
+        }
+      }
+      function hideHeadToHead() { h2hOverlay.classList.remove('show'); }
+      function closeHeadToHead() { history.back(); }
+      document.getElementById('h2hClose').onclick = closeHeadToHead;
+      h2hOverlay.addEventListener('click', (e) => { if (e.target === h2hOverlay) closeHeadToHead(); });
 
       // ---------- Collectible cards ----------
       const POKER_SUITS = [
@@ -11295,17 +11620,29 @@
     </div>`).join('');
       }
 
-      // Admin-only — a real name behind the nickname everyone else sees, both
-      // visible and editable only when viewing as admin. Kept separate from
-      // the nickname the user set for themselves, which they still fully
-      // control everywhere else in the app.
+      // A real name behind the nickname everyone else sees — visible to
+      // everyone once an admin has set one, but still only ever editable by
+      // an admin (see firestore.rules' realNameUnchanged() check, which
+      // blocks a non-admin's own profile update from touching this field
+      // even directly via devtools). Kept separate from the nickname the
+      // user set for themselves, which they still fully control everywhere
+      // else in the app.
       function renderRealNameTag(userId, u) {
         const tag = document.getElementById('profileViewRealNameTag');
-        if (!isAdmin()) { tag.style.display = 'none'; return; }
-        tag.style.display = 'inline-flex';
         const realName = u?.realName;
-        tag.textContent = realName ? `🔒 ${realName}` : '🔒 + Add real name';
-        tag.onclick = () => openEditRealNameModal(userId, u?.name, realName || '');
+        if (isAdmin()) {
+          tag.style.display = 'inline-flex';
+          tag.style.cursor = 'pointer';
+          tag.textContent = realName ? `🔒 ${realName}` : '🔒 + Add real name';
+          tag.onclick = () => openEditRealNameModal(userId, u?.name, realName || '');
+        } else if (realName) {
+          tag.style.display = 'inline-flex';
+          tag.style.cursor = 'default';
+          tag.textContent = `🔒 ${realName}`;
+          tag.onclick = null;
+        } else {
+          tag.style.display = 'none';
+        }
       }
       function renderProfileView(userId, u) {
         const stats = getUserStats(userId);
@@ -11313,6 +11650,7 @@
         profileViewName.innerHTML = nameWithAdminTag(u);
         renderRealNameTag(userId, u);
         profileViewBadge.textContent = `${stats.tier.emoji} ${stats.tier.label}`;
+        document.getElementById('profileViewTotalTag').textContent = `🏅 ${stats.total} total points`;
         profileViewStats.innerHTML = statsBreakdownItems(stats).map(s => `<div>${s}</div>`).join('');
         const poker = POKER_CARDS.find(c => c.id === u?.pokerCard);
         const hun = HUN_CARDS.find(c => c.id === u?.hunCard);
@@ -15600,6 +15938,14 @@
         }
         if (photoSourceOverlay.classList.contains('show')) {
           hidePhotoChooser();
+          return;
+        }
+        if (h2hOverlay.classList.contains('show')) {
+          hideHeadToHead();
+          return;
+        }
+        if (h2hPickerOverlay.classList.contains('show')) {
+          hideH2hPicker();
           return;
         }
         if (yearlyRecapOverlay.classList.contains('show')) {
