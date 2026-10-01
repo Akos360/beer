@@ -2,8 +2,6 @@
 
 A shared PWA for a friend group: log and rate beers, spirits, cigarettes/vapes ("Nikotin") and energy drinks ("Koffein"), track drinks at parties, review pubs on a real map, compete on a leaderboard, get a Spotify-Wrapped-style yearly recap, and gamble your points away in a casino.
 
-Live app: https://beer-dca5c.web.app
-
 ## Layout
 
 Header (always visible): 🎰 Jackpot shortcut · 🎮 Games (Flappy Bird / Tic Tac Toe) · profile avatar.
