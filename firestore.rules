@@ -270,6 +270,23 @@ service cloud.firestore {
       }
     }
 
+    // A trip is just a name + date range; the actual drinking happens on
+    // its per-day docs over in /parties (tagged tripId/tripDayIndex), which
+    // the existing parties rule above already covers unchanged - isValidName()
+    // there doesn't care about the extra tripId/tripDayIndex fields.
+    match /trips/{tripId} {
+      allow read: if true;
+      allow create: if isMember() && isValidName()
+        && request.resource.data.startDate is string && request.resource.data.startDate.size() == 10
+        && request.resource.data.endDate is string && request.resource.data.endDate.size() == 10;
+      // Editing a trip (rename / resize the date range) touches only
+      // name/startDate/endDate - createdBy/ts never change.
+      allow update: if isMember() && isOwnerOrAdmin(resource.data.get('createdBy', '')) && isValidName()
+        && request.resource.data.startDate is string && request.resource.data.startDate.size() == 10
+        && request.resource.data.endDate is string && request.resource.data.endDate.size() == 10;
+      allow delete: if isMember() && isOwnerOrAdmin(resource.data.get('createdBy', ''));
+    }
+
     match /pubs/{pubId} {
       allow read: if true;
       allow create: if isMember() && isValidName();

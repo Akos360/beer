@@ -452,7 +452,27 @@
       grid-template-columns: repeat(2, 1fr)
     }
 
+    /* A trip can span many days, so unlike the fixed 2/4-tab switches
+       above, this one scrolls horizontally instead of using a fixed grid. */
+    #partyViewDayTabs {
+      display: flex;
+      flex-wrap: nowrap;
+      overflow-x: auto;
+      -webkit-overflow-scrolling: touch;
+    }
+
+    #partyViewDayTabs::-webkit-scrollbar {
+      display: none
+    }
+
+    #partyViewDayTabs .tabBtn {
+      flex: 0 0 auto;
+      white-space: nowrap;
+      padding: 9px 14px
+    }
+
     #partyList,
+    #tripList,
     #pubList {
       padding: 14px;
       padding-bottom: 90px;
@@ -461,7 +481,8 @@
       gap: 10px
     }
 
-    #partyListHead {
+    #partyListHead,
+    #tripListHead {
       padding: 14px 14px 0
     }
 
@@ -2258,6 +2279,140 @@
       height: 100%;
       object-fit: cover;
       cursor: pointer
+    }
+
+    .photoWallGrid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(96px, 1fr));
+      gap: 6px
+    }
+
+    .photoWallTile {
+      position: relative;
+      aspect-ratio: 1;
+      border-radius: 10px;
+      overflow: hidden;
+      background: var(--bg-elev);
+      border: 1px solid var(--border);
+      cursor: pointer
+    }
+
+    .photoWallTile img,
+    .photoWallTile video {
+      width: 100%;
+      height: 100%;
+      object-fit: cover
+    }
+
+    .photoWallDayBadge {
+      position: absolute;
+      left: 5px;
+      bottom: 5px;
+      padding: 2px 7px;
+      border-radius: 999px;
+      background: rgba(0, 0, 0, .6);
+      color: #fff;
+      font-size: .65rem;
+      font-weight: 700
+    }
+
+    .calendarNav {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 10px
+    }
+
+    .calendarNav #calendarMonthLabel {
+      font-weight: 800;
+      font-size: 1rem
+    }
+
+    .calendarNav .btn {
+      flex: 0 0 auto;
+      padding: 6px 16px
+    }
+
+    .calendarWeekdays,
+    .calendarGrid {
+      display: grid;
+      grid-template-columns: repeat(7, 1fr);
+      gap: 4px
+    }
+
+    .calendarWeekdays span {
+      text-align: center;
+      font-size: .7rem;
+      color: var(--text-dim);
+      font-weight: 700;
+      padding-bottom: 4px
+    }
+
+    .calendarCell {
+      position: relative;
+      aspect-ratio: 1;
+      border-radius: 8px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      font-size: .78rem;
+      color: var(--text)
+    }
+
+    .calendarCell.calendarCellBlank {
+      visibility: hidden
+    }
+
+    .calendarCell.hasEvents {
+      background: var(--bg-elev);
+      border: 1px solid var(--border);
+      cursor: pointer;
+      font-weight: 700
+    }
+
+    .calendarCell.today {
+      border: 1px solid var(--accent)
+    }
+
+    .calendarCell.selected {
+      background: var(--accent);
+      color: #1c1410
+    }
+
+    .calendarDots {
+      position: absolute;
+      bottom: 4px;
+      display: flex;
+      gap: 2px
+    }
+
+    .calendarDot {
+      width: 5px;
+      height: 5px;
+      border-radius: 50%;
+      background: var(--accent)
+    }
+
+    .calendarDot.trip {
+      background: #7ee787
+    }
+
+    .calendarCell.selected .calendarDot {
+      background: #1c1410
+    }
+
+    .calendarDayRow {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 8px 0;
+      cursor: pointer;
+      border-bottom: 1px solid var(--border)
+    }
+
+    .calendarDayRow:last-child {
+      border-bottom: none
     }
 
     .mediaPlayBadge {
@@ -4611,12 +4766,43 @@
     }
 
     .userListHead {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
       font-size: .75rem;
       color: var(--text-dim);
       font-weight: 700;
       text-transform: uppercase;
       letter-spacing: .03em;
       margin-bottom: 8px
+    }
+
+    .calendarBtn {
+      margin-left: auto;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      background: var(--bg-elev)
+    }
+
+    .userListHead .calendarBtn {
+      padding: 7px 12px
+    }
+
+    .userListHead .calendarBtn svg {
+      width: 18px;
+      height: 18px
+    }
+
+    #partyViewCalendarBtn {
+      padding: 7px 12px
+    }
+
+    #partyViewCalendarBtn svg {
+      width: 18px;
+      height: 18px
     }
 
     .userRow {
@@ -4739,6 +4925,10 @@
       <button type="button" class="tabBtn" data-subtab="nikotin">🚬 Nikotin</button>
       <button type="button" class="tabBtn" data-subtab="koffein">⚡ Koffein</button>
     </div>
+    <div class="tabSwitch" id="partiesSubTabSwitch" style="display:none">
+      <button type="button" class="tabBtn active" data-partysubtab="party">🎉 Parties</button>
+      <button type="button" class="tabBtn" data-partysubtab="trip">🧳 Trips</button>
+    </div>
     <div id="beerToolbarRows">
       <div class="row">
         <input id="searchInput" type="search" placeholder="Search name, brewery, country, notes…">
@@ -4849,8 +5039,16 @@
   <div id="spiritList" style="display:none"></div>
   <div id="nikotinList" style="display:none"></div>
   <div id="koffeinList" style="display:none"></div>
-  <div class="userListHead" id="partyListHead" style="display:none">Parties</div>
+  <div class="userListHead" id="partyListHead" style="display:none">
+    <span id="partyListHeadText">Parties</span>
+    <button type="button" class="cityTag calendarBtn" id="partyCalendarBtn" title="Calendar view"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line></svg></button>
+  </div>
   <div id="partyList" style="display:none"></div>
+  <div class="userListHead" id="tripListHead" style="display:none">
+    <span id="tripListHeadText">Trips</span>
+    <button type="button" class="cityTag calendarBtn" id="tripCalendarBtn" title="Calendar view"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line></svg></button>
+  </div>
+  <div id="tripList" style="display:none"></div>
   <div id="pubList" style="display:none"></div>
   <div id="leaderboardPage" style="display:none">
     <div class="tabSwitch" id="lbSubTabSwitch" style="grid-template-columns:1fr 1fr 1fr;margin:10px 14px 10px">
@@ -5668,6 +5866,32 @@
     </div>
   </div>
 
+  <div class="overlay" id="calendarViewOverlay">
+    <div class="sheet">
+      <div class="sheetHead">
+        <h2>Calendar</h2>
+        <button class="closeX" id="calendarViewClose">✕</button>
+      </div>
+      <div class="calendarNav">
+        <button type="button" class="btn ghost" id="calendarPrevBtn">‹</button>
+        <span id="calendarMonthLabel"></span>
+        <button type="button" class="btn ghost" id="calendarNextBtn">›</button>
+      </div>
+      <div class="calendarWeekdays">
+        <span>Mo</span><span>Tu</span><span>We</span><span>Th</span><span>Fr</span><span>Sa</span><span>Su</span>
+      </div>
+      <div class="calendarGrid" id="calendarGrid"></div>
+      <div class="field" id="calendarDaySection" style="margin-top:16px">
+        <label id="calendarDayLabel">Select a day</label>
+        <div id="calendarDayList"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- partyViewOverlay must come after calendarViewOverlay in the DOM:
+       overlays with the same z-index stack by DOM order, and opening a
+       party from the calendar's day list needs the party view to paint
+       on top of (not under) the calendar it was opened from. -->
   <div class="overlay" id="partyViewOverlay">
     <div class="sheet">
       <div class="sheetHead">
@@ -5682,6 +5906,12 @@
       <div class="viewTitleRow">
         <div class="viewTitle"><span id="partyViewName"></span></div>
         <button type="button" class="btn primary viewEditBtnInline" id="partyViewEditBtn">Edit</button>
+      </div>
+      <div id="partyViewCreator"></div>
+      <div class="tabSwitch" id="partyViewDayTabs" style="display:none"></div>
+      <div style="display:flex; align-items:center; gap:8px; margin-bottom:10px">
+        <button type="button" class="btn ghost" id="tripPhotoWallBtn" style="display:none; flex:1">🖼️ All trip photos</button>
+        <button type="button" class="cityTag calendarBtn" id="partyViewCalendarBtn" title="Calendar view"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line></svg></button>
       </div>
       <div class="viewMeta" id="partyViewDate"></div>
       <div class="viewBadges" id="partyViewTotals" style="margin-top:10px"></div>
@@ -5709,6 +5939,16 @@
     </div>
   </div>
 
+  <div class="overlay" id="tripPhotoWallOverlay">
+    <div class="sheet">
+      <div class="sheetHead">
+        <h2>All trip photos</h2>
+        <button class="closeX" id="tripPhotoWallClose">✕</button>
+      </div>
+      <div class="photoWallGrid" id="tripPhotoWallGrid"></div>
+    </div>
+  </div>
+
   <div class="overlay" id="partyFormOverlay">
     <div class="sheet">
       <div class="sheetHead">
@@ -5722,20 +5962,45 @@
           <label>Name</label>
           <input id="pfName" required placeholder="e.g. Friday Night">
         </div>
-        <div class="twoCol">
-          <div class="field">
-            <label>Date (M/D)</label>
-            <input id="pfDate" required placeholder="e.g. 9/11">
-          </div>
-          <div class="field">
-            <label>Year</label>
-            <input id="pfYear" type="number" required min="2000" max="2100" placeholder="2026">
-          </div>
+        <div class="field">
+          <label>Date</label>
+          <input id="pfDate" type="date" required min="2000-01-01" max="2100-12-31">
         </div>
         <div class="formActions">
           <button type="button" class="btn danger" id="partyDeleteBtn" style="display:none">Delete</button>
           <button type="button" class="btn ghost" id="partyCancelBtn">Cancel</button>
           <button type="submit" class="btn primary" id="partySaveBtn">Add Party</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <div class="overlay" id="tripFormOverlay">
+    <div class="sheet">
+      <div class="sheetHead">
+        <h2 id="tripFormTitle">Add Trip</h2>
+        <button class="closeX" id="tripFormClose">✕</button>
+      </div>
+      <form id="tripForm">
+        <div class="field">
+          <label>Name</label>
+          <input id="tfName" required placeholder="e.g. Summer Lake Trip">
+        </div>
+        <div class="twoCol">
+          <div class="field">
+            <label>Start date</label>
+            <input id="tfStart" type="date" required>
+          </div>
+          <div class="field">
+            <label>End date</label>
+            <input id="tfEnd" type="date" required>
+          </div>
+        </div>
+        <div class="field" id="tfDaysPreview" style="color:var(--text-dim);font-size:.85rem"></div>
+        <div class="formActions">
+          <button type="button" class="btn danger" id="tripDeleteBtn" style="display:none">Delete</button>
+          <button type="button" class="btn ghost" id="tripCancelBtn">Cancel</button>
+          <button type="submit" class="btn primary" id="tripSaveBtn">Add Trip</button>
         </div>
       </form>
     </div>
@@ -5759,6 +6024,7 @@
         <div class="viewTitle"><span id="pubViewName"></span></div>
         <button type="button" class="btn primary viewEditBtnInline" id="pubViewEditBtn">Edit</button>
       </div>
+      <div id="pubViewCreator"></div>
       <div class="viewMeta" id="pubViewCity"></div>
       <div class="viewBadges" id="pubViewBadges" style="margin-top:10px"></div>
       <div class="field" style="margin-top:16px">
@@ -6392,6 +6658,16 @@
         history.pushState({ sorOverlay: true }, '');
       }
 
+      // Overlays that can open "into" each other in either direction (the
+      // calendar can open a party/trip, and a party/trip can now open the
+      // calendar) can't rely on fixed DOM order to decide which one paints
+      // on top - whichever was opened most recently needs to win. Moving it
+      // to the end of <body> (same element, just relocated) makes that true
+      // regardless of where it was originally declared in the HTML.
+      function bringOverlayToFront(el) {
+        document.body.appendChild(el);
+      }
+
       function buildRatingButtons(container, value, onSelect) {
         container.innerHTML = '';
         for (let n = 1; n <= 10; n++) {
@@ -6572,10 +6848,10 @@
       // Small "Added by [avatar] name" row shown on a beer/spirit's view
       // page — the grid card shows just the avatar (corner badge, tight on
       // space); the full view adds the name too, per how it's used there.
-      function creatorRowHtml(item) {
+      function creatorRowHtml(item, clickable = true) {
         const creator = allUsers.find(u => u.id === item.createdBy);
         if (!creator) return '';
-        return `<div class="viewCreatorRow lbProfileLink" data-user="${creator.id}">
+        return `<div class="viewCreatorRow${clickable ? ' lbProfileLink' : ''}" data-user="${creator.id}">
       <div class="userAvatar" style="width:22px;height:22px;font-size:.65rem">${avatarInner(creator.name, creator.photoURL)}</div>
       <span>Added by ${nameWithAdminTag(creator)}</span>
     </div>`;
@@ -7095,14 +7371,19 @@
       let allParties = [];
       let allPartyParticipants = {}; // partyId -> [{id: userId, count, ts}]
       let activeTab = 'beers';
+      let activePartiesSubTab = 'party';
 
       const tabSwitch = document.getElementById('tabSwitch');
       const beerToolbarRows = document.getElementById('beerToolbarRows');
       const partyListEl = document.getElementById('partyList');
+      const tripListEl = document.getElementById('tripList');
+      const partiesSubTabSwitch = document.getElementById('partiesSubTabSwitch');
 
       function applyTabVisibility() {
         const isBeersTab = activeTab === 'beers';
         const isParties = activeTab === 'parties';
+        const showPartySub = isParties && activePartiesSubTab === 'party';
+        const showTripSub = isParties && activePartiesSubTab === 'trip';
         const isPubs = activeTab === 'pubs';
         const isLeaderboard = activeTab === 'leaderboard';
         const showBeerSub = isBeersTab && activeReviewsSubTab === 'beer';
@@ -7121,28 +7402,43 @@
         document.getElementById('spiritList').style.display = showSpiritSub ? 'grid' : 'none';
         document.getElementById('nikotinList').style.display = showNikotinSub ? 'grid' : 'none';
         document.getElementById('koffeinList').style.display = showKoffeinSub ? 'grid' : 'none';
-        document.getElementById('partyListHead').style.display = isParties ? 'block' : 'none';
-        partyListEl.style.display = isParties ? 'flex' : 'none';
+        partiesSubTabSwitch.style.display = isParties ? 'grid' : 'none';
+        document.getElementById('partyListHead').style.display = showPartySub ? 'flex' : 'none';
+        partyListEl.style.display = showPartySub ? 'flex' : 'none';
+        document.getElementById('tripListHead').style.display = showTripSub ? 'flex' : 'none';
+        tripListEl.style.display = showTripSub ? 'flex' : 'none';
         document.getElementById('pubList').style.display = isPubs ? 'flex' : 'none';
         document.getElementById('leaderboardPage').style.display = isLeaderboard ? 'block' : 'none';
 
         document.getElementById('fab').style.display = isLeaderboard ? 'none' : 'flex';
-        document.getElementById('fab').title = isParties ? 'Add party' : isPubs ? 'Add pub' : showSpiritSub ? 'Add spirit' : showNikotinSub ? 'Add nikotin' : showKoffeinSub ? 'Add koffein' : 'Add beer';
+        document.getElementById('fab').title = showTripSub ? 'Add trip' : showPartySub ? 'Add party' : isPubs ? 'Add pub' : showSpiritSub ? 'Add spirit' : showNikotinSub ? 'Add nikotin' : showKoffeinSub ? 'Add koffein' : 'Add beer';
       }
       function setActiveTab(tab) {
         activeTab = tab;
         tabSwitch.querySelectorAll('.tabBtn').forEach(b => b.classList.toggle('active', b.dataset.tab === tab));
         applyTabVisibility();
-        if (activeTab === 'parties') renderPartyList();
+        if (activeTab === 'parties' && activePartiesSubTab === 'party') renderPartyList();
+        if (activeTab === 'parties' && activePartiesSubTab === 'trip') renderTripList();
         if (activeTab === 'pubs') renderPubList();
         if (activeTab === 'leaderboard') renderLeaderboard();
       }
       tabSwitch.querySelectorAll('.tabBtn').forEach(b => {
         b.onclick = () => setActiveTab(b.dataset.tab);
       });
+      function setActivePartiesSubTab(sub) {
+        activePartiesSubTab = sub;
+        partiesSubTabSwitch.querySelectorAll('.tabBtn').forEach(b => b.classList.toggle('active', b.dataset.partysubtab === sub));
+        applyTabVisibility();
+        if (sub === 'party') renderPartyList();
+        else renderTripList();
+      }
+      partiesSubTabSwitch.querySelectorAll('.tabBtn').forEach(b => {
+        b.onclick = () => setActivePartiesSubTab(b.dataset.partysubtab);
+      });
       document.getElementById('fab').onclick = () => {
         if (!canWrite()) return promptInstallOrSignIn();
-        if (activeTab === 'parties') openPartyForm(null);
+        if (activeTab === 'parties' && activePartiesSubTab === 'trip') openTripForm();
+        else if (activeTab === 'parties') openPartyForm(null);
         else if (activeTab === 'pubs') openPubForm(null);
         else if (activeTab === 'beers' && activeReviewsSubTab === 'spirit') openSpiritForm(null);
         else if (activeTab === 'beers' && activeReviewsSubTab === 'nikotin') openNikotinForm(null);
@@ -7174,10 +7470,11 @@
         return `<span class="shopPreviewChip chip-${chip.type} partyChipMini" title="${escapeHtml(chip.owner?.name || 'Anonymous')} · ${label}"></span>`;
       }
 
-      // Parties are dated via free-text "M/D" (pfDate) + a separate numeric
-      // year (pfYear), not a real date picker — parsed here into a
-      // comparable timestamp. Returns null for anything that doesn't parse,
-      // so callers can fall back to creation time for undated parties.
+      // Parties are stored as "M/D" (date) + a separate numeric year, not a
+      // single real date - the form itself uses a date picker (see
+      // partyFieldsFromIsoDate), but every other party-dated feature still
+      // reads/sorts by this pair. Returns null for anything that doesn't
+      // parse, so callers can fall back to creation time for undated parties.
       function partyDateValue(p) {
         const m = /^(\d{1,2})\s*\/\s*(\d{1,2})$/.exec((p.date || '').trim());
         if (!m) return null;
@@ -7198,13 +7495,21 @@
         });
       }
 
+      // Trip days live in this same collection (tagged with tripId) so all
+      // the existing party machinery - join/count, chips, comments, photos,
+      // leaderboard aggregation - works for them unchanged. The regular
+      // party list only ever shows standalone parties; trips get their own
+      // list (renderTripList) and day-switcher inside the opened view.
+      function standaloneParties() { return allParties.filter(p => !p.tripId); }
+
       function renderPartyList() {
-        document.getElementById('partyListHead').textContent = `Parties (${allParties.length})`;
-        if (!allParties.length) {
+        const standalone = standaloneParties();
+        document.getElementById('partyListHeadText').textContent = `Parties (${standalone.length})`;
+        if (!standalone.length) {
           partyListEl.innerHTML = '<div class="empty">No parties yet 🎉<br>Tap + to start one.</div>';
           return;
         }
-        const sorted = sortPartiesByDateDesc(allParties);
+        const sorted = sortPartiesByDateDesc(standalone);
         partyListEl.innerHTML = sorted.map(p => {
           const totals = partyTotals(p.id);
           const cover = (p.photos && p.photos[0]) ? `<img src="${escapeHtml(p.photos[0].url)}">` : '🎉';
@@ -7214,6 +7519,7 @@
       <div class="partyThumb">${cover}</div>
       <div class="partyInfo">
         <div class="partyName">${escapeHtml(p.name || 'Unnamed party')}</div>
+        ${creatorRowHtml(p, false)}
         <div class="partyMeta">${totals.joined} joined · ${totals.totalBeers} 🍺 · ${totals.totalShots} 🥃</div>
         ${chipsHtml ? `<div class="partyChipsRow">${chipsHtml}</div>` : ''}
       </div>
@@ -7233,7 +7539,8 @@
 
       partiesCol.onSnapshot(snap => {
         allParties = snap.docs.map(d => ({ id: d.id, ...d.data() }));
-        if (activeTab === 'parties') renderPartyList();
+        if (activeTab === 'parties' && activePartiesSubTab === 'party') renderPartyList();
+        if (activeTab === 'parties' && activePartiesSubTab === 'trip') renderTripList();
         refreshPartyViewIfOpen();
         if (activeTab === 'leaderboard') renderLeaderboard();
         refreshProfileDisplays();
@@ -7246,7 +7553,8 @@
           if (!allPartyParticipants[partyId]) allPartyParticipants[partyId] = [];
           allPartyParticipants[partyId].push({ id: d.id, ...d.data() });
         });
-        if (activeTab === 'parties') renderPartyList();
+        if (activeTab === 'parties' && activePartiesSubTab === 'party') renderPartyList();
+        if (activeTab === 'parties' && activePartiesSubTab === 'trip') renderTripList();
         refreshPartyViewIfOpen();
         if (activeTab === 'leaderboard') renderLeaderboard();
         refreshProfileDisplays();
@@ -7771,6 +8079,10 @@
           : '<div class="placeholder">🎉</div>';
         wireCarouselClicks(partyViewCarousel, photos);
         partyViewName.textContent = party.name || 'Unnamed party';
+        const partyCreatorEl = document.getElementById('partyViewCreator');
+        partyCreatorEl.innerHTML = creatorRowHtml(party);
+        const partyCreatorRow = partyCreatorEl.querySelector('.viewCreatorRow');
+        if (partyCreatorRow) partyCreatorRow.onclick = () => openProfileView(partyCreatorRow.dataset.user);
         document.getElementById('partyViewDate').textContent = [party.date, party.year].filter(Boolean).join(' · ');
         const totals = partyTotals(party.id);
         document.getElementById('partyViewTotals').innerHTML =
@@ -7781,6 +8093,7 @@
         partyViewEditBtn.style.display = canEdit ? 'flex' : 'none';
         renderPartyParticipants(party);
         renderPartyViewChips(party);
+        renderPartyViewDayTabs(party);
       }
 
       function renderPartyViewChips(party) {
@@ -7833,6 +8146,7 @@
         partyCommentInput.value = '';
         partyCommentsCache = [];
         partyCommentsEl.innerHTML = '';
+        bringOverlayToFront(partyViewOverlay);
         partyViewOverlay.classList.add('show');
 
         if (partyCommentsUnsub) { partyCommentsUnsub(); partyCommentsUnsub = null; }
@@ -7855,8 +8169,17 @@
       partyViewOverlay.addEventListener('click', (e) => { if (e.target === partyViewOverlay) closePartyView(); });
       partyViewEditBtn.onclick = () => {
         const party = allParties.find(p => p.id === currentPartyViewId);
+        if (!party) return;
         hidePartyView();
-        if (party) openPartyForm(party);
+        // A trip day is never edited on its own (name/date are derived from
+        // the trip) - editing opens the trip-level form (name + date range)
+        // instead, same as tapping Edit from the trips list would.
+        if (party.tripId) {
+          const trip = allTrips.find(t => t.id === party.tripId);
+          if (trip) openTripForm(trip);
+        } else {
+          openPartyForm(party);
+        }
       };
       document.getElementById('partyViewAddPhotoBtn').onclick = () => openPhotoChooser(document.getElementById('partyViewPhotoInput'));
       document.getElementById('partyViewPhotoInput').onchange = async () => {
@@ -7956,8 +8279,7 @@
         document.getElementById('partySaveBtn').textContent = party ? 'Save' : 'Add Party';
         partyDeleteBtn.style.display = party ? 'block' : 'none';
         document.getElementById('pfName').value = party?.name || '';
-        document.getElementById('pfDate').value = party?.date || '';
-        document.getElementById('pfYear').value = party?.year || '';
+        document.getElementById('pfDate').value = party ? isoDateFromPartyFields(party.date, party.year) : '';
         renderPartyPhotoStrip(party);
         partyFormOverlay.classList.add('show');
       }
@@ -7971,33 +8293,30 @@
       document.getElementById('partyCancelBtn').onclick = closePartyForm;
       partyFormOverlay.addEventListener('click', (e) => { if (e.target === partyFormOverlay) closePartyForm(); });
 
-      // Real range/validity check for the free-text M/D + year fields —
-      // `required` on the inputs only catches "left empty", not "13/32".
-      // Built on new Date() itself so Feb 30, Apr 31, non-leap Feb 29 etc.
-      // are rejected too, not just out-of-range month/day.
-      function validatePartyDate(dateStr, year) {
-        const m = /^(\d{1,2})\s*\/\s*(\d{1,2})$/.exec(dateStr.trim());
-        if (!m) return 'Enter the date as M/D, e.g. 9/11';
-        const month = Number(m[1]);
-        const day = Number(m[2]);
-        if (month < 1 || month > 12) return 'Month must be between 1 and 12';
-        if (day < 1 || day > 31) return 'Day must be between 1 and 31';
-        if (!year) return 'Year is required';
-        const d = new Date(year, month - 1, day);
-        if (d.getMonth() !== month - 1 || d.getDate() !== day) return `${month}/${day} isn't a real date`;
-        return null;
+      // The form still stores/reads a party's date as the separate "M/D"
+      // string + numeric year fields every other party-dated feature here
+      // already relies on (sorting, leaderboard year filtering, the chip
+      // party picker, etc.) - only the form's own UI uses a real date
+      // picker now, converting to/from that pair at the edges.
+      function isoDateFromPartyFields(dateStr, year) {
+        const m = /^(\d{1,2})\s*\/\s*(\d{1,2})$/.exec((dateStr || '').trim());
+        if (!m || !year) return '';
+        return `${year}-${String(m[1]).padStart(2, '0')}-${String(m[2]).padStart(2, '0')}`;
+      }
+      function partyFieldsFromIsoDate(iso) {
+        const [y, m, d] = iso.split('-').map(Number);
+        return { date: `${m}/${d}`, year: y };
       }
 
       partyForm.onsubmit = async (e) => {
         e.preventDefault();
         if (!canWrite()) return promptInstallOrSignIn();
         const name = document.getElementById('pfName').value.trim();
-        const date = document.getElementById('pfDate').value.trim();
-        const year = document.getElementById('pfYear').value === '' ? null : Number(document.getElementById('pfYear').value);
-        const dateError = validatePartyDate(date, year);
-        if (dateError) { showToast(dateError); return; }
+        const iso = document.getElementById('pfDate').value;
+        if (!iso) { showToast('Pick a date'); return; }
+        const { date, year } = partyFieldsFromIsoDate(iso);
         if (!partyEditingId) {
-          const dupe = findDuplicateItem(allParties, 'name', name, { date, year }, ['date', 'year']);
+          const dupe = findDuplicateItem(standaloneParties(), 'name', name, { date, year }, ['date', 'year']);
           if (dupe) {
             showToast(`A party with this name and date already exists: "${dupe.name}"`);
             return;
@@ -8044,6 +8363,434 @@
         if (!party) return;
         confirmDeleteParty(party);
       };
+
+      // ---------- Trips ----------
+      // A trip is a lightweight container (name + date range) in its own
+      // `trips` collection; each day of that range is a real doc in the
+      // `parties` collection (tagged tripId/tripDayIndex), so every bit of
+      // existing party machinery - joining, beer/shot counts, chips,
+      // comments, photos, leaderboard aggregation - works for a trip day
+      // completely unchanged. The trip view is just the regular party view
+      // with a day-switcher row added on top (see renderPartyViewDayTabs).
+      const tripsCol = db.collection('trips');
+      let allTrips = [];
+      const tripFormOverlay = document.getElementById('tripFormOverlay');
+      const tripForm = document.getElementById('tripForm');
+      const MAX_TRIP_DAYS = 60;
+
+      function tripDays(tripId) {
+        return allParties.filter(p => p.tripId === tripId).sort((a, b) => (a.tripDayIndex || 0) - (b.tripDayIndex || 0));
+      }
+      function tripTotals(tripId) {
+        const days = tripDays(tripId);
+        const joinedSet = new Set();
+        let totalBeers = 0, totalShots = 0;
+        days.forEach(d => {
+          (allPartyParticipants[d.id] || []).forEach(p => {
+            joinedSet.add(p.id);
+            totalBeers += p.count || 0;
+            totalShots += p.shotCount || 0;
+          });
+        });
+        return { joined: joinedSet.size, totalBeers, totalShots, days: days.length };
+      }
+      function dayCountInclusive(startStr, endStr) {
+        if (!startStr || !endStr) return 0;
+        const start = new Date(startStr + 'T00:00:00');
+        const end = new Date(endStr + 'T00:00:00');
+        const diff = Math.round((end - start) / 86400000);
+        return diff >= 0 ? diff + 1 : 0;
+      }
+      function shortDateLabel(dateStr) {
+        const d = new Date(dateStr + 'T00:00:00');
+        return `${d.getMonth() + 1}/${d.getDate()}`;
+      }
+      function tripDateRangeLabel(t) {
+        if (!t.startDate || !t.endDate) return '';
+        return t.startDate === t.endDate ? shortDateLabel(t.startDate) : `${shortDateLabel(t.startDate)}–${shortDateLabel(t.endDate)}`;
+      }
+      // Trips have no photos of their own - this surfaces the first photo
+      // found on any of its days (in day order) as the list cover, same as
+      // how a party's own first photo is used.
+      function tripCoverPhoto(tripId) {
+        for (const d of tripDays(tripId)) {
+          if (d.photos && d.photos[0]) return d.photos[0];
+        }
+        return null;
+      }
+
+      function renderTripList() {
+        document.getElementById('tripListHeadText').textContent = `Trips (${allTrips.length})`;
+        if (!allTrips.length) {
+          tripListEl.innerHTML = '<div class="empty">No trips yet 🧳<br>Tap + to plan one.</div>';
+          return;
+        }
+        const sorted = allTrips.slice().sort((a, b) => (b.ts || 0) - (a.ts || 0));
+        tripListEl.innerHTML = sorted.map(t => {
+          const totals = tripTotals(t.id);
+          const coverPhoto = tripCoverPhoto(t.id);
+          const cover = coverPhoto ? `<img src="${escapeHtml(coverPhoto.url)}">` : '🧳';
+          const startYear = t.startDate ? t.startDate.slice(0, 4) : '';
+          return `<div class="partyRow" data-trip="${t.id}">
+      <div class="partyThumb">${cover}</div>
+      <div class="partyInfo">
+        <div class="partyName">${escapeHtml(t.name || 'Unnamed trip')}</div>
+        ${creatorRowHtml(t, false)}
+        <div class="partyMeta">${totals.joined} joined · ${totals.totalBeers} 🍺 · ${totals.totalShots} 🥃</div>
+      </div>
+      <div class="tagStack">
+        <span class="cityTag">${escapeHtml(tripDateRangeLabel(t))}</span>
+        ${startYear ? `<span class="cityTag">${escapeHtml(startYear)}</span>` : ''}
+        <span class="cityTag" style="background:var(--accent);color:#1c1410;border-color:var(--accent)">${totals.days} day${totals.days === 1 ? '' : 's'}</span>
+      </div>
+    </div>`;
+        }).join('');
+        tripListEl.querySelectorAll('.partyRow[data-trip]').forEach(row => {
+          row.onclick = () => {
+            const trip = allTrips.find(t => t.id === row.dataset.trip);
+            if (trip) openTripView(trip);
+          };
+        });
+      }
+
+      tripsCol.onSnapshot(snap => {
+        allTrips = snap.docs.map(d => ({ id: d.id, ...d.data() }));
+        if (activeTab === 'parties' && activePartiesSubTab === 'trip') renderTripList();
+      }, err => showToast('Sync error: ' + err.message));
+
+      function openTripView(trip) {
+        const days = tripDays(trip.id);
+        if (!days.length) { showToast('This trip has no days yet'); return; }
+        pushOverlayState();
+        showPartyView(days[0]);
+      }
+
+      // Renders the horizontally-scrollable "Day 1 / Day 2 / ..." row shown
+      // inside the (shared) party view sheet whenever the open party is one
+      // day of a trip - switching days re-renders the same sheet in place
+      // (no new history entry), same as refreshPartyViewIfOpen.
+      function renderPartyViewDayTabs(party) {
+        const el = document.getElementById('partyViewDayTabs');
+        const wallBtn = document.getElementById('tripPhotoWallBtn');
+        if (!party.tripId) { el.style.display = 'none'; el.innerHTML = ''; wallBtn.style.display = 'none'; return; }
+        const days = tripDays(party.tripId);
+        el.style.display = 'flex';
+        el.innerHTML = days.map(d => `<button type="button" class="tabBtn${d.id === party.id ? ' active' : ''}" data-day="${d.id}">Day ${(d.tripDayIndex || 0) + 1}</button>`).join('');
+        el.querySelectorAll('.tabBtn').forEach(b => {
+          b.onclick = () => {
+            const dayParty = allParties.find(p => p.id === b.dataset.day);
+            if (dayParty) showPartyView(dayParty);
+          };
+        });
+        wallBtn.style.display = flattenTripPhotos(party.tripId).length ? 'block' : 'none';
+        wallBtn.onclick = () => openTripPhotoWall(party.tripId);
+      }
+
+      // Pulls every day's photos into one flat, day-ordered array (tagging
+      // each with which day it came from) so the whole trip can be browsed
+      // as a single gallery instead of flipping through day tabs.
+      function flattenTripPhotos(tripId) {
+        const flat = [];
+        tripDays(tripId).forEach(d => {
+          (d.photos || []).forEach(p => flat.push({ ...p, dayIndex: d.tripDayIndex || 0 }));
+        });
+        return flat;
+      }
+
+      function openTripPhotoWall(tripId) {
+        const photos = flattenTripPhotos(tripId);
+        const grid = document.getElementById('tripPhotoWallGrid');
+        grid.innerHTML = photos.map((p, i) => `
+          <div class="photoWallTile" data-i="${i}">
+            ${mediaThumbInnerHtml(p.url)}
+            <span class="photoWallDayBadge">Day ${p.dayIndex + 1}</span>
+          </div>`).join('');
+        grid.querySelectorAll('.photoWallTile').forEach(el => {
+          el.onclick = () => openLightbox(photos, Number(el.dataset.i));
+        });
+        pushOverlayState();
+        document.getElementById('tripPhotoWallOverlay').classList.add('show');
+      }
+      function hideTripPhotoWall() { document.getElementById('tripPhotoWallOverlay').classList.remove('show'); }
+      function closeTripPhotoWall() { history.back(); }
+      document.getElementById('tripPhotoWallClose').onclick = closeTripPhotoWall;
+      document.getElementById('tripPhotoWallOverlay').addEventListener('click', (e) => {
+        if (e.target === document.getElementById('tripPhotoWallOverlay')) closeTripPhotoWall();
+      });
+
+      function updateTripDaysPreview() {
+        const n = dayCountInclusive(document.getElementById('tfStart').value, document.getElementById('tfEnd').value);
+        document.getElementById('tfDaysPreview').textContent = n > 0 ? `${n} day${n === 1 ? '' : 's'}` : '';
+      }
+      document.getElementById('tfStart').oninput = updateTripDaysPreview;
+      document.getElementById('tfEnd').oninput = updateTripDaysPreview;
+
+      let tripEditingId = null;
+
+      function openTripForm(trip) {
+        tripEditingId = trip ? trip.id : null;
+        pushOverlayState();
+        document.getElementById('tripFormTitle').textContent = trip ? 'Edit Trip' : 'Add Trip';
+        document.getElementById('tripSaveBtn').textContent = trip ? 'Save' : 'Add Trip';
+        document.getElementById('tripDeleteBtn').style.display = trip ? 'block' : 'none';
+        document.getElementById('tfName').value = trip?.name || '';
+        document.getElementById('tfStart').value = trip?.startDate || '';
+        document.getElementById('tfEnd').value = trip?.endDate || '';
+        updateTripDaysPreview();
+        tripFormOverlay.classList.add('show');
+      }
+      function hideTripForm() { tripFormOverlay.classList.remove('show'); }
+      function closeTripForm() { history.back(); }
+      document.getElementById('tripFormClose').onclick = closeTripForm;
+      document.getElementById('tripCancelBtn').onclick = closeTripForm;
+      tripFormOverlay.addEventListener('click', (e) => { if (e.target === tripFormOverlay) closeTripForm(); });
+      document.getElementById('tripDeleteBtn').onclick = () => {
+        const trip = allTrips.find(t => t.id === tripEditingId);
+        if (trip) confirmDeleteTrip(trip);
+      };
+
+      async function createTrip(name, startStr, endStr, days) {
+        const tripRef = tripsCol.doc();
+        const batch = db.batch();
+        batch.set(tripRef, { name, startDate: startStr, endDate: endStr, createdBy: myUid, ts: Date.now() });
+        const start = new Date(startStr + 'T00:00:00');
+        for (let i = 0; i < days; i++) {
+          const d = new Date(start);
+          d.setDate(d.getDate() + i);
+          const dayRef = partiesCol.doc();
+          batch.set(dayRef, {
+            name: `${name} — Day ${i + 1}`,
+            date: `${d.getMonth() + 1}/${d.getDate()}`,
+            year: d.getFullYear(),
+            photos: [],
+            createdBy: myUid,
+            ts: Date.now(),
+            tripId: tripRef.id,
+            tripDayIndex: i,
+          });
+        }
+        await batch.commit();
+      }
+
+      // Cleans up every subcollection/photo on each given day doc, then the
+      // doc itself — shared by a full trip delete and shrinking a trip's
+      // date range (which removes the days that fall off the end).
+      async function deleteTripDays(days) {
+        for (const day of days) {
+          for (const p of (day.photos || [])) {
+            try { await storage.ref(p.path).delete(); } catch (e) { }
+          }
+          const partSnap = await partiesCol.doc(day.id).collection('participants').get();
+          for (const doc of partSnap.docs) { try { await doc.ref.delete(); } catch (e) { } }
+          const commentsSnap = await partiesCol.doc(day.id).collection('comments').get();
+          for (const doc of commentsSnap.docs) { try { await doc.ref.delete(); } catch (e) { } }
+          await partiesCol.doc(day.id).delete();
+        }
+      }
+
+      // Renames every kept day to match the (possibly changed) trip name and
+      // its new calendar date, creates any days a grown range now needs, and
+      // reports which existing days a shrunk range no longer covers (the
+      // caller deletes those - this never deletes anything itself, since the
+      // shrink path needs to confirm with the user first).
+      async function saveTripEdit(tripId, name, startStr, endStr, newDayCount) {
+        const existingDays = tripDays(tripId);
+        const keptOrNew = existingDays.slice(0, newDayCount);
+        const removedDays = existingDays.slice(newDayCount);
+
+        const batch = db.batch();
+        batch.update(tripsCol.doc(tripId), { name, startDate: startStr, endDate: endStr });
+        const start = new Date(startStr + 'T00:00:00');
+        for (let i = 0; i < newDayCount; i++) {
+          const d = new Date(start);
+          d.setDate(d.getDate() + i);
+          const dayFields = {
+            name: `${name} — Day ${i + 1}`,
+            date: `${d.getMonth() + 1}/${d.getDate()}`,
+            year: d.getFullYear(),
+          };
+          if (i < keptOrNew.length) {
+            batch.update(partiesCol.doc(keptOrNew[i].id), dayFields);
+          } else {
+            const dayRef = partiesCol.doc();
+            batch.set(dayRef, { ...dayFields, photos: [], createdBy: myUid, ts: Date.now(), tripId, tripDayIndex: i });
+          }
+        }
+        await batch.commit();
+        if (removedDays.length) await deleteTripDays(removedDays);
+      }
+
+      tripForm.onsubmit = async (e) => {
+        e.preventDefault();
+        if (!canWrite()) return promptInstallOrSignIn();
+        const name = document.getElementById('tfName').value.trim();
+        const startStr = document.getElementById('tfStart').value;
+        const endStr = document.getElementById('tfEnd').value;
+        const newDayCount = dayCountInclusive(startStr, endStr);
+        if (!startStr || !endStr || newDayCount <= 0) { showToast('End date must be on or after the start date'); return; }
+        if (newDayCount > MAX_TRIP_DAYS) { showToast(`Trips can be at most ${MAX_TRIP_DAYS} days`); return; }
+
+        const saveBtn = document.getElementById('tripSaveBtn');
+
+        if (tripEditingId) {
+          const removedDays = tripDays(tripEditingId).slice(newDayCount);
+          if (removedDays.length) {
+            askConfirm(`Shrinking this trip removes ${removedDays.length} day${removedDays.length === 1 ? '' : 's'} (the last ${removedDays.length === 1 ? 'day' : `${removedDays.length} days`}), along with everyone's counts, chips, and photos there. Continue?`, async () => {
+              await saveTripEdit(tripEditingId, name, startStr, endStr, newDayCount);
+              showToast('Trip updated');
+            });
+            return;
+          }
+          saveBtn.disabled = true;
+          try {
+            await saveTripEdit(tripEditingId, name, startStr, endStr, newDayCount);
+            showToast('Trip updated');
+            closeTripForm();
+          } catch (err) {
+            showToast('Save failed: ' + err.message);
+          } finally {
+            saveBtn.disabled = false;
+          }
+          return;
+        }
+
+        saveBtn.disabled = true;
+        try {
+          await createTrip(name, startStr, endStr, newDayCount);
+          showToast('Trip added');
+          closeTripForm();
+        } catch (err) {
+          showToast('Save failed: ' + err.message);
+        } finally {
+          saveBtn.disabled = false;
+        }
+      };
+
+      function confirmDeleteTrip(trip) {
+        const days = tripDays(trip.id);
+        askConfirm(`Delete "${trip.name || 'this trip'}"? This removes all ${days.length} day${days.length === 1 ? '' : 's'}, their photos, and everyone's counts.`, async () => {
+          await deleteTripDays(days);
+          await tripsCol.doc(trip.id).delete();
+          showToast('Trip deleted');
+        });
+      }
+
+      // ---------- Calendar view (every party + every trip day, combined) ----------
+      // Standalone parties and trip days are both just docs in `parties`
+      // with the same date/year shape (partyDateValue already parses
+      // either uniformly), so this needs no special-casing between the two
+      // - only the dot color and the 🧳/🎉 icon in the day list differ.
+      let calendarYear = new Date().getFullYear();
+      let calendarMonth = new Date().getMonth();
+      let calendarSelectedKey = null;
+      const CALENDAR_MONTH_NAMES = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
+
+      function calendarDateKey(year, month, day) { return `${year}-${month}-${day}`; }
+
+      function calendarEventsByDate() {
+        const map = {};
+        allParties.forEach(p => {
+          const dv = partyDateValue(p);
+          if (dv == null) return;
+          const d = new Date(dv);
+          const key = calendarDateKey(d.getFullYear(), d.getMonth(), d.getDate());
+          (map[key] || (map[key] = [])).push(p);
+        });
+        return map;
+      }
+
+      function renderCalendarView() {
+        document.getElementById('calendarMonthLabel').textContent = `${CALENDAR_MONTH_NAMES[calendarMonth]} ${calendarYear}`;
+        const eventsByDate = calendarEventsByDate();
+        const daysInMonth = new Date(calendarYear, calendarMonth + 1, 0).getDate();
+        const leadingBlanks = (new Date(calendarYear, calendarMonth, 1).getDay() + 6) % 7; // Monday-first grid
+        const today = new Date();
+        const todayKey = calendarDateKey(today.getFullYear(), today.getMonth(), today.getDate());
+
+        let html = '';
+        for (let i = 0; i < leadingBlanks; i++) html += '<div class="calendarCell calendarCellBlank"></div>';
+        for (let day = 1; day <= daysInMonth; day++) {
+          const key = calendarDateKey(calendarYear, calendarMonth, day);
+          const events = eventsByDate[key] || [];
+          const classes = ['calendarCell'];
+          if (events.length) classes.push('hasEvents');
+          if (key === todayKey) classes.push('today');
+          if (key === calendarSelectedKey) classes.push('selected');
+          const dots = events.slice(0, 3).map(ev => `<span class="calendarDot${ev.tripId ? ' trip' : ''}"></span>`).join('');
+          html += `<div class="${classes.join(' ')}" data-key="${key}">${day}${dots ? `<div class="calendarDots">${dots}</div>` : ''}</div>`;
+        }
+        // Always pad to exactly 6 rows (42 cells) - a month only needing 4 or
+        // 5 rows would otherwise make the whole sheet shrink/grow as you
+        // page between months.
+        const trailingBlanks = 42 - leadingBlanks - daysInMonth;
+        for (let i = 0; i < trailingBlanks; i++) html += '<div class="calendarCell calendarCellBlank"></div>';
+        const grid = document.getElementById('calendarGrid');
+        grid.innerHTML = html;
+        grid.querySelectorAll('.calendarCell.hasEvents').forEach(cell => {
+          cell.onclick = () => selectCalendarDay(cell.dataset.key, eventsByDate[cell.dataset.key] || []);
+        });
+      }
+
+      // Shown whenever no day is selected (first open, or right after
+      // changing month) - sized exactly like a real event row so picking
+      // the first event of a day never changes the sheet's height.
+      function showCalendarDayPlaceholder() {
+        document.getElementById('calendarDayLabel').textContent = 'Select a day';
+        document.getElementById('calendarDayList').innerHTML =
+          `<div class="calendarDayRow" style="cursor:default"><span>📅</span><span>Select party</span></div>`;
+      }
+
+      function selectCalendarDay(key, events) {
+        calendarSelectedKey = key;
+        renderCalendarView();
+        const [y, m, d] = key.split('-').map(Number);
+        document.getElementById('calendarDayLabel').textContent = `${CALENDAR_MONTH_NAMES[m]} ${d}, ${y}`;
+        const list = document.getElementById('calendarDayList');
+        list.innerHTML = events.map(ev => `
+          <div class="calendarDayRow" data-id="${ev.id}">
+            <span>${ev.tripId ? '🧳' : '🎉'}</span>
+            <span>${escapeHtml(ev.name || 'Unnamed')}</span>
+          </div>`).join('');
+        list.querySelectorAll('.calendarDayRow').forEach(row => {
+          row.onclick = () => {
+            const party = allParties.find(p => p.id === row.dataset.id);
+            if (party) openPartyView(party);
+          };
+        });
+      }
+
+      function changeCalendarMonth(delta) {
+        calendarMonth += delta;
+        if (calendarMonth < 0) { calendarMonth = 11; calendarYear--; }
+        else if (calendarMonth > 11) { calendarMonth = 0; calendarYear++; }
+        calendarSelectedKey = null;
+        showCalendarDayPlaceholder();
+        renderCalendarView();
+      }
+
+      function openCalendarView() {
+        const now = new Date();
+        calendarYear = now.getFullYear();
+        calendarMonth = now.getMonth();
+        calendarSelectedKey = null;
+        showCalendarDayPlaceholder();
+        renderCalendarView();
+        pushOverlayState();
+        const overlay = document.getElementById('calendarViewOverlay');
+        bringOverlayToFront(overlay);
+        overlay.classList.add('show');
+      }
+      function hideCalendarView() { document.getElementById('calendarViewOverlay').classList.remove('show'); }
+      function closeCalendarView() { history.back(); }
+      document.getElementById('calendarViewClose').onclick = closeCalendarView;
+      document.getElementById('calendarViewOverlay').addEventListener('click', (e) => {
+        if (e.target === document.getElementById('calendarViewOverlay')) closeCalendarView();
+      });
+      document.getElementById('calendarPrevBtn').onclick = () => changeCalendarMonth(-1);
+      document.getElementById('calendarNextBtn').onclick = () => changeCalendarMonth(1);
+      document.getElementById('partyCalendarBtn').onclick = openCalendarView;
+      document.getElementById('tripCalendarBtn').onclick = openCalendarView;
+      document.getElementById('partyViewCalendarBtn').onclick = openCalendarView;
 
       // ---------- Pubs ----------
       const pubsCol = db.collection('pubs');
@@ -8115,6 +8862,7 @@
       <div class="partyThumb">${cover}</div>
       <div class="partyInfo">
         <div class="partyName">${escapeHtml(p.name || 'Unnamed pub')}</div>
+        ${creatorRowHtml(p, false)}
         <div class="partyMeta">${p.avgRating != null ? p.avgRating.toFixed(1) : '–'}/10${p.ratingCount ? ` (${p.ratingCount})` : ''}</div>
         ${activityTags ? `<div class="pubTagRow">${activityTags}</div>` : ''}
       </div>
@@ -8246,6 +8994,10 @@
           : '<div class="placeholder">🍸</div>';
         wireCarouselClicks(pubViewCarousel, photos);
         pubViewName.textContent = pub.name || 'Unnamed pub';
+        const pubCreatorEl = document.getElementById('pubViewCreator');
+        pubCreatorEl.innerHTML = creatorRowHtml(pub);
+        const pubCreatorRow = pubCreatorEl.querySelector('.viewCreatorRow');
+        if (pubCreatorRow) pubCreatorRow.onclick = () => openProfileView(pubCreatorRow.dataset.user);
         document.getElementById('pubViewCity').textContent = pub.city || '';
         renderPubViewBadges(pub);
         const canEdit = pub.createdBy === myUid || isAdmin();
@@ -11355,7 +12107,10 @@
         const spiritsUploaded = allSpirits.filter(s => s.createdBy === userId).length;
         const nikotinUploaded = allNikotin.filter(n => n.createdBy === userId).length;
         const koffeinUploaded = allKoffein.filter(k => k.createdBy === userId).length;
-        const partiesAdded = allParties.filter(p => p.createdBy === userId).length;
+        // Trip days are auto-generated (tagged with tripId) when a trip is
+        // added, so they're excluded here - creating one 5-day trip
+        // shouldn't inflate this into "5 parties added".
+        const partiesAdded = allParties.filter(p => p.createdBy === userId && !p.tripId).length;
         const pubsAdded = allPubs.filter(p => p.createdBy === userId).length;
         const partiesJoined = Object.values(allPartyParticipants).filter(participants => participants.some(p => p.id === userId)).length;
         const mine = allRatings.filter(r => r.userId === userId);
@@ -11722,7 +12477,8 @@
         refreshJackpotIfOpen();
         refreshGamesIfOpen();
         checkJackpotZeroBailout();
-        if (activeTab === 'parties') renderPartyList();
+        if (activeTab === 'parties' && activePartiesSubTab === 'party') renderPartyList();
+        if (activeTab === 'parties' && activePartiesSubTab === 'trip') renderTripList();
         refreshPartyViewIfOpen();
         // The grid's creator-avatar corner badge and the view page's
         // "Added by" row both read from allUsers, which usually arrives
@@ -15899,6 +16655,10 @@
           hideLightbox();
           return;
         }
+        if (document.getElementById('tripPhotoWallOverlay').classList.contains('show')) {
+          hideTripPhotoWall();
+          return;
+        }
         if (confirmModal.classList.contains('show')) {
           confirmModal.classList.remove('show');
           pendingDelete = null;
@@ -16000,6 +16760,10 @@
           }
           return;
         }
+        if (tripFormOverlay.classList.contains('show')) {
+          hideTripForm();
+          return;
+        }
         if (pubFormOverlay.classList.contains('show')) {
           hidePubForm();
           if (pubFormOpenedFromId) {
@@ -16031,6 +16795,10 @@
         }
         if (partyViewOverlay.classList.contains('show')) {
           hidePartyView();
+          return;
+        }
+        if (document.getElementById('calendarViewOverlay').classList.contains('show')) {
+          hideCalendarView();
           return;
         }
         if (pubViewOverlay.classList.contains('show')) {
