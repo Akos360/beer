@@ -107,6 +107,8 @@ firebase deploy
 
 Deploys Hosting + `firestore.rules` + `storage.rules` + Functions. Requires `firebase login` with the CLI pointed at `beer-dca5c` (default in `.firebaserc`). Deploy a subset with `--only`, e.g. `firebase deploy --only hosting` or `firebase deploy --only functions:closeYear`.
 
+A Hosting `postdeploy` hook (`scripts/cleanup-hosting-versions.js`) automatically prunes old Hosting releases after every deploy, keeping only the live version + one previous — Firebase Hosting otherwise keeps every release's full file set forever, which quietly grew into a 10GB+ storage bill over a few weeks of frequent deploys before this was added.
+
 ## Fresh project setup
 
 1. Create a Firebase project, enable Firestore + Storage (Blaze plan — Functions require it)

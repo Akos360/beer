@@ -6,8 +6,10 @@
       "**/.*",
       "**/node_modules/**",
       "*.rules",
-      "README.md"
+      "README.md",
+      "scripts/**"
     ],
+    "postdeploy": "node scripts/cleanup-hosting-versions.js",
     "headers": [
       {
         "source": "**/*.@(html|js)",
