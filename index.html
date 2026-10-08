@@ -6786,6 +6786,10 @@
       function showRatersList(colRef, itemId) {
         pushOverlayState();
         document.getElementById('ratersListBody').innerHTML = '<div class="empty" style="padding:14px 0">Loading…</div>';
+        // Opened by tapping the rating badge inside a beer/spirit/nikotin/
+        // koffein/pub view page, which stays open underneath - needs to
+        // paint on top of it, same as the other nested-open overlays.
+        bringOverlayToFront(ratersListOverlay);
         ratersListOverlay.classList.add('show');
         if (ratersListUnsub) { ratersListUnsub(); ratersListUnsub = null; }
         ratersListUnsub = colRef.doc(itemId).collection('ratings').onSnapshot(snap => {
@@ -6819,6 +6823,11 @@
       function openPhotoChooser(input) {
         photoSourcePendingInput = input;
         pushOverlayState();
+        // Shared across every "+ add photo" button, including ones on
+        // view pages (party, pub, …) that may have been moved to the end
+        // of <body> by their own bringOverlayToFront call - without doing
+        // the same here, this chooser stays stacked under them.
+        bringOverlayToFront(photoSourceOverlay);
         photoSourceOverlay.classList.add('show');
       }
       function hidePhotoChooser() {
@@ -7354,6 +7363,11 @@
         pendingDelete = fn;
         pendingDeleteCloseAfter = closeOverlayAfter;
         pushOverlayState();
+        // Used from dozens of places, almost always while some other
+        // overlay (a view page, a form, …) is still open underneath -
+        // needs to paint on top of it every time, not just when DOM
+        // order happens to already favor it.
+        bringOverlayToFront(confirmModal);
         confirmModal.classList.add('show');
       }
       document.getElementById('confirmCancel').onclick = () => { pendingDelete = null; history.back(); };
@@ -7819,6 +7833,11 @@
         document.getElementById('partyDrinkPickerSearchField').style.display = opts.canEdit ? 'block' : 'none';
         partyDrinkPickerSearch.value = '';
         pushOverlayState();
+        // This always opens "into" another already-open overlay (the
+        // party view, the leaderboard, …), which may itself have been
+        // moved to the end of <body> by its own bringOverlayToFront call -
+        // without doing the same here, the picker stays stacked under it.
+        bringOverlayToFront(partyDrinkPickerOverlay);
         partyDrinkPickerOverlay.classList.add('show');
         renderDrinkPickerList('');
       }
@@ -8509,6 +8528,10 @@
           el.onclick = () => openLightbox(photos, Number(el.dataset.i));
         });
         pushOverlayState();
+        // Opened from a button inside the party view, which moves itself
+        // to the end of <body> on open (bringOverlayToFront) - without
+        // doing the same here, this wall would stay stacked under it.
+        bringOverlayToFront(document.getElementById('tripPhotoWallOverlay'));
         document.getElementById('tripPhotoWallOverlay').classList.add('show');
       }
       function hideTripPhotoWall() { document.getElementById('tripPhotoWallOverlay').classList.remove('show'); }
@@ -9796,6 +9819,11 @@
         pushOverlayState();
         lbPhotos = photos; lbIdx = idx;
         lbShow();
+        // Opened from photo strips on every view page (party, profile,
+        // trip photo wall, …), several of which move themselves to the
+        // end of <body> on open - needs to paint on top of whichever one
+        // it was opened from.
+        bringOverlayToFront(lightbox);
         lightbox.classList.add('show');
       }
       function hideLightbox() {
@@ -11857,6 +11885,10 @@
 
       function openYearlyRecapOverlay() {
         pushOverlayState();
+        // Opened from a year chip inside the profile view, which moves
+        // itself to the end of <body> on open - needs to paint on top of
+        // it, not wherever it happened to land in static DOM order.
+        bringOverlayToFront(yearlyRecapOverlay);
         yearlyRecapOverlay.classList.add('show');
       }
       function hideYearlyRecapOverlay() { yearlyRecapOverlay.classList.remove('show'); }
@@ -11965,6 +11997,9 @@
         h2hPickerSearch.value = '';
         renderH2hPickerList('');
         pushOverlayState();
+        // Opened from the recap list inside the profile view, which
+        // moves itself to the end of <body> on open.
+        bringOverlayToFront(h2hPickerOverlay);
         h2hPickerOverlay.classList.add('show');
       }
       function hideH2hPicker() { h2hPickerOverlay.classList.remove('show'); }
@@ -12034,6 +12069,11 @@
       async function openHeadToHead(year, opponentUid) {
         document.getElementById('h2hBody').innerHTML = '<div class="yearlyRecapEmpty" style="padding:20px 0">Loading…</div>';
         pushOverlayState();
+        // Opened from inside the h2h picker, itself opened from the
+        // profile view - both of those move themselves to the end of
+        // <body> on open, so this needs the same treatment to land above
+        // both rather than wherever its static DOM position now is.
+        bringOverlayToFront(h2hOverlay);
         h2hOverlay.classList.add('show');
         try {
           const [mine, theirs] = await Promise.all([
@@ -12631,6 +12671,10 @@
       function openProfileView(userId) {
         pushOverlayState();
         profileViewIsNested = profileViewOverlay.classList.contains('show');
+        // Opened from inside beer/spirit/party/pub view pages (tapping a
+        // name) without closing them first, so it needs to paint on top
+        // of whichever of those was moved to the end of <body> already.
+        bringOverlayToFront(profileViewOverlay);
         showProfileView(userId);
       }
       function hideProfileView() {
@@ -13414,6 +13458,9 @@
         document.getElementById('editCoinsLabel').textContent = `Set balance for ${userName || 'Anonymous'}`;
         document.getElementById('editCoinsInput').value = currentValue;
         pushOverlayState();
+        // Opened from the member list inside the profile view, which
+        // moves itself to the end of <body> on open.
+        bringOverlayToFront(editCoinsModal);
         editCoinsModal.classList.add('show');
       }
       function hideEditCoinsModal() {
@@ -13443,6 +13490,9 @@
         document.getElementById('editRealNameLabel').textContent = `Set real name for ${userName || 'Anonymous'}`;
         document.getElementById('editRealNameInput').value = currentValue || '';
         pushOverlayState();
+        // Opened from the member list inside the profile view, which
+        // moves itself to the end of <body> on open.
+        bringOverlayToFront(editRealNameModal);
         editRealNameModal.classList.add('show');
       }
       function hideEditRealNameModal() {
@@ -13474,6 +13524,7 @@
         document.getElementById('editShopPriceLabel').textContent = `Set price for ${itemName}`;
         document.getElementById('editShopPriceInput').value = currentPrice;
         pushOverlayState();
+        bringOverlayToFront(editShopPriceModal);
         editShopPriceModal.classList.add('show');
       }
       function hideEditShopPriceModal() {
@@ -14506,6 +14557,11 @@
         </div>`;
         document.getElementById('tttAcceptBtn').onclick = tttAcceptInvite;
         document.getElementById('tttDeclineBtn').onclick = tttDeclineInvite;
+        // This can fire while the person is anywhere in the app (it's the
+        // first overlay declared in the DOM, so without this it would
+        // paint behind literally every other overlay) - see the comment
+        // on tttIncomingInvite above.
+        bringOverlayToFront(document.getElementById('tttInviteOverlay'));
         document.getElementById('tttInviteOverlay').classList.add('show');
       }
       function hideTttInviteOverlay() {
@@ -15006,6 +15062,9 @@
           document.getElementById('chipPopupPartyDisplay').innerHTML = '<button type="button" class="btn ghost" id="chipPopupPartyTriggerBtn">🎉 Choose a party</button>';
           document.getElementById('chipPopupPartyTriggerBtn').onclick = openChipPartyPicker;
         }
+        // Opened from the raters list or the profile's chip grid, both of
+        // which move themselves to the end of <body> on open.
+        bringOverlayToFront(chipPopupOverlay);
         chipPopupOverlay.classList.add('show');
       }
       function openChipPopup(chipId, ownerUid) {
@@ -15128,6 +15187,10 @@
       }
       function showChipPartyPicker() {
         renderChipPartyPickerList();
+        // Opened from inside the chip popup, itself opened from the
+        // raters list or profile - all of which move themselves to the
+        // end of <body> on open.
+        bringOverlayToFront(chipPartyPickerOverlay);
         chipPartyPickerOverlay.classList.add('show');
       }
       function openChipPartyPicker() {
@@ -15157,6 +15220,10 @@
         document.getElementById('wheelSpinStep').style.display = 'none';
         document.getElementById('wheelCanvas').style.transform = 'rotate(0deg)';
         wheelSpinning = false;
+        // Opened from inside the chip popup, itself opened from the
+        // raters list or profile - all of which move themselves to the
+        // end of <body> on open.
+        bringOverlayToFront(wheelOverlay);
         wheelOverlay.classList.add('show');
       }
       function openWheelOverlay() {
