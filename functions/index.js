@@ -89,19 +89,33 @@ exports.verifyPasscode = onCall({ secrets: [GROUP_PASSCODE] }, async (request) =
 // (`getAuth().setCustomUserClaims(uid, { isAdmin: true, passcodeVerified:
 // true })`), not a permanently-deployed callable function.
 
-// One-time cleanup for the passcode/anon-auth migration: the automatic
-// same-device migration (see migrateLegacyProfileIfAny in index.html) only
-// copies fields that live directly on the users/{uid} doc (name, photo,
-// coins, badges, inventory, game stats). Content *attributed to* the old
-// uid — beers/spirits/parties/pubs someone added, their ratings, pub
-// comments, party participation, drink/shot logs — lives on other
-// documents keyed or field-tagged by that old uid, and reassigning it
-// requires bypassing per-user ownership rules (nobody can sign in as the
-// old uid to do it themselves), so it has to run as trusted server code.
+// One-time cleanup for the passcode/anon-auth migration: copies the
+// users/{uid} doc fields (name, photo, coins, badges, inventory, game
+// stats) AND reassigns content *attributed to* the old uid — beers/
+// spirits/parties/pubs someone added, their ratings, pub comments, party
+// participation, drink/shot logs — which lives on other documents keyed
+// or field-tagged by that old uid. Both halves need trusted server code:
+// nobody can sign in as the old uid to do the second half themselves, and
+// the profile-field copy below used to be a plain client-side
+// `usersCol.doc(myUid).set(copyable, {merge:true})` in
+// migrateLegacyProfileIfAny() — which, for any actual returning player,
+// collides head-on with the users/{uid} rule's purchase/equip/realName
+// guards (inventoryChangeIsPaidFor() only allows exactly one item added
+// per write, not a one-shot restore of a whole pre-existing collection,
+// and realName can never be self-written at all). That write would fail
+// — silently, from the client's point of view, since
+// migrateLegacyProfileIfAny() swallows the error and returns null — on
+// literally every real account with 2+ owned shop items or an
+// admin-assigned real name, leaving name/photoURL permanently unset and
+// the onboarding "set up your profile" popup stuck reappearing forever,
+// since the *next* load retries the exact same doomed write. Doing the
+// copy here with the Admin SDK bypasses those self-write rules entirely
+// (appropriate, since this is a one-time account migration, not an
+// ongoing self-service edit) and actually succeeds.
 // Called automatically by migrateLegacyProfileIfAny() in index.html right
-// after a same-device migration copies the users/{uid} doc fields, so
-// every real member gets their full history moved in one go — not just
-// admin-run cleanup for cases the automatic path already missed.
+// after it finds a same-device legacy uid, so every real member gets
+// their full profile + history moved in one go — not just admin-run
+// cleanup for cases the automatic path already missed.
 //
 // Self-service (newUid === caller) is allowed, but only when oldUid points
 // at a genuine pre-passcode relic (no passcodeVerified on it) — otherwise
@@ -127,6 +141,11 @@ exports.mergeAccountData = onCall(async (request) => {
   if (!isAdminCaller && oldDoc.data().passcodeVerified) {
     throw new HttpsError('permission-denied', 'That account is already a real member — cannot merge from it.');
   }
+
+  // Profile fields first (Admin SDK write — not subject to the client
+  // self-write rule's purchase/equip/realName guards, see comment above).
+  const { passcodeVerified: _ignoredVerified, isAdmin: _ignoredAdmin, ...copyableProfile } = oldDoc.data();
+  await db.collection('users').doc(newUid).set(copyableProfile, { merge: true });
 
   const summary = {};
 
@@ -226,7 +245,7 @@ exports.mergeAccountData = onCall(async (request) => {
   await db.collection('users').doc(oldUid).delete();
   summary.oldUserDocDeleted = true;
 
-  return { ok: true, summary };
+  return { ok: true, summary, profile: copyableProfile };
 });
 
 // "Find variants" in the add/edit beer/spirit form — asks Gemini (free

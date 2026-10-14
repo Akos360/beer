@@ -12271,27 +12271,23 @@
       // old localStorage-uuid scheme gets their existing profile/coins/stats
       // carried over automatically the first time they pass the passcode on
       // that same device, instead of starting over.
+      //
+      // The actual copy happens entirely inside the mergeAccountData Cloud
+      // Function now (Admin SDK, bypasses firestore.rules) rather than as a
+      // direct client-side `usersCol.doc(myUid).set(copyable, {merge:true})`
+      // here — that used to collide with the users/{uid} rule's purchase/
+      // equip/realName guards on any real returning account (an inventory
+      // with more than one item, or an admin-assigned real name, both fail
+      // those checks outright), which failed the write silently and left
+      // name/photoURL permanently unset — reproducing the exact same failed
+      // migration attempt, and the same stuck "set up your profile" popup,
+      // on every single future load.
       async function migrateLegacyProfileIfAny() {
         const legacyUid = localStorage.getItem('sor-uid');
         if (!legacyUid || legacyUid === myUid) return null;
         try {
-          const legacySnap = await usersCol.doc(legacyUid).get();
-          if (!legacySnap.exists) return null;
-          const { passcodeVerified, isAdmin: _ignoredAdmin, ...copyable } = legacySnap.data();
-          await retryOnClaimLag(() => usersCol.doc(myUid).set(copyable, { merge: true }));
-          // The user-doc fields (name, photo, coins, badges, inventory) are
-          // copied above by the client directly — that's just writing your
-          // own doc. Everything else attributed to the old uid (beers added,
-          // ratings, pub comments, party participation, drink/shot logs)
-          // lives on documents keyed or tagged with that old uid, which
-          // nothing signed in as the *new* uid is allowed to touch under
-          // firestore.rules — so a trusted Cloud Function does it instead.
-          // Best-effort: if this fails, the profile fields above have still
-          // landed, so the person isn't stuck starting over from zero.
-          try {
-            await retryOnClaimLag(() => functions.httpsCallable('mergeAccountData')({ oldUid: legacyUid }));
-          } catch (e) { /* stats/history reassignment can be redone by an admin later */ }
-          return copyable;
+          const result = await retryOnClaimLag(() => functions.httpsCallable('mergeAccountData')({ oldUid: legacyUid }));
+          return result.data?.profile || null;
         } catch (e) {
           return null;
         }

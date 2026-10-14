@@ -179,8 +179,17 @@ service cloud.firestore {
       return !(newInv.hasAny([id]) && !oldInv.hasAny([id])) || coinDelta == shopPriceOf(id);
     }
     function inventoryChangeIsPaidFor() {
-      let oldInv = resource.data.get('inventory', []);
-      let newInv = request.resource.data.get('inventory', []);
+      // .get(key, default) only falls back to `default` when the key is
+      // ABSENT - a doc that ever got `inventory: null` written to it (a
+      // stray admin edit, a past bug) still comes back as literal `null`
+      // here, and calling .size()/.hasAll() on that blows up the whole
+      // rule - denying every single future self-update for that user,
+      // including something as unrelated as saving their onboarding
+      // name/photo. Coercing null to [] closes that off.
+      let oldInvRaw = resource.data.get('inventory', []);
+      let newInvRaw = request.resource.data.get('inventory', []);
+      let oldInv = oldInvRaw == null ? [] : oldInvRaw;
+      let newInv = newInvRaw == null ? [] : newInvRaw;
       let coinDelta = resource.data.get('jackpotCoins', 50) - request.resource.data.get('jackpotCoins', 50);
       return newInv == oldInv || (
         newInv.size() == oldInv.size() + 1 && newInv.hasAll(oldInv) &&
@@ -207,7 +216,8 @@ service cloud.firestore {
     // directly, on top of the purchase check above (which stops adding a
     // fake item to inventory for free in the first place).
     function equipsAreOwned() {
-      let newInv = request.resource.data.get('inventory', []);
+      let newInvRaw = request.resource.data.get('inventory', []);
+      let newInv = newInvRaw == null ? [] : newInvRaw;
       let hat = request.resource.data.get('equippedHat', null);
       let border = request.resource.data.get('equippedBorder', null);
       let skin = request.resource.data.get('equippedSkin', null);
