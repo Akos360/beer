@@ -4558,7 +4558,8 @@
 
     .chip-beer,
     .chip-shot,
-    .chip-driver {
+    .chip-driver,
+    .chip-host {
       border: 9px solid transparent;
       background:
         linear-gradient(#fff, #fff) content-box,
@@ -4575,6 +4576,10 @@
 
     .chip-driver {
       --chip-stripe-color: #2f7fd6
+    }
+
+    .chip-host {
+      --chip-stripe-color: #d6b22f
     }
 
     .shopPreviewChip.redeemed {
@@ -4615,6 +4620,25 @@
       border-color: #2f7fd6;
       background: rgba(47, 127, 214, .18);
       color: #2f7fd6
+    }
+
+    .partyHostBtn {
+      border: 1px solid var(--border);
+      background: var(--bg-elev);
+      color: var(--text-dim);
+      border-radius: 7px;
+      width: 40px;
+      height: 22px;
+      font-size: .8rem;
+      cursor: pointer;
+      line-height: 1;
+      padding: 0
+    }
+
+    .partyHostBtn.isHost {
+      border-color: #d6b22f;
+      background: rgba(214, 178, 47, .18);
+      color: #d6b22f
     }
 
     .chipGiverRow {
@@ -6166,6 +6190,14 @@
           <button type="button" class="btn ghost" id="profileViewDriverExchangeShotBtn">🥃 Exchange 3 for Shot</button>
         </div>
       </div>
+      <div class="field" style="margin-top:16px" id="profileViewHostChipsSection">
+        <label>Házigazda chips</label>
+        <div id="profileViewHostChips" class="profileViewInventory"></div>
+        <div id="profileViewHostExchangeRow" style="display:none;gap:8px;margin-top:8px;flex-wrap:wrap">
+          <button type="button" class="btn ghost" id="profileViewHostExchangeBeerBtn">🍺 Exchange 3 for Beer</button>
+          <button type="button" class="btn ghost" id="profileViewHostExchangeShotBtn">🥃 Exchange 3 for Shot</button>
+        </div>
+      </div>
       <div class="field" style="margin-top:16px" id="profileViewRecapSection">
         <label>Year in Review</label>
         <div id="profileViewRecapList" class="profileViewRecapList"></div>
@@ -7660,6 +7692,7 @@
       <div class="partyAvatarCol">
         ${wrapAvatarWithHat(u, `<div class="userAvatar lbProfileLink${avatarBorderClass(u)}" data-user="${u.id}">${avatarInner(u.name, u.photoURL)}</div>`)}
         <button type="button" class="partyDriverBtn${p.isDriver ? ' isDriver' : ''}" data-party="${party.id}" data-user="${u.id}" title="${p.isDriver ? 'Designated driver — tap to undo' : 'Mark as designated driver'}">🚗</button>
+        <button type="button" class="partyHostBtn${p.isHost ? ' isHost' : ''}" data-party="${party.id}" data-user="${u.id}" title="${p.isHost ? 'Házigazda — tap to undo' : 'Mark as házigazda (party host)'}">🏠</button>
       </div>
       <div class="userName lbProfileLink" data-user="${u.id}">${nameWithAdminTag(u)}</div>
       <div class="partyCounters">
@@ -7708,6 +7741,24 @@
               } else {
                 await grantDriverChip(partyId, uid);
                 showToast('🚗 Driver chip added!');
+              }
+            } catch (err) {
+              showToast('Failed: ' + err.message);
+            }
+          };
+        });
+        partyParticipantsEl.querySelectorAll('.partyHostBtn').forEach(btn => {
+          btn.onclick = async () => {
+            const partyId = btn.dataset.party, uid = btn.dataset.user;
+            if (uid !== myUid && !isAdmin()) { showToast('Only that person or an admin can toggle this'); return; }
+            if (!canWrite()) return promptInstallOrSignIn();
+            try {
+              if (btn.classList.contains('isHost')) {
+                await revokeHostChip(partyId, uid);
+                showToast('Házigazda chip removed');
+              } else {
+                await grantHostChip(partyId, uid);
+                showToast('🏠 Házigazda chip added!');
               }
             } catch (err) {
               showToast('Failed: ' + err.message);
@@ -7787,6 +7838,63 @@
           showToast('Exchanged! New chip added to your chips.');
         } catch (err) {
           showToast(err.message === 'Not enough driver chips' ? 'Not enough driver chips' : 'Exchange failed: ' + err.message);
+        }
+      }
+
+      // ---------- Házigazda (party host) chips ----------
+      // Same mechanic as driver chips above (free, earned not bought,
+      // capped at one per (user, party) pair, 3 exchange for a beer/shot
+      // chip) - kept as its own `isHost`/`host` pair rather than sharing
+      // `isDriver`/`driver`, since someone can be both the designated
+      // driver AND the host of the same party, and the two collections
+      // (3 driver chips vs. 3 host chips) exchange independently.
+      const HOST_CHIPS_PER_EXCHANGE = 3;
+      async function grantHostChip(partyId, uid) {
+        const participantRef = partiesCol.doc(partyId).collection('participants').doc(uid);
+        const userRef = usersCol.doc(uid);
+        await db.runTransaction(async (tx) => {
+          const [pSnap] = await Promise.all([tx.get(participantRef)]);
+          if (pSnap.data()?.isHost) return;
+          const newChip = {
+            id: 'c' + Date.now() + Math.random().toString(36).slice(2, 7),
+            type: 'host', status: 'unredeemed', partyId, ts: Date.now()
+          };
+          tx.set(participantRef, { isHost: true }, { merge: true });
+          tx.set(userRef, { chips: firebase.firestore.FieldValue.arrayUnion(newChip) }, { merge: true });
+        });
+      }
+      async function revokeHostChip(partyId, uid) {
+        const participantRef = partiesCol.doc(partyId).collection('participants').doc(uid);
+        const userRef = usersCol.doc(uid);
+        await db.runTransaction(async (tx) => {
+          const [pSnap, uSnap] = await Promise.all([tx.get(participantRef), tx.get(userRef)]);
+          if (!pSnap.data()?.isHost) return;
+          const chips = uSnap.data()?.chips || [];
+          const chip = chips.find(c => c.type === 'host' && c.partyId === partyId && c.status === 'unredeemed');
+          tx.set(participantRef, { isHost: false }, { merge: true });
+          if (chip) tx.update(userRef, { chips: chips.filter(c => c.id !== chip.id) });
+        });
+      }
+      async function exchangeHostChips(targetType) {
+        if (!canWrite()) return promptInstallOrSignIn();
+        try {
+          await db.runTransaction(async (tx) => {
+            const ref = usersCol.doc(myUid);
+            const snap = await tx.get(ref);
+            const chips = snap.data()?.chips || [];
+            const available = chips.filter(c => c.type === 'host' && c.status !== 'exchanged').sort((a, b) => (a.ts || 0) - (b.ts || 0));
+            if (available.length < HOST_CHIPS_PER_EXCHANGE) throw new Error('Not enough host chips');
+            const spendIds = new Set(available.slice(0, HOST_CHIPS_PER_EXCHANGE).map(c => c.id));
+            const newChips = chips.map(c => spendIds.has(c.id) ? { ...c, status: 'exchanged' } : c);
+            newChips.push({
+              id: 'c' + Date.now() + Math.random().toString(36).slice(2, 7),
+              type: targetType, status: 'unredeemed', photoURL: null, photoPath: null, givenByUid: null, ts: Date.now()
+            });
+            tx.update(ref, { chips: newChips });
+          });
+          showToast('Exchanged! New chip added to your chips.');
+        } catch (err) {
+          showToast(err.message === 'Not enough host chips' ? 'Not enough host chips' : 'Exchange failed: ' + err.message);
         }
       }
 
@@ -13151,9 +13259,9 @@
           }
         });
 
-        // Driver chips are earned, not bought, and get their own row below —
-        // they never mix into this (buyable beer/shot) chips grid.
-        const chips = (u?.chips || []).filter(c => c.type !== 'driver');
+        // Driver/host chips are earned, not bought, and get their own rows
+        // below — they never mix into this (buyable beer/shot) chips grid.
+        const chips = (u?.chips || []).filter(c => c.type !== 'driver' && c.type !== 'host');
         const chipsSection = document.getElementById('profileViewChipsSection');
         const chipsEl = document.getElementById('profileViewChips');
         if (!chips.length) {
@@ -13232,9 +13340,42 @@
           const availableCount = driverChips.filter(c => c.status !== 'exchanged').length;
           exchangeRow.style.display = (isOwn && availableCount >= DRIVER_CHIPS_PER_EXCHANGE) ? 'flex' : 'none';
         }
+
+        const hostChips = (u?.chips || []).filter(c => c.type === 'host');
+        const hostSection = document.getElementById('profileViewHostChipsSection');
+        const hostEl = document.getElementById('profileViewHostChips');
+        const hostExchangeRow = document.getElementById('profileViewHostExchangeRow');
+        if (!hostChips.length) {
+          hostSection.style.display = 'none';
+        } else {
+          hostSection.style.display = 'block';
+          hostEl.innerHTML = hostChips.slice().sort((a, b) => (b.ts || 0) - (a.ts || 0)).map(c => {
+            const used = c.status === 'exchanged';
+            const removeBtn = isAdmin() ? `<button type="button" class="invItemRemoveBtn" data-chip-id="${c.id}" title="Remove chip">✕</button>` : '';
+            return `<div class="invItem" data-chip-id="${c.id}" title="Házigazda${used ? ' (used)' : ''}">
+            ${removeBtn}
+            <div class="shopPreview shopPreviewChip chip-host${used ? ' redeemed' : ''}">🏠<br>HÁZIGAZDA</div>
+          </div>`;
+          }).join('');
+          if (isAdmin()) {
+            hostEl.querySelectorAll('.invItemRemoveBtn').forEach(btn => {
+              btn.onclick = (e) => {
+                e.stopPropagation();
+                const chipId = btn.dataset.chipId;
+                askConfirm('Remove this házigazda chip? This cannot be undone.', async () => {
+                  await adminDeleteHostChip(u.id, chipId);
+                }, false);
+              };
+            });
+          }
+          const hostAvailableCount = hostChips.filter(c => c.status !== 'exchanged').length;
+          hostExchangeRow.style.display = (isOwn && hostAvailableCount >= HOST_CHIPS_PER_EXCHANGE) ? 'flex' : 'none';
+        }
       }
       document.getElementById('profileViewDriverExchangeBeerBtn').onclick = () => exchangeDriverChips('beer');
       document.getElementById('profileViewDriverExchangeShotBtn').onclick = () => exchangeDriverChips('shot');
+      document.getElementById('profileViewHostExchangeBeerBtn').onclick = () => exchangeHostChips('beer');
+      document.getElementById('profileViewHostExchangeShotBtn').onclick = () => exchangeHostChips('shot');
 
       // Unlike adminDeleteChip, this also clears the source party's
       // `isDriver` flag — without that, removing the chip wouldn't remove
@@ -13254,6 +13395,27 @@
             try { await partiesCol.doc(partyId).collection('participants').doc(ownerUid).set({ isDriver: false }, { merge: true }); } catch (e) { }
           }
           showToast('Driver chip removed');
+        } catch (err) {
+          showToast('Failed: ' + err.message);
+        }
+      }
+      // Same reasoning as adminDeleteDriverChip above, for the házigazda
+      // (host) chip's own isHost flag.
+      async function adminDeleteHostChip(ownerUid, chipId) {
+        try {
+          const ref = usersCol.doc(ownerUid);
+          let partyId = null;
+          await db.runTransaction(async (tx) => {
+            const snap = await tx.get(ref);
+            const chips = snap.data()?.chips || [];
+            const chip = chips.find(c => c.id === chipId);
+            partyId = chip?.partyId || null;
+            tx.update(ref, { chips: chips.filter(c => c.id !== chipId) });
+          });
+          if (partyId) {
+            try { await partiesCol.doc(partyId).collection('participants').doc(ownerUid).set({ isHost: false }, { merge: true }); } catch (e) { }
+          }
+          showToast('Házigazda chip removed');
         } catch (err) {
           showToast('Failed: ' + err.message);
         }
