@@ -4641,6 +4641,30 @@
       color: #d6b22f
     }
 
+    .partyDriverHostSummary {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+      margin-bottom: 10px;
+      font-size: .82rem
+    }
+
+    .partyDriverHostSummary .summaryLine {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      flex-wrap: wrap
+    }
+
+    .partyDriverHostSummary .summaryLabel {
+      color: var(--text-dim);
+      flex: 0 0 auto
+    }
+
+    .partyDriverHostSummary .summaryNames {
+      font-weight: 700
+    }
+
     .chipGiverRow {
       display: flex;
       align-items: center;
@@ -4787,6 +4811,41 @@
 
     .badgeTierReq {
       font-size: .75rem
+    }
+
+    .achievementsGrid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 8px
+    }
+
+    .achievementCard {
+      padding: 10px 12px;
+      border-radius: 10px;
+      border: 1px solid var(--border);
+      background: var(--bg-elev);
+      display: flex;
+      flex-direction: column;
+      gap: 3px
+    }
+
+    .achievementCard.locked {
+      opacity: .45
+    }
+
+    .achievementEmoji {
+      font-size: 1.3rem;
+      line-height: 1
+    }
+
+    .achievementName {
+      font-size: .82rem;
+      font-weight: 700
+    }
+
+    .achievementProgress {
+      font-size: .72rem;
+      color: var(--text-dim)
     }
 
     .userListHead {
@@ -5942,6 +6001,7 @@
       <div class="field" style="margin-top:16px">
         <details class="variantDropdown viewVariants" open>
           <summary>Drinkers</summary>
+          <div id="partyDriverHostSummary" class="partyDriverHostSummary" style="display:none"></div>
           <div id="partyParticipants"></div>
         </details>
       </div>
@@ -5949,6 +6009,14 @@
         <details class="variantDropdown viewVariants" open>
           <summary>Chips redeemed here</summary>
           <div id="partyViewChips"></div>
+        </details>
+      </div>
+      <div class="field" id="partyViewHangoverSection" style="margin-top:16px;display:none">
+        <details class="variantDropdown viewVariants" open>
+          <summary>🤕 Hangover check-in</summary>
+          <div id="partyViewHangoverMine" style="margin:8px 0"></div>
+          <div class="ratingButtons" id="partyViewHangoverButtons"></div>
+          <div id="partyViewHangoverList" style="margin-top:10px"></div>
         </details>
       </div>
       <div class="field" style="margin-top:16px">
@@ -6197,6 +6265,10 @@
           <button type="button" class="btn ghost" id="profileViewHostExchangeBeerBtn">🍺 Exchange 3 for Beer</button>
           <button type="button" class="btn ghost" id="profileViewHostExchangeShotBtn">🥃 Exchange 3 for Shot</button>
         </div>
+      </div>
+      <div class="field" style="margin-top:16px">
+        <label>Achievements</label>
+        <div id="profileViewAchievements" class="achievementsGrid"></div>
       </div>
       <div class="field" style="margin-top:16px" id="profileViewRecapSection">
         <label>Year in Review</label>
@@ -7668,6 +7740,24 @@
         participants.forEach(p => knownIds.add(p.id));
         if (myUid) knownIds.add(myUid);
         const allKnownUsers = [...knownIds].map(id => allUsers.find(u => u.id === id) || { id });
+
+        // Driver/host at-a-glance, so you don't have to scan every row's
+        // chip buttons to answer "wait, who's driving tonight?" - built
+        // from the same participant flags the buttons below toggle.
+        const summaryEl = document.getElementById('partyDriverHostSummary');
+        const drivers = allKnownUsers.filter(u => byUser[u.id]?.isDriver);
+        const hosts = allKnownUsers.filter(u => byUser[u.id]?.isHost);
+        if (!drivers.length && !hosts.length) {
+          summaryEl.style.display = 'none';
+        } else {
+          summaryEl.style.display = 'flex';
+          const line = (emoji, label, users) => !users.length ? '' : `<div class="summaryLine">
+        <span class="summaryLabel">${emoji} ${label}:</span>
+        <span class="summaryNames">${users.map(u => escapeHtml(u.name || 'Anonymous')).join(', ')}</span>
+      </div>`;
+          summaryEl.innerHTML = line('🚗', 'Driving', drivers) + line('🏠', 'Házigazda', hosts);
+        }
+
         // "You" always lead the list if you've joined, regardless of count —
         // everyone else below stays ranked by count like before.
         const joined = allKnownUsers.filter(u => byUser[u.id]).sort((a, b) => {
@@ -8221,6 +8311,46 @@
         renderPartyParticipants(party);
         renderPartyViewChips(party);
         renderPartyViewDayTabs(party);
+        renderPartyViewHangover(party);
+      }
+
+      // ---------- Hangover check-in ----------
+      // A fun next-morning 1-10 self-rating of how rough a party was,
+      // stored right on the same participants/{uid} doc the drink counts
+      // and driver/host flags already live on (self-only write, same
+      // rule as those). Only shown to people who actually joined - rating
+      // a party you didn't attend doesn't mean anything.
+      function renderPartyViewHangover(party) {
+        const section = document.getElementById('partyViewHangoverSection');
+        const participants = allPartyParticipants[party.id] || [];
+        const mine = participants.find(p => p.id === myUid);
+        if (!canWrite() || !mine) { section.style.display = 'none'; return; }
+        section.style.display = 'block';
+        const mineEl = document.getElementById('partyViewHangoverMine');
+        mineEl.textContent = typeof mine.hangover === 'number'
+          ? `Your hangover: ${mine.hangover}/10`
+          : 'How rough was the morning after?';
+        buildRatingButtons(document.getElementById('partyViewHangoverButtons'), mine.hangover || null, async (n) => {
+          try {
+            await partiesCol.doc(party.id).collection('participants').doc(myUid).set({ hangover: n }, { merge: true });
+          } catch (err) {
+            showToast('Failed: ' + err.message);
+          }
+        });
+        const rated = participants.filter(p => typeof p.hangover === 'number' && p.id !== myUid);
+        const listEl = document.getElementById('partyViewHangoverList');
+        if (!rated.length) {
+          listEl.innerHTML = '';
+        } else {
+          listEl.innerHTML = rated.slice().sort((a, b) => b.hangover - a.hangover).map(p => {
+            const u = allUsers.find(x => x.id === p.id);
+            return `<div class="reviewRow">
+          <div class="userAvatar">${avatarInner(u?.name, u?.photoURL)}</div>
+          <div class="userName">${nameWithAdminTag(u)}</div>
+          <span class="badge rating" style="background:${ratingColor(p.hangover)}">${p.hangover}/10</span>
+        </div>`;
+          }).join('');
+        }
       }
 
       function renderPartyViewChips(party) {
@@ -11960,6 +12090,13 @@
               <div class="yearlyRecapHighlightItem">${stats.topRatedItem.emoji || ''} ${escapeHtml(stats.topRatedItem.label)} — ${stats.topRatedItem.rating}★</div>
             </div>`
           : '';
+        // Lifetime/cumulative, same as the profile page's own section -
+        // labeled "current" rather than tied to `year` since these never
+        // get frozen into a past year's snapshot the way `stats` does.
+        const achievementsSection = user?.id ? `
+          <div class="yearlyRecapBreakdownLabel" style="margin-bottom:8px">Current achievements</div>
+          <div class="achievementsGrid" style="margin-bottom:16px">${achievementsHtml(user.id)}</div>`
+          : '';
         // The sheetHead h2 sits outside what the download button captures,
         // so the status line (sample/live) lives there — it's chrome about
         // this viewing session, not part of the card. The actual "20XX
@@ -11988,6 +12125,7 @@
           <div class="yearlyRecapGrid">${tiles}</div>
           ${breakdownHtml}
           ${highlight}
+          ${achievementsSection}
         `;
       }
 
@@ -12268,6 +12406,61 @@
         const reviewsWritten = beerReviewsWritten + pubCommentsWritten;
         const total = beersUploaded + spiritsUploaded + nikotinUploaded + koffeinUploaded + partiesAdded + pubsAdded + partiesJoined + ratingsGiven + reviewsWritten;
         return { beersUploaded, spiritsUploaded, nikotinUploaded, koffeinUploaded, partiesAdded, pubsAdded, partiesJoined, ratingsGiven, reviewsWritten, total, tier: getTierForTotal(total) };
+      }
+
+      // ---------- Achievements ----------
+      // Tiered, read-only badges derived entirely from data already
+      // tracked elsewhere (chip history, ratings, party attendance) -
+      // nothing new is written to Firestore for these, so there's no
+      // migration and no new rules surface. The driver/host achievements
+      // intentionally count LIFETIME chips (exchanged ones included -
+      // exchanging 3 for a beer doesn't erase the fact you drove/hosted
+      // that many times), not just the currently-unspent count shown in
+      // the chips sections above.
+      const ACHIEVEMENTS = [
+        {
+          emoji: '🏠', name: 'Házigazda', unit: 'parties hosted', tiers: [1, 5, 10, 25],
+          getValue: (userId) => (allUsers.find(u => u.id === userId)?.chips || []).filter(c => c.type === 'host').length,
+        },
+        {
+          emoji: '🚗', name: 'Designated Driver', unit: 'times driven home', tiers: [1, 5, 10, 25],
+          getValue: (userId) => (allUsers.find(u => u.id === userId)?.chips || []).filter(c => c.type === 'driver').length,
+        },
+        {
+          emoji: '🍺', name: 'Beer Explorer', unit: 'different beers tried', tiers: [5, 20, 50, 100],
+          getValue: (userId) => new Set(allRatings.filter(r => r.userId === userId && allBeers.some(b => b.id === r.beerId)).map(r => r.beerId)).size,
+        },
+        {
+          emoji: '🎉', name: 'Party Animal', unit: 'parties attended', tiers: [5, 15, 30, 60],
+          getValue: (userId) => getUserStats(userId).partiesJoined,
+        },
+        {
+          emoji: '📝', name: 'Reviewer', unit: 'reviews written', tiers: [5, 15, 30, 60],
+          getValue: (userId) => getUserStats(userId).reviewsWritten,
+        },
+      ];
+      // Shared by the profile view's own section and the Wrapped recap
+      // card below - achievements are lifetime/cumulative, not scoped to
+      // a single year, so the same live standing is what belongs on
+      // either surface (labeled "Current achievements" on the recap card
+      // so it never reads as if it were frozen into that year's snapshot).
+      function achievementsHtml(userId) {
+        return ACHIEVEMENTS.map(a => {
+          const value = a.getValue(userId);
+          let tierIndex = -1;
+          for (let i = 0; i < a.tiers.length; i++) { if (value >= a.tiers[i]) tierIndex = i; }
+          const locked = tierIndex === -1;
+          const maxed = tierIndex === a.tiers.length - 1;
+          const progressText = maxed ? `${value} ${a.unit} — maxed out!` : `${value}/${a.tiers[tierIndex + 1]} ${a.unit}`;
+          return `<div class="achievementCard${locked ? ' locked' : ''}" title="${escapeHtml(a.name)}">
+        <div class="achievementEmoji">${a.emoji}</div>
+        <div class="achievementName">${escapeHtml(a.name)}${locked ? '' : ` · Tier ${tierIndex + 1}`}</div>
+        <div class="achievementProgress">${locked ? `0/${a.tiers[0]} ${a.unit}` : progressText}</div>
+      </div>`;
+        }).join('');
+      }
+      function renderAchievements(userId) {
+        document.getElementById('profileViewAchievements').innerHTML = achievementsHtml(userId);
       }
 
       let allUsers = [];
@@ -12567,6 +12760,7 @@
           existingBadge.remove();
         }
         renderProfileViewInventory(u, userId === myUid);
+        renderAchievements(userId);
       }
 
       function renderCardSlots() {
