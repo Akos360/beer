@@ -20,6 +20,8 @@ Header (always visible): 🎰 Jackpot shortcut · 🎮 Games (Flappy Bird / Tic 
 - **Nikotin**: type (Cigi/Vape/...), strength, flavor, price, comment, photos/videos
 - **Koffein**: type (Energeťák/...), caffeine content, flavor, zero-sugar toggle, price, comment, photos/videos
 - All four: 1–10 rating averaged across everyone (rater count shown), one rating/review per person, only the creator (or admin) can edit/delete, search + sort + type filter + count badge, tap a card for a read-only view with a photo/video lightbox (pinch-zoom, swipe or arrow navigation)
+- **Best value** (Beers and Alko sort menus): ranks by average rating per euro, with a green "pts/€" badge on each card. Drinks rated under 5/10, unrated or without a price sit at the end - a cheap drink nobody liked isn't good value
+- **Want to try** (beers and spirits): a 🔖 button on a drink you haven't rated adds it to your own list (`users/{uid}.wantToTry`, an array of item ids); pick "🔖 Want to try" in the type filter to see it. Rating a drink takes it off the list automatically
 - **Variant lookup**: while adding a beer/spirit/nikotin/koffein, an AI lookup (Gemini, via the `lookupVariants` Cloud Function) suggests known real variants of whatever you're typing so you don't have to remember exact names — rate-limited per person per day
 
 ## Parties
@@ -29,6 +31,7 @@ Header (always visible): 🎰 Jackpot shortcut · 🎮 Games (Flappy Bird / Tic 
 - **🚗 Driver chips**: a button below each drinker's avatar marks them the designated driver for that party (self or admin, one per person per party) and grants a free, non-buyable blue chip. Collect 3 and exchange them in your profile for a free Beer or Shot chip — the 3 spent turn grey but stay visible
 - **Chips**: buy a "Free Beer" or "Free Shot" chip in the casino shop, then redeem it — upload a photo, spin a wheel to pick who gave it to you, pick which party it's for, then redeem
 - Party view shows a photo/video carousel, everyone's redeemed chips with their photo, and joined/beer-total/shot-total counts
+- **Pub**: a party can say which pub it was at (optional "Pub" picker in the party form, stored as `pubId`). The party view shows it as a chip that opens the pub; the pub view lists every party held there with its beer total
 
 ## Pubs
 
@@ -50,6 +53,8 @@ Header (always visible): 🎰 Jackpot shortcut · 🎮 Games (Flappy Bird / Tic 
 - The current year shows a live, still-updating preview; past years show the real frozen snapshot
 
 ## Profile & Inventory
+- **Countries tried**: a world map on every profile, colouring the countries of the beers and spirits that person rated or added. The country comes from the typed country name (English, Hungarian, Slovak, Czech and other names, from Natural Earth) or else the flag emoji; names that match nothing are still counted and listed under the map, as are countries too small for it. Shapes load on demand from `img/countries-110m.geojson` (Natural Earth 1:110m, trimmed)
+- **Achievements** also include 🌍 Globetrotter (countries tried), 🍸 Pub Crawler (different pubs you partied at, via the party's pub) and 🥃 Spirit Hunter (different spirits rated)
 
 - Photo, name, a badge earned from a total activity score, optional decorative poker card
 - **Inventory** is a collapsible dropdown (closed by default) with Hats / Borders / Skins in their own labeled rows — equip one of each

@@ -1076,6 +1076,82 @@
       color: #f1e9df
     }
 
+    .badge.value {
+      top: auto;
+      bottom: 6px;
+      left: 6px;
+      background: #2f8f4e;
+      color: #fff
+    }
+
+    .wantBtn {
+      cursor: pointer;
+      background: var(--bg-elev);
+      color: var(--text);
+      border: 1px dashed var(--border)
+    }
+
+    .wantBtn.on {
+      background: var(--accent);
+      color: #1c1410;
+      border-style: solid
+    }
+
+    .linkChip {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      margin-top: 8px;
+      padding: 6px 12px;
+      border-radius: 999px;
+      border: 1px solid var(--border);
+      background: var(--bg-elev);
+      color: var(--text);
+      font: inherit;
+      font-size: .9rem;
+      cursor: pointer
+    }
+
+    .pubPartyRow {
+      display: flex;
+      justify-content: space-between;
+      gap: 10px;
+      width: 100%;
+      padding: 8px 2px;
+      border: 0;
+      border-bottom: 1px solid var(--border);
+      background: none;
+      color: var(--text);
+      font: inherit;
+      text-align: left;
+      cursor: pointer
+    }
+
+    .pubPartyRow span:last-child {
+      color: var(--text-dim);
+      white-space: nowrap
+    }
+
+    .countriesMap {
+      height: 220px;
+      border-radius: 12px;
+      border: 1px solid var(--border);
+      background: var(--bg-elev);
+      overflow: hidden
+    }
+
+    .countriesSummary {
+      margin-bottom: 8px;
+      color: var(--text-dim);
+      font-size: .9rem
+    }
+
+    .countriesUnplaced {
+      margin-top: 8px;
+      color: var(--text-dim);
+      font-size: .8rem
+    }
+
     .badge.reviews {
       top: auto;
       bottom: 6px;
@@ -5024,6 +5100,7 @@
           <option value="name">Name A–Z</option>
           <option value="rating-desc">Rating high→low</option>
           <option value="rating-asc">Rating low→high</option>
+          <option value="value">Best value (rating per €)</option>
         </select>
         <select id="typeSelect">
           <option value="">All types</option>
@@ -5042,6 +5119,7 @@
           <option value="name">Name A–Z</option>
           <option value="rating-desc">Rating high→low</option>
           <option value="rating-asc">Rating low→high</option>
+          <option value="value">Best value (rating per €)</option>
         </select>
         <select id="spiritTypeSelect">
           <option value="">All types</option>
@@ -6006,6 +6084,7 @@
         <button type="button" class="cityTag calendarBtn" id="partyViewCalendarBtn" title="Calendar view"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line></svg></button>
       </div>
       <div class="viewMeta" id="partyViewDate"></div>
+      <div id="partyViewPub"></div>
       <div class="viewBadges" id="partyViewTotals" style="margin-top:10px"></div>
       <div class="field" style="margin-top:16px">
         <details class="variantDropdown viewVariants" open>
@@ -6068,6 +6147,10 @@
           <label>Date</label>
           <input id="pfDate" type="date" required min="2000-01-01" max="2100-12-31">
         </div>
+        <div class="field">
+          <label>Pub</label>
+          <select id="pfPub"></select>
+        </div>
         <div class="formActions">
           <button type="button" class="btn danger" id="partyDeleteBtn" style="display:none">Delete</button>
           <button type="button" class="btn ghost" id="partyCancelBtn">Cancel</button>
@@ -6129,6 +6212,12 @@
       <div id="pubViewCreator"></div>
       <div class="viewMeta" id="pubViewCity"></div>
       <div class="viewBadges" id="pubViewBadges" style="margin-top:10px"></div>
+      <div class="field" style="margin-top:16px" id="pubViewPartiesSection">
+        <details class="variantDropdown viewVariants">
+          <summary id="pubViewPartiesTitle">Parties here</summary>
+          <div id="pubViewParties"></div>
+        </details>
+      </div>
       <div class="field" style="margin-top:16px">
         <label>Your rating</label>
         <div class="ratingButtons" id="pubRatingButtons"></div>
@@ -6280,6 +6369,12 @@
       <div class="field" style="margin-top:16px">
         <label>Achievements</label>
         <div id="profileViewAchievements" class="achievementsGrid"></div>
+      </div>
+      <div class="field" style="margin-top:16px">
+        <label>Countries tried</label>
+        <div class="countriesSummary" id="profileViewCountriesSummary"></div>
+        <div class="countriesMap" id="profileViewCountriesMap"></div>
+        <div class="countriesUnplaced" id="profileViewCountriesUnplaced"></div>
       </div>
       <div class="field" style="margin-top:16px" id="profileViewRecapSection">
         <label>Year in Review</label>
@@ -6831,7 +6926,7 @@
       }
       function renderFilters() {
         const curType = typeSelect.value;
-        typeSelect.innerHTML = '<option value="">All types</option>' +
+        typeSelect.innerHTML = '<option value="">All types</option>' + wantOptionHtml() +
           distinctTypes().map(t => `<option value="${escapeHtml(t)}">${escapeHtml(t)}</option>`).join('');
         typeSelect.value = curType;
 
@@ -6847,6 +6942,158 @@
       // anywhere a single display label is needed (cards, view titles).
       function itemLabel(item) {
         return (item?.name || item?.realName || 'Unnamed');
+      }
+
+      // ---------- Best value ----------
+      // Average rating points per euro. Unrated, unpriced and below-5/10
+      // items have no score and sort last under "Best value" - a cheap
+      // drink nobody liked isn't good value at any price.
+      const VALUE_MIN_RATING = 5;
+      function valueScore(item) {
+        return item.avgRating >= VALUE_MIN_RATING && item.price > 0 ? item.avgRating / item.price : null;
+      }
+      function sortByValue(list) {
+        list.sort((a, b) => (valueScore(b) ?? -1) - (valueScore(a) ?? -1));
+      }
+      function valueBadgeHtml(item) {
+        const v = valueScore(item);
+        return v == null ? '' : `<span class="badge value">${v.toFixed(1)} pts/€</span>`;
+      }
+
+      // ---------- Want to try ----------
+      // users/{uid}.wantToTry = [beer/spirit doc ids]. An item drops off the
+      // list by itself once you rate it, so nothing needs cleaning up.
+      const WANT_FILTER = '__want';
+      function myWantList() {
+        return allUsers.find(u => u.id === myUid)?.wantToTry || [];
+      }
+      function iHaveRated(itemId) {
+        return allRatings.some(r => r.userId === myUid && r.beerId === itemId && typeof r.rating === 'number');
+      }
+      function isOnWantList(itemId) {
+        return myWantList().includes(itemId) && !iHaveRated(itemId);
+      }
+      function wantButtonHtml(itemId) {
+        if (!canWrite() || iHaveRated(itemId)) return '';
+        const on = myWantList().includes(itemId);
+        return `<span class="wantBtn${on ? ' on' : ''}" role="button" tabindex="0" data-want="${itemId}">${on ? '🔖 On your list' : '🔖 Want to try'}</span>`;
+      }
+      function wireWantButton(container) {
+        const btn = container.querySelector('[data-want]');
+        if (!btn) return;
+        btn.onclick = async () => {
+          const id = btn.dataset.want;
+          const on = myWantList().includes(id);
+          try {
+            await db.collection('users').doc(myUid).update({
+              wantToTry: on ? firebase.firestore.FieldValue.arrayRemove(id) : firebase.firestore.FieldValue.arrayUnion(id),
+            });
+            showToast(on ? 'Removed from your want-to-try list' : 'Added to your want-to-try list');
+          } catch (e) {
+            showToast('Save failed: ' + e.message);
+          }
+        };
+      }
+      function wantOptionHtml() {
+        return canWrite() ? `<option value="${WANT_FILTER}">🔖 Want to try</option>` : '';
+      }
+
+      // ---------- Countries ----------
+      // A drink's country comes from its typed country name, matched
+      // against English/Hungarian/Slovak/... names built from Natural
+      // Earth, and otherwise from its flag emoji (two regional-indicator
+      // letters = the ISO code). Typed names that match nothing still count, under
+      // their own text, and are listed below the map.
+      const COUNTRY_ALIASES = {"afganistan":"AF","afganisztan":"AF","afghanistan":"AF","agypten":"EG","aland":"AX","alandislands":"AX","albania":"AL","albanien":"AL","algeria":"DZ","algerien":"DZ","algieria":"DZ","america":"US","americansamoa":"AS","amerika":"US","amerikaiegyesultallamok":"US","amerikaiszamoa":"AS","amerikaivirginszigetek":"VI","amerikanischejungferninseln":"VI","amerikanischsamoa":"AS","andora":"AD","andorra":"AD","anglia":"GB","anglicko":"GB","anglie":"GB","angola":"AO","anguilla":"AI","antarctica":"AQ","antarktika":"AQ","antarktyda":"AQ","antiguaandbarb":"AG","antiguaandbarbuda":"AG","antiguaesbarbuda":"AG","antiguaibarbuda":"AG","antiguaundbarbuda":"AG","aquatorialguinea":"GQ","arabiasaudyjska":"SA","arabrepublicofegypt":"EG","argentina":"AR","argentinerepublic":"AR","argentinien":"AR","argentyna":"AR","armenia":"AM","armenien":"AM","armensko":"AM","aruba":"AW","aserbaidschan":"AZ","ashmoreandcartieris":"AU","ashmoreandcartierislands":"AU","ashmoreescartierszigetek":"AU","ashmoreundcartierinseln":"AU","athiopien":"ET","australia":"AU","australianindianoceanterritories":"AU","australien":"AU","australijskieterytoriumoceanuindyjskiego":"AU","australischeterritorienimindischenozean":"AU","austria":"AT","ausztralia":"AU","ausztralindiaioceaniterulet":"AU","ausztria":"AT","azerbaijan":"AZ","azerbajdzsan":"AZ","azerbejdzan":"AZ","bahamas":"BS","bahamasthe":"BS","bahamaszigetek":"BS","bahamy":"BS","bahrain":"BH","bahrajn":"BH","bahrein":"BH","bailiwickofguernsey":"GG","bailiwickofjersey":"JE","banglades":"BD","bangladesch":"BD","bangladesh":"BD","bangladesz":"BD","barbados":"BB","belarus":"BY","belgia":"BE","belgicko":"BE","belgie":"BE","belgien":"BE","belgium":"BE","belize":"BZ","benin":"BJ","bermuda":"BM","bermudy":"BM","bhutan":"BT","biaorus":"BY","bielorusko":"BY","bissauguinea":"GW","bolivarianrepublicofvenezuela":"VE","bolivia":"BO","bolivien":"BO","boliwia":"BO","bosna":"BA","bosniaandherz":"BA","bosniaandherzegovina":"BA","bosniaihercegowina":"BA","bosnienundherzegowina":"BA","boszniahercegovina":"BA","botswana":"BW","brasilien":"BR","brazil":"BR","brazilia":"BR","brazilie":"BR","brazylia":"BR","brindianoceanter":"IO","britain":"GB","britindiaioceaniterulet":"IO","britischejungferninseln":"VG","britischesterritoriumimindischenozean":"IO","britishindianoceanterritory":"IO","britishvirginis":"VG","britishvirginislands":"VG","britvirginszigetek":"VG","brunei":"BN","bruneidarussalam":"BN","brytyjskieterytoriumoceanuindyjskiego":"IO","brytyjskiewyspydziewicze":"VG","bugaria":"BG","bulgaria":"BG","bulgarien":"BG","bulharsko":"BG","burkinafaso":"BF","burma":"MM","burundi":"BI","caboverde":"CV","cambodia":"KH","cameroon":"CM","canada":"CA","capeverde":"CV","caymanis":"KY","caymanislands":"KY","cechy":"CZ","centralafricanrep":"CF","centralafricanrepublic":"CF","ceskarepublika":"CZ","cesko":"CZ","chad":"TD","chile":"CL","china":"CN","chinskarepublikaludowa":"CN","chorvatsko":"HR","chorwacja":"HR","ciernahora":"ME","cile":"CL","cina":"CN","ciprus":"CY","colombia":"CO","commonwealthofaustralia":"AU","commonwealthofdominica":"DM","commonwealthofpuertorico":"PR","commonwealthofthebahamas":"BS","commonwealthofthenorthernmarianaislands":"MP","comoreszigetek":"KM","comoros":"KM","congo":"CG","congodemocraticrepublicofthe":"CD","congodemrep":"CD","congorep":"CG","congorepublicofthe":"CG","cookinseln":"CK","cookis":"CK","cookislands":"CK","cookszigetek":"CK","cooperativerepublicofguyana":"GY","costarica":"CR","cotedivoire":"CI","croatia":"HR","csad":"TD","csehorszag":"CZ","cuba":"CU","curacao":"CW","cypr":"CY","cyprus":"CY","czad":"TD","czarnogora":"ME","czech":"CZ","czechia":"CZ","czechrepublic":"CZ","czechy":"CZ","danemark":"DK","dania":"DK","dansko":"DK","delafrikaikoztarsasag":"ZA","deligeorgiaesdelisandwichszigetek":"GS","delkorea":"KR","delszudan":"SS","democraticpeoplesrepublicofkorea":"KP","democraticrepublicofsaotomeandprincipe":"ST","democraticrepublicofthecongo":"CD","democraticrepublicoftimorleste":"TL","democraticsocialistrepublicofsrilanka":"LK","demokratischerepublikkongo":"CD","demokratycznarepublikakonga":"CD","demrepcongo":"CD","demrepkorea":"KP","denmark":"GL","deutschland":"DE","djibouti":"DJ","dominica":"DM","dominicanrep":"DO","dominicanrepublic":"DO","dominika":"DM","dominikaikozosseg":"DM","dominikaikoztarsasag":"DO","dominikana":"DO","dominikanischerepublik":"DO","dominikanskarepublika":"DO","dschibuti":"DJ","dzibuti":"DJ","dzsibuti":"DJ","easttimor":"TL","ecuador":"EC","egipt":"EG","egyenlitoiguinea":"GQ","egyesultarabemirsegek":"AE","egyesultkiralysag":"GB","egyiptom":"EG","egypt":"EG","egyptarabrep":"EG","ekwador":"EC","elefantcsontpart":"CI","elfenbeinkuste":"CI","elsalvador":"SV","england":"GB","eqguinea":"GQ","equatorialguinea":"GQ","eritrea":"ER","erytrea":"ER","estland":"EE","estonia":"EE","estonsko":"EE","eswatini":"SZ","eszakimarianaszigetek":"MP","eszakkorea":"KP","eszakmacedonia":"MK","esztorszag":"EE","ethiopia":"ET","etiopia":"ET","faeroeis":"FO","faeroeislands":"FO","falklandinseln":"FK","falklandis":"FK","falklandislands":"FK","falklandislandsislasmalvinas":"FK","falklandislandsmalvinas":"FK","falklandszigetek":"FK","falklandy":"FK","faroeislands":"FO","faroer":"FO","federaldemocraticrepublicofethiopia":"ET","federalrepublicofgermany":"DE","federalrepublicofnigeria":"NG","federalrepublicofsomalia":"SO","federatedstatesofmicronesia":"FM","federationofsaintkittsandnevis":"KN","federativerepublicofbrazil":"BR","feheroroszorszag":"BY","feroer":"FO","fidschi":"FJ","fidzi":"FJ","fidzsiszigetek":"FJ","fiji":"FJ","filipiny":"PH","finland":"AX","finlandia":"FI","finnland":"FI","finnorszag":"FI","finsko":"FI","foderiertestaatenvonmikronesien":"FM","france":"FR","franciadeliesantarktisziteruletek":"TF","franciaorszag":"FR","franciapolinezia":"PF","francie":"FR","francja":"FR","francuskieterytoriapoudnioweiantarktyczne":"TF","francuzsko":"FR","frankreich":"FR","franzosischesudundantarktisgebiete":"TF","franzosischpolynesien":"PF","frenchpolynesia":"PF","frenchrepublic":"FR","frenchsouthernandantarcticlands":"TF","froyarisfaeroeis":"FO","frpolynesia":"PF","frsantarcticlands":"TF","fulopszigetek":"PH","gabon":"GA","gaboneserepublic":"GA","gabun":"GA","gambia":"GM","gambiathe":"GM","georgia":"GE","georgiapoudniowaisandwichpoudniowy":"GS","georgien":"GE","germany":"DE","ghana":"GH","gorogorszag":"GR","grandduchyofluxembourg":"LU","greatbritain":"GB","grecja":"GR","grecko":"GR","greece":"GR","greenland":"GL","grenada":"GD","grenlandia":"GL","griechenland":"GR","gronland":"GL","gruzia":"GE","gruzinsko":"GE","gruzja":"GE","guam":"GU","guatemala":"GT","guernsey":"GG","guernseybailiffseg":"GG","guinea":"GN","guineabissau":"GW","gujana":"GY","guyana":"GY","gwatemala":"GT","gwinea":"GN","gwineabissau":"GW","gwinearownikowa":"GQ","haiti":"HT","hashemitekingdomofjordan":"JO","heardiandmcdonaldis":"HM","heardiandmcdonaldislands":"HM","heardislandandmcdonaldislands":"HM","heardszigetesmcdonaldszigetek":"HM","heardundmcdonaldinseln":"HM","hellenicrepublic":"GR","hiszpania":"ES","holandia":"NL","holandsko":"NL","holland":"NL","hollandia":"NL","holysee":"VA","holyseevaticancity":"VA","honduras":"HN","hongkong":"HK","hongkongsar":"HK","hongkongsarchina":"HK","hongkongspecialadministrativeregionprc":"HK","horvatorszag":"HR","hungary":"HU","iceland":"IS","independentstateofpapuanewguinea":"PG","independentstateofsamoa":"WS","india":"IN","indianoceanter":"AU","indianoceanterritories":"AU","indie":"IN","indien":"IN","indonesia":"ID","indonesien":"ID","indonezia":"ID","indonezja":"ID","irak":"IQ","iran":"IR","iranislamicrep":"IR","iraq":"IQ","ireland":"IE","irland":"IE","irlandia":"IE","irorszag":"IE","irsko":"IE","islamicrepublicofiran":"IR","islamicrepublicofmauritania":"MR","islamicrepublicofpakistan":"PK","islamicstateofafghanistan":"AF","island":"IS","islandia":"IS","islasmalvinas":"FK","isleofman":"IM","israel":"IL","italianrepublic":"IT","italie":"IT","italien":"IT","italy":"IT","ivorycoast":"CI","izland":"IS","izrael":"IL","jamaica":"JM","jamaika":"JM","jamajka":"JM","japan":"JP","japonia":"JP","japonsko":"JP","jemen":"YE","jersey":"JE","jordan":"JO","jordania":"JO","jordanien":"JO","juhoafrickarepublika":"ZA","juznakorea":"KR","kajmanszigetek":"KY","kajmany":"KY","kambodscha":"KH","kambodza":"KH","kambodzsa":"KH","kamerun":"CM","kanada":"CA","kapverde":"CV","kasachstan":"KZ","katar":"QA","kazachstan":"KZ","kazahsztan":"KZ","kazakhstan":"KZ","kelettimor":"TL","kenia":"KE","kenya":"KE","kina":"CN","kinaikoztarsasag":"TW","kingdomofbahrain":"BH","kingdomofbelgium":"BE","kingdomofbhutan":"BT","kingdomofcambodia":"KH","kingdomofdenmark":"DK","kingdomofeswatini":"SZ","kingdomoflesotho":"LS","kingdomofmorocco":"MA","kingdomofnorway":"NO","kingdomofsaudiarabia":"SA","kingdomofspain":"ES","kingdomofsweden":"SE","kingdomofthailand":"TH","kingdomofthenetherlands":"NL","kingdomoftonga":"TO","kirgisistan":"KG","kirgistan":"KG","kirgizisztan":"KG","kiribati":"KI","kolumbia":"CO","kolumbien":"CO","komoren":"KM","komory":"KM","kongo":"CG","kongoidemokratikuskoztarsasag":"CD","kongoikoztarsasag":"CG","korea":"KR","koreademrep":"KP","koreanorth":"KP","koreaponocna":"KP","koreapoudniowa":"KR","korearep":"KR","koreasouth":"KR","kosovo":"XK","kosowo":"XK","kostaryka":"CR","koszovo":"XK","kozepafrikaikoztarsasag":"CF","kroatien":"HR","kuba":"CU","kuvait":"KW","kuwait":"KW","kuwejt":"KW","kyrgyzrepublic":"KG","kyrgyzstan":"KG","laopdr":"LA","laopeoplesdemocraticrepublic":"LA","laos":"LA","laosz":"LA","latvia":"LV","lebaneserepublic":"LB","lebanon":"LB","lengyelorszag":"PL","lesotho":"LS","lettland":"LV","lettorszag":"LV","liban":"LB","libanon":"LB","liberia":"LR","libia":"LY","libya":"LY","libyen":"LY","liechtenstein":"LI","litauen":"LT","lithuania":"LT","litva":"LT","litvania":"LT","litwa":"LT","lotyssko":"LV","luksemburg":"LU","luxembourg":"LU","luxemburg":"LU","luxembursko":"LU","macao":"MO","macaosar":"MO","macaosarchina":"MO","macaospecialadministrativeregionprc":"MO","macau":"MO","macedoniaponocna":"MK","macedonsko":"MK","madagascar":"MG","madagaskar":"MG","madagaszkar":"MG","madarsko":"HU","magyar":"HU","magyarorszag":"HU","makao":"MO","makau":"MO","malajzia":"MY","malawi":"MW","malaysia":"MY","maldives":"MV","maldivszigetek":"MV","malediven":"MV","malediwy":"MV","malezja":"MY","mali":"ML","malta":"MT","man":"IM","marianyponocne":"MP","marokko":"MA","maroko":"MA","marshallinseln":"MH","marshallis":"MH","marshallislands":"MH","marshallszigetek":"MH","mauretania":"MR","mauretanien":"MR","mauritania":"MR","mauritius":"MU","meksyk":"MX","mexico":"MX","mexiko":"MX","mianmar":"MM","micronesia":"FM","micronesiafederatedstatesof":"FM","mikroneziaiszovetsegiallamok":"FM","mikronezja":"FM","mjanma":"MM","modawia":"MD","moldavsko":"MD","moldova":"MD","monaco":"MC","monako":"MC","mongolei":"MN","mongolia":"MN","montenegro":"ME","montserrat":"MS","morocco":"MA","mosambik":"MZ","mozambik":"MZ","mozambique":"MZ","myanmar":"MM","namibia":"NA","nauru":"NR","negarabruneidarussalam":"BN","nemecko":"DE","nemetorszag":"DE","nepal":"NP","netherlands":"NL","neukaledonien":"NC","neuseeland":"NZ","newcaledonia":"NC","newzealand":"NZ","nicaragua":"NI","niederlande":"NL","niemcy":"DE","niger":"NE","nigeria":"NG","nikaragua":"NI","niue":"NU","nizozemsko":"NL","nmarianais":"MP","nordkorea":"KP","nordlichemarianen":"MP","nordmazedonien":"MK","norfolk":"NF","norfolkinsel":"NF","norfolkisland":"NF","norfolksziget":"NF","norsko":"NO","northernireland":"GB","northernmarianaislands":"MP","northkorea":"KP","northmacedonia":"MK","norvegia":"NO","norway":"NO","norwegen":"NO","norwegia":"NO","novyzeland":"NZ","nowakaledonia":"NC","nowazelandia":"NZ","nyugatszahara":"EH","olaszorszag":"IT","oman":"OM","orientalrepublicofuruguay":"UY","ormenyorszag":"AM","oroszorszag":"RU","osterreich":"AT","osttimor":"TL","otwa":"LV","pakistan":"PK","pakisztan":"PK","palastina":"PS","palau":"PW","palestine":"PS","palestinewestbankandgaza":"PS","palestyna":"PS","palesztina":"PS","panama":"PA","papuaneuguinea":"PG","papuanewguinea":"PG","papuanowagwinea":"PG","papuaujguinea":"PG","paraguay":"PY","paragwaj":"PY","peoplesdemocraticrepublicofalgeria":"DZ","peoplesrepublicofangola":"AO","peoplesrepublicofbangladesh":"BD","peoplesrepublicofchina":"CN","peru":"PE","philippinen":"PH","philippines":"PH","pitcairn":"PN","pitcairnhendersonducieandoenoislands":"PN","pitcairninseln":"PN","pitcairnis":"PN","pitcairnislands":"PN","pitcairnszigetek":"PN","plurinationalstateofbolivia":"BO","poland":"PL","polen":"PL","polinezjafrancuska":"PF","polska":"PL","polsko":"PL","portoryko":"PR","portugal":"PT","portugalia":"PT","portugalsko":"PT","portugueserepublic":"PT","poudniowaafryka":"ZA","principalityofandorra":"AD","principalityofliechtenstein":"LI","principalityofmonaco":"MC","puertorico":"PR","qatar":"QA","rakousko":"AT","rakusko":"AT","recko":"GR","republicofalbania":"AL","republicofarmenia":"AM","republicofaustria":"AT","republicofazerbaijan":"AZ","republicofbelarus":"BY","republicofbenin":"BJ","republicofbotswana":"BW","republicofbulgaria":"BG","republicofburundi":"BI","republicofcaboverde":"CV","republicofcameroon":"CM","republicofchad":"TD","republicofchile":"CL","republicofcolombia":"CO","republicofcostarica":"CR","republicofcroatia":"HR","republicofcuba":"CU","republicofcyprus":"CY","republicofdjibouti":"DJ","republicofecuador":"EC","republicofelsalvador":"SV","republicofequatorialguinea":"GQ","republicofestonia":"EE","republicoffiji":"FJ","republicoffinland":"FI","republicofghana":"GH","republicofguatemala":"GT","republicofguinea":"GN","republicofguineabissau":"GW","republicofhaiti":"HT","republicofhonduras":"HN","republicofhungary":"HU","republicoficeland":"IS","republicofindia":"IN","republicofindonesia":"ID","republicofiraq":"IQ","republicofivorycoast":"CI","republicofkazakhstan":"KZ","republicofkenya":"KE","republicofkiribati":"KI","republicofkorea":"KR","republicofkosovo":"XK","republicoflatvia":"LV","republicofliberia":"LR","republicoflithuania":"LT","republicofmadagascar":"MG","republicofmalawi":"MW","republicofmaldives":"MV","republicofmali":"ML","republicofmalta":"MT","republicofmauritius":"MU","republicofmoldova":"MD","republicofmozambique":"MZ","republicofnamibia":"NA","republicofnauru":"NR","republicofnicaragua":"NI","republicofniger":"NE","republicofnorthmacedonia":"MK","republicofpalau":"PW","republicofpanama":"PA","republicofparaguay":"PY","republicofperu":"PE","republicofpoland":"PL","republicofrwanda":"RW","republicofsanmarino":"SM","republicofsenegal":"SN","republicofserbia":"RS","republicofseychelles":"SC","republicofsierraleone":"SL","republicofsingapore":"SG","republicofslovenia":"SI","republicofsouthafrica":"ZA","republicofsouthsudan":"SS","republicofsuriname":"SR","republicoftajikistan":"TJ","republicofthecongo":"CG","republicofthegambia":"GM","republicofthemarshallislands":"MH","republicofthephilippines":"PH","republicofthesudan":"SD","republicoftheunionofmyanmar":"MM","republicoftrinidadandtobago":"TT","republicoftunisia":"TN","republicofturkey":"TR","republicofuganda":"UG","republicofuzbekistan":"UZ","republicofvanuatu":"VU","republicofyemen":"YE","republicofzambia":"ZM","republicofzimbabwe":"ZW","republikachinska":"TW","republikasrodkowoafrykanska":"CF","republikazielonegoprzyladka":"CV","republikchina":"TW","republikkongo":"CG","republikmoldau":"MD","republikzypern":"CY","romania":"RO","rosja":"RU","ruanda":"RW","rumanien":"RO","rumunia":"RO","rumunsko":"RO","rusko":"RU","russia":"RU","russianfederation":"RU","russland":"RU","rwanda":"RW","saharazachodnia":"EH","sahrawiarabdemocraticrepublic":"EH","saintbarthelemy":"BL","sainthelena":"SH","sainthelenaascensionandtristandacunha":"SH","saintkittsandnevis":"KN","saintkittsesnevis":"KN","saintkittsinevis":"KN","saintlucia":"LC","saintmartin":"MF","saintmartinfrenchpart":"MF","saintpierreandmiquelon":"PM","saintpierreesmiquelon":"PM","saintpierreimiquelon":"PM","saintpierreundmiquelon":"PM","saintvincentandthegrenadines":"VC","saintvincentesagrenadineszigetek":"VC","saintvincentigrenadyny":"VC","salamonszigetek":"SB","salomonen":"SB","salvador":"SV","salwador":"SV","sambia":"ZM","samoa":"WS","samoaamerykanskie":"AS","sanmarino":"SM","saotomeandprincipe":"ST","saotomeesprincipe":"ST","saotomeundprincipe":"ST","saudiarabia":"SA","saudiarabien":"SA","schweden":"SE","schweiz":"CH","scotland":"GB","senegal":"SN","serbia":"RS","serbien":"RS","seszele":"SC","seychellen":"SC","seychelles":"SC","seychelleszigetek":"SC","sgeoandtheis":"GS","sierraleone":"SL","simbabwe":"ZW","singapore":"SG","singapur":"SG","sintmaarten":"SX","sintmaartendutchpart":"SX","skocia":"GB","skotsko":"GB","slovak":"SK","slovakia":"SK","slovakrepublic":"SK","slovenia":"SI","slovenskarepublika":"SK","slovensko":"SK","slovinsko":"SI","slowakei":"SK","slowenien":"SI","socialistrepublicofvietnam":"VN","solomonis":"SB","solomonislands":"SB","somalia":"SO","southafrica":"ZA","southgeorgiaandtheislands":"GS","southgeorgiaandthesouthsandwichislands":"GS","southkorea":"KR","southsudan":"SS","sowacja":"SK","sowenia":"SI","spain":"ES","spanelsko":"ES","spanielsko":"ES","spanien":"ES","spanyolorszag":"ES","spojenestaty":"US","srbsko":"RS","srilanka":"LK","ssudan":"SS","stanyzjednoczone":"US","stateoferitrea":"ER","stateofisrael":"IL","stateofkuwait":"KW","stateofqatar":"QA","stateofthevaticancity":"VA","stbarthelemy":"BL","sthelena":"SH","stkittsandnevis":"KN","stkittsundnevis":"KN","stlucia":"LC","stmaartendutchpart":"SX","stmartin":"MF","stmartinfrenchpart":"MF","stpierreandmiquelon":"PM","stvinandgren":"VC","stvincentandthegrenadines":"VC","stvincentunddiegrenadinen":"VC","sudafrika":"ZA","sudan":"SD","sudanpoudniowy":"SS","sudgeorgienunddiesudlichensandwichinseln":"GS","sudkorea":"KR","sudsudan":"SS","sultanateofoman":"OM","surinam":"SR","suriname":"SR","svajc":"CH","svajciarsko":"CH","svedorszag":"SE","svedsko":"SE","svycarsko":"CH","swaziland":"SZ","sweden":"SE","swissconfederation":"CH","switzerland":"CH","syria":"SY","syrianarabrepublic":"SY","syrien":"SY","szamoa":"WS","szaudarabia":"SA","szenegal":"SN","szentilona":"SH","szerbia":"RS","szingapur":"SG","sziria":"SY","szlovakia":"SK","szlovenia":"SI","szomalia":"SO","szudan":"SD","szvazifold":"SZ","szwajcaria":"CH","szwecja":"SE","tadschikistan":"TJ","tadzsikisztan":"TJ","tadzykistan":"TJ","taiwan":"TW","tajikistan":"TJ","tajlandia":"TH","taliansko":"IT","tansania":"TZ","tanzania":"TZ","territoryofashmoreandcartierislands":"AU","territoryofguam":"GU","territoryofheardislandandmcdonaldislands":"HM","territoryofnorfolkisland":"NF","territoryofthefrenchsouthernandantarcticlands":"TF","thaifold":"TH","thailand":"TH","thajsko":"TH","thebahamas":"BS","thebermudasorsomersisles":"BM","thegambia":"GM","timorleste":"TL","timorwschodni":"TL","togo":"TG","togoleserepublic":"TG","tonga":"TO","torokorszag":"TR","trinidad":"TT","trinidadandtobago":"TT","trinidadestobago":"TT","trinidadundtobago":"TT","trynidaditobago":"TT","tschad":"TD","tschechien":"CZ","tunesien":"TN","tunezia":"TN","tunezja":"TN","tunisia":"TN","turcja":"TR","turecko":"TR","turkei":"TR","turkey":"TR","turkmenistan":"TM","turkmenisztan":"TM","turksandcaicosis":"TC","turksandcaicosislands":"TC","turksescaicosszigetek":"TC","turksicaicos":"TC","turksundcaicosinseln":"TC","tuvalu":"TV","uganda":"UG","ujkaledonia":"NC","ujzeland":"NZ","uk":"GB","ukraina":"UA","ukraine":"UA","ukrajina":"UA","ukrajna":"UA","ungarn":"HU","unionofthecomoros":"KM","unitedarabemirates":"AE","unitedkingdom":"GB","unitedkingdomofgreatbritainandnorthernireland":"GB","unitedmexicanstates":"MX","unitedrepublicoftanzania":"TZ","unitedstates":"US","unitedstatesofamerica":"MP","unitedstatesvirginislands":"VI","uruguay":"UY","urugwaj":"UY","us":"US","usa":"US","usbekistan":"UZ","usvirginis":"VI","uzbegisztan":"UZ","uzbekistan":"UZ","vanuatu":"VU","vatican":"VA","vaticancity":"VA","vaticanholysee":"VA","vatikan":"VA","vatikanstadt":"VA","velkabritania":"GB","venezuela":"VE","venezuelarb":"VE","vereinigtearabischeemirate":"AE","vereinigteskonigreich":"GB","vereinigtestaaten":"US","vietnam":"VN","virginislands":"VI","virginislandsoftheunitedstates":"VI","virginislandsus":"VI","volksrepublikchina":"CN","wales":"GB","wallisandfutuna":"WF","wallisandfutunais":"WF","wallisandfutunaislands":"WF","wallisesfutuna":"WF","wallisifutuna":"WF","wallisundfutuna":"WF","watykan":"VA","wegry":"HU","wenezuela":"VE","westbankandgaza":"PS","westernsahara":"EH","westsahara":"EH","wielkabrytania":"GB","wietnam":"VN","wochy":"IT","wsahara":"EH","wybrzezekoscisoniowej":"CI","wyspaman":"IM","wyspaswietejheleny":"SH","wyspyalandzkie":"AX","wyspyashmoreicartiera":"AU","wyspycooka":"CK","wyspydziewiczestanowzjednoczonych":"VI","wyspyheardimcdonalda":"HM","wyspymarshalla":"MH","wyspyowcze":"FO","wyspysalomona":"SB","wyspyswietegotomaszaiksiazeca":"ST","yemen":"YE","yemenrep":"YE","zambia":"ZM","zentralafrikanischerepublik":"CF","zimbabwe":"ZW","zjednoczoneemiratyarabskie":"AE","zoldfokikoztarsasag":"CV"};
+      const COUNTRY_NAMES = {"AD":"Andorra","AE":"United Arab Emirates","AF":"Afghanistan","AG":"Antigua and Barb.","AI":"Anguilla","AL":"Albania","AM":"Armenia","AO":"Angola","AQ":"Antarctica","AR":"Argentina","AS":"American Samoa","AT":"Austria","AU":"Australia","AW":"Aruba","AX":"Åland","AZ":"Azerbaijan","BA":"Bosnia and Herz.","BB":"Barbados","BD":"Bangladesh","BE":"Belgium","BF":"Burkina Faso","BG":"Bulgaria","BH":"Bahrain","BI":"Burundi","BJ":"Benin","BL":"St-Barthélemy","BM":"Bermuda","BN":"Brunei","BO":"Bolivia","BR":"Brazil","BS":"Bahamas","BT":"Bhutan","BW":"Botswana","BY":"Belarus","BZ":"Belize","CA":"Canada","CD":"Dem. Rep. Congo","CF":"Central African Rep.","CG":"Congo","CH":"Switzerland","CI":"Côte d'Ivoire","CK":"Cook Is.","CL":"Chile","CM":"Cameroon","CN":"China","CO":"Colombia","CR":"Costa Rica","CU":"Cuba","CV":"Cabo Verde","CW":"Curaçao","CY":"Cyprus","CZ":"Czechia","DE":"Germany","DJ":"Djibouti","DK":"Denmark","DM":"Dominica","DO":"Dominican Rep.","DZ":"Algeria","EC":"Ecuador","EE":"Estonia","EG":"Egypt","EH":"W. Sahara","ER":"Eritrea","ES":"Spain","ET":"Ethiopia","FI":"Finland","FJ":"Fiji","FK":"Falkland Is.","FM":"Micronesia","FO":"Faeroe Is.","FR":"France","GA":"Gabon","GB":"United Kingdom","GD":"Grenada","GE":"Georgia","GG":"Guernsey","GH":"Ghana","GL":"Greenland","GM":"Gambia","GN":"Guinea","GQ":"Eq. Guinea","GR":"Greece","GS":"S. Geo. and the Is.","GT":"Guatemala","GU":"Guam","GW":"Guinea-Bissau","GY":"Guyana","HK":"Hong Kong","HM":"Heard I. and McDonald Is.","HN":"Honduras","HR":"Croatia","HT":"Haiti","HU":"Hungary","ID":"Indonesia","IE":"Ireland","IL":"Israel","IM":"Isle of Man","IN":"India","IO":"Br. Indian Ocean Ter.","IQ":"Iraq","IR":"Iran","IS":"Iceland","IT":"Italy","JE":"Jersey","JM":"Jamaica","JO":"Jordan","JP":"Japan","KE":"Kenya","KG":"Kyrgyzstan","KH":"Cambodia","KI":"Kiribati","KM":"Comoros","KN":"St. Kitts and Nevis","KP":"North Korea","KR":"South Korea","KW":"Kuwait","KY":"Cayman Is.","KZ":"Kazakhstan","LA":"Laos","LB":"Lebanon","LC":"Saint Lucia","LI":"Liechtenstein","LK":"Sri Lanka","LR":"Liberia","LS":"Lesotho","LT":"Lithuania","LU":"Luxembourg","LV":"Latvia","LY":"Libya","MA":"Morocco","MC":"Monaco","MD":"Moldova","ME":"Montenegro","MF":"St-Martin","MG":"Madagascar","MH":"Marshall Is.","MK":"North Macedonia","ML":"Mali","MM":"Myanmar","MN":"Mongolia","MO":"Macao","MP":"N. Mariana Is.","MR":"Mauritania","MS":"Montserrat","MT":"Malta","MU":"Mauritius","MV":"Maldives","MW":"Malawi","MX":"Mexico","MY":"Malaysia","MZ":"Mozambique","NA":"Namibia","NC":"New Caledonia","NE":"Niger","NF":"Norfolk Island","NG":"Nigeria","NI":"Nicaragua","NL":"Netherlands","NO":"Norway","NP":"Nepal","NR":"Nauru","NU":"Niue","NZ":"New Zealand","OM":"Oman","PA":"Panama","PE":"Peru","PF":"Fr. Polynesia","PG":"Papua New Guinea","PH":"Philippines","PK":"Pakistan","PL":"Poland","PM":"St. Pierre and Miquelon","PN":"Pitcairn Is.","PR":"Puerto Rico","PS":"Palestine","PT":"Portugal","PW":"Palau","PY":"Paraguay","QA":"Qatar","RO":"Romania","RS":"Serbia","RU":"Russia","RW":"Rwanda","SA":"Saudi Arabia","SB":"Solomon Is.","SC":"Seychelles","SD":"Sudan","SE":"Sweden","SG":"Singapore","SH":"Saint Helena","SI":"Slovenia","SK":"Slovakia","SL":"Sierra Leone","SM":"San Marino","SN":"Senegal","SO":"Somalia","SR":"Suriname","SS":"S. Sudan","ST":"São Tomé and Principe","SV":"El Salvador","SX":"Sint Maarten","SY":"Syria","SZ":"eSwatini","TC":"Turks and Caicos Is.","TD":"Chad","TF":"Fr. S. Antarctic Lands","TG":"Togo","TH":"Thailand","TJ":"Tajikistan","TL":"Timor-Leste","TM":"Turkmenistan","TN":"Tunisia","TO":"Tonga","TR":"Turkey","TT":"Trinidad and Tobago","TV":"Tuvalu","TW":"Taiwan","TZ":"Tanzania","UA":"Ukraine","UG":"Uganda","US":"United States of America","UY":"Uruguay","UZ":"Uzbekistan","VA":"Vatican","VC":"St. Vin. and Gren.","VE":"Venezuela","VG":"British Virgin Is.","VI":"U.S. Virgin Is.","VN":"Vietnam","VU":"Vanuatu","WF":"Wallis and Futuna Is.","WS":"Samoa","XK":"Kosovo","YE":"Yemen","ZA":"South Africa","ZM":"Zambia","ZW":"Zimbabwe"};
+      function normCountry(s) {
+        return String(s || '').normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase().replace(/[^a-z]/g, '');
+      }
+      function flagToIso(flag) {
+        const letters = [...String(flag || '')].map(c => c.codePointAt(0)).filter(cp => cp >= 0x1F1E6 && cp <= 0x1F1FF);
+        return letters.length >= 2 ? String.fromCharCode(letters[0] - 0x1F1A5, letters[1] - 0x1F1A5) : null;
+      }
+      // { iso, label } - iso is null when only the typed name is known.
+      function countryOf(item) {
+        // The typed name wins when it's recognised - flags get mis-picked
+        // (an Austrian beer with a Peru flag); the flag covers typos.
+        const iso = COUNTRY_ALIASES[normCountry(item.country)] || flagToIso(item.flag) || null;
+        if (iso) return { iso, label: COUNTRY_NAMES[iso] || item.country || iso };
+        const typed = (item.country || '').trim();
+        return typed ? { iso: null, label: typed } : null;
+      }
+      // Countries of every beer/spirit this person rated or added.
+      function countriesTried(userId) {
+        const rated = new Set(allRatings.filter(r => r.userId === userId && typeof r.rating === 'number').map(r => r.beerId));
+        const byKey = new Map();
+        [...allBeers, ...allSpirits].forEach(item => {
+          if (item.createdBy !== userId && !rated.has(item.id)) return;
+          const c = countryOf(item);
+          if (!c) return;
+          const key = c.iso || 'name:' + normCountry(c.label);
+          if (!byKey.has(key)) byKey.set(key, { ...c, count: 0 });
+          byKey.get(key).count++;
+        });
+        return [...byKey.values()];
+      }
+
+      let countriesGeo = null;
+      let countriesGeoLoading = null;
+      let countriesMap = null;
+      let countriesLayer = null;
+      function loadCountriesGeo() {
+        if (!countriesGeoLoading) {
+          countriesGeoLoading = fetch('img/countries-110m.geojson')
+            .then(r => (r.ok ? r.json() : Promise.reject(new Error(r.status))))
+            .then(g => { countriesGeo = g; return g; })
+            .catch(err => { countriesGeoLoading = null; throw err; });
+        }
+        return countriesGeoLoading;
+      }
+      function renderCountriesTried(userId) {
+        const tried = countriesTried(userId);
+        const isos = new Map(tried.filter(c => c.iso).map(c => [c.iso, c]));
+        const summary = document.getElementById('profileViewCountriesSummary');
+        summary.textContent = tried.length
+          ? `${tried.length} ${tried.length === 1 ? 'country' : 'countries'} from beers and spirits rated or added`
+          : 'No countries yet - rate a beer or spirit that has a country or flag.';
+        const draw = () => {
+          const el = document.getElementById('profileViewCountriesMap');
+          if (!countriesMap) {
+            countriesMap = L.map(el, { zoomControl: false, attributionControl: false, worldCopyJump: true, minZoom: 1, maxZoom: 6 }).setView([48, 15], 2);
+          }
+          if (!countriesLayer) {
+            countriesLayer = L.geoJSON(countriesGeo, {
+              onEachFeature: (f, layer) => layer.bindTooltip(() => {
+                const c = countriesLayer.__tried?.get(f.properties.iso);
+                return c ? `${escapeHtml(f.properties.name)} · ${c.count} ${c.count === 1 ? 'drink' : 'drinks'}` : escapeHtml(f.properties.name);
+              }, { sticky: true }),
+            }).addTo(countriesMap);
+          }
+          countriesLayer.__tried = isos;
+          const accent = getComputedStyle(document.documentElement).getPropertyValue('--accent').trim() || '#f2a541';
+          countriesLayer.setStyle(f => isos.has(f.properties.iso)
+            ? { color: accent, weight: 1, fillColor: accent, fillOpacity: .85 }
+            : { color: '#888', weight: .5, fillColor: '#888', fillOpacity: .12 });
+          const shown = new Set(countriesGeo.features.map(f => f.properties.iso));
+          const unplaced = tried.filter(c => !c.iso || !shown.has(c.iso)).map(c => c.label);
+          document.getElementById('profileViewCountriesUnplaced').textContent = unplaced.length ? `Not on the map: ${unplaced.join(', ')}` : '';
+          setTimeout(() => countriesMap.invalidateSize(), 50);
+        };
+        if (countriesGeo) draw();
+        else loadCountriesGeo().then(() => { if (currentProfileViewId === userId) draw(); }).catch(() => {
+          document.getElementById('profileViewCountriesUnplaced').textContent = 'The map could not load - check your connection.';
+        });
+      }
+
+      // ---------- Parties at pubs ----------
+      // parties/{id}.pubId links a standalone party to the pub it was at.
+      function partiesAtPub(pubId) {
+        return allParties.filter(p => p.pubId === pubId)
+          .sort((a, b) => (isoDateFromPartyFields(b.date, b.year) || '').localeCompare(isoDateFromPartyFields(a.date, a.year) || ''));
+      }
+      function pubsPartiedAt(userId) {
+        return new Set(allParties.filter(p => p.pubId && (allPartyParticipants[p.id] || []).some(x => x.id === userId)).map(p => p.pubId)).size;
       }
 
       // Duplicate-item guard shared by every "add new" form (beer/spirit/
@@ -7066,12 +7313,14 @@
         let list = allBeers.slice();
         const q = searchInput.value.trim().toLowerCase();
         if (q) list = list.filter(b => [b.name, b.realName, b.brewery, b.country, b.comment].some(v => (v || '').toLowerCase().includes(q)));
-        if (typeSelect.value) list = list.filter(b => b.beerType === typeSelect.value);
+        if (typeSelect.value === WANT_FILTER) list = list.filter(b => isOnWantList(b.id));
+        else if (typeSelect.value) list = list.filter(b => b.beerType === typeSelect.value);
         switch (sortSelect.value) {
           case 'name': list.sort((a, b) => itemLabel(a).localeCompare(itemLabel(b))); break;
           case 'rating-desc': list.sort((a, b) => (b.avgRating || 0) - (a.avgRating || 0)); break;
           case 'rating-asc': list.sort((a, b) => (a.avgRating || 0) - (b.avgRating || 0)); break;
           case 'oldest': list.sort((a, b) => (a.ts || 0) - (b.ts || 0)); break;
+          case 'value': sortByValue(list); break;
           default: list.sort((a, b) => (b.ts || 0) - (a.ts || 0));
         }
         return list;
@@ -7081,7 +7330,9 @@
         const list = filteredSorted();
         document.getElementById('beerCountBadge').textContent = list.length;
         if (!list.length) {
-          beerList.innerHTML = '<div class="empty">No beers yet 🍺<br>Tap + to add the first one.</div>';
+          beerList.innerHTML = typeSelect.value === WANT_FILTER
+            ? '<div class="empty">Your want-to-try list is empty 🔖<br>Open a beer and tap "Want to try".</div>'
+            : '<div class="empty">No beers yet 🍺<br>Tap + to add the first one.</div>';
           return;
         }
         beerList.innerHTML = list.map(b => {
@@ -7095,7 +7346,7 @@
         ${cover}
         <span class="badge rating" style="background:${ratingColor(b.avgRating || 0)}">${b.avgRating != null ? b.avgRating.toFixed(1) : '–'}/10${b.ratingCount ? ` (${b.ratingCount})` : ''}</span>
         ${b.abv != null ? `<span class="badge abv">${b.abv}%</span>` : ''}
-        ${writtenReviewCount(b.id) ? `<span class="badge reviews">📝 ${writtenReviewCount(b.id)}</span>` : ''}
+        ${sortSelect.value === 'value' ? valueBadgeHtml(b) : writtenReviewCount(b.id) ? `<span class="badge reviews">📝 ${writtenReviewCount(b.id)}</span>` : ''}
         ${creator ? `<div class="creatorAvatar" data-creator="${creator.id}" title="Added by ${escapeHtml(creator.name || creator.realName || 'someone')}">${avatarInner(creator.name, creator.photoURL)}</div>` : ''}
       </div>
       <div class="body">
@@ -8324,6 +8575,10 @@
         const partyCreatorRow = partyCreatorEl.querySelector('.viewCreatorRow');
         if (partyCreatorRow) partyCreatorRow.onclick = () => openProfileView(partyCreatorRow.dataset.user);
         document.getElementById('partyViewDate').textContent = [party.date, party.year].filter(Boolean).join(' · ');
+        const partyPub = party.pubId ? allPubs.find(p => p.id === party.pubId) : null;
+        const partyPubEl = document.getElementById('partyViewPub');
+        partyPubEl.innerHTML = partyPub ? `<button type="button" class="linkChip">🍸 ${escapeHtml(partyPub.name || 'Pub')}${partyPub.city ? ` · ${escapeHtml(partyPub.city)}` : ''}</button>` : '';
+        if (partyPub) partyPubEl.firstElementChild.onclick = () => { openPubView(partyPub); bringOverlayToFront(pubViewOverlay); };
         const totals = partyTotals(party.id);
         document.getElementById('partyViewTotals').innerHTML =
           `<span style="background:var(--bg-elev);color:var(--text);border:1px solid var(--border)">${totals.joined} joined</span>` +
@@ -8564,6 +8819,11 @@
         partyDeleteBtn.style.display = party ? 'block' : 'none';
         document.getElementById('pfName').value = party?.name || '';
         document.getElementById('pfDate').value = party ? isoDateFromPartyFields(party.date, party.year) : '';
+        const pubSelect = document.getElementById('pfPub');
+        const pubs = allPubs.slice().sort((a, b) => (a.name || '').localeCompare(b.name || ''));
+        pubSelect.innerHTML = '<option value="">— Not at a pub —</option>' +
+          pubs.map(p => `<option value="${p.id}">${escapeHtml(p.name || 'Unnamed pub')}${p.city ? ` (${escapeHtml(p.city)})` : ''}</option>`).join('');
+        pubSelect.value = party?.pubId && pubs.some(p => p.id === party.pubId) ? party.pubId : '';
         renderPartyPhotoStrip(party);
         partyFormOverlay.classList.add('show');
       }
@@ -8599,6 +8859,7 @@
         const iso = document.getElementById('pfDate').value;
         if (!iso) { showToast('Pick a date'); return; }
         const { date, year } = partyFieldsFromIsoDate(iso);
+        const pubId = document.getElementById('pfPub').value || null;
         if (!partyEditingId) {
           const dupe = findDuplicateItem(standaloneParties(), 'name', name, { date, year }, ['date', 'year']);
           if (dupe) {
@@ -8610,10 +8871,10 @@
         saveBtn.disabled = true;
         try {
           if (partyEditingId) {
-            await partiesCol.doc(partyEditingId).update({ name, date, year });
+            await partiesCol.doc(partyEditingId).update({ name, date, year, pubId });
             showToast('Party updated');
           } else {
-            const ref = await partiesCol.add({ name, date, year, photos: [], createdBy: myUid, ts: Date.now() });
+            const ref = await partiesCol.add({ name, date, year, pubId, photos: [], createdBy: myUid, ts: Date.now() });
             for (const pp of partyPendingPhotos) await uploadPhotoToParty(ref.id, pp.file);
             showToast('Party added');
           }
@@ -9288,6 +9549,17 @@
         if (pubCreatorRow) pubCreatorRow.onclick = () => openProfileView(pubCreatorRow.dataset.user);
         document.getElementById('pubViewCity').textContent = pub.city || '';
         renderPubViewBadges(pub);
+        const here = partiesAtPub(pub.id);
+        document.getElementById('pubViewPartiesSection').style.display = here.length ? '' : 'none';
+        document.getElementById('pubViewPartiesTitle').textContent = `🍻 ${here.length} ${here.length === 1 ? 'party' : 'parties'} here`;
+        const herePartiesEl = document.getElementById('pubViewParties');
+        herePartiesEl.innerHTML = here.map(p => `<button type="button" class="pubPartyRow" data-party="${p.id}"><span>${escapeHtml(p.name || 'Unnamed party')}</span><span>${escapeHtml([p.date, p.year].filter(Boolean).join(' · '))} · 🍺 ${partyTotals(p.id).totalBeers}</span></button>`).join('');
+        herePartiesEl.querySelectorAll('[data-party]').forEach(btn => {
+          btn.onclick = () => {
+            const party = allParties.find(p => p.id === btn.dataset.party);
+            if (party) { openPartyView(party); bringOverlayToFront(partyViewOverlay); }
+          };
+        });
         const canEdit = pub.createdBy === myUid || isAdmin();
         document.getElementById('pubViewEditBtn').style.display = canEdit ? 'flex' : 'none';
       }
@@ -10205,6 +10477,7 @@
       ${beer.abv != null ? `<span style="background:var(--bg-elev);color:var(--text);border:1px solid var(--border)">${beer.abv}% ALC</span>` : ''}
       ${beer.price != null ? `<span style="background:var(--bg-elev);color:var(--text);border:1px solid var(--border)">€${beer.price}</span>` : ''}
       ${beer.filtered != null ? `<span style="background:var(--bg-elev);color:var(--text);border:1px solid var(--border)">${beer.filtered ? 'Filtered' : 'Unfiltered'}</span>` : ''}
+      ${wantButtonHtml(beer.id)}
     </div>
     ${(beer.variants || []).length ? `<details class="variantDropdown viewVariants">
       <summary>Known variants (${beer.variants.length})</summary>
@@ -10214,6 +10487,7 @@
   `;
         const ratingBadgeEl = viewStats.querySelector('.ratingBadgeClickable');
         if (ratingBadgeEl) ratingBadgeEl.onclick = () => showRatersList(beersCol, beer.id);
+        wireWantButton(viewStats);
       }
 
       function refreshViewIfOpen() {
@@ -10335,7 +10609,7 @@
       }
       function renderSpiritFilters() {
         const curType = spiritTypeSelect.value;
-        spiritTypeSelect.innerHTML = '<option value="">All types</option>' +
+        spiritTypeSelect.innerHTML = '<option value="">All types</option>' + wantOptionHtml() +
           distinctSpiritTypes().map(t => `<option value="${escapeHtml(t)}">${escapeHtml(t)}</option>`).join('');
         spiritTypeSelect.value = curType;
         spiritTypeListEl.innerHTML = distinctSpiritTypes().map(t => `<option value="${escapeHtml(t)}">`).join('');
@@ -10345,12 +10619,14 @@
         let list = allSpirits.slice();
         const q = spiritSearchInput.value.trim().toLowerCase();
         if (q) list = list.filter(s => [s.name, s.realName, s.brand, s.country, s.comment].some(v => (v || '').toLowerCase().includes(q)));
-        if (spiritTypeSelect.value) list = list.filter(s => s.spiritType === spiritTypeSelect.value);
+        if (spiritTypeSelect.value === WANT_FILTER) list = list.filter(s => isOnWantList(s.id));
+        else if (spiritTypeSelect.value) list = list.filter(s => s.spiritType === spiritTypeSelect.value);
         switch (spiritSortSelect.value) {
           case 'name': list.sort((a, b) => itemLabel(a).localeCompare(itemLabel(b))); break;
           case 'rating-desc': list.sort((a, b) => (b.avgRating || 0) - (a.avgRating || 0)); break;
           case 'rating-asc': list.sort((a, b) => (a.avgRating || 0) - (b.avgRating || 0)); break;
           case 'oldest': list.sort((a, b) => (a.ts || 0) - (b.ts || 0)); break;
+          case 'value': sortByValue(list); break;
           default: list.sort((a, b) => (b.ts || 0) - (a.ts || 0));
         }
         return list;
@@ -10738,6 +11014,7 @@
       <span class="ratingBadgeClickable" style="background:${ratingColor(spirit.avgRating || 0)};color:#1c1410;cursor:pointer">${spirit.avgRating != null ? spirit.avgRating.toFixed(1) : '–'}/10${spirit.ratingCount ? ` (${spirit.ratingCount})` : ''}</span>
       ${spirit.abv != null ? `<span style="background:var(--bg-elev);color:var(--text);border:1px solid var(--border)">${spirit.abv}% ALC</span>` : ''}
       ${spirit.price != null ? `<span style="background:var(--bg-elev);color:var(--text);border:1px solid var(--border)">€${spirit.price}</span>` : ''}
+      ${wantButtonHtml(spirit.id)}
     </div>
     ${(spirit.variants || []).length ? `<details class="variantDropdown viewVariants">
       <summary>Known variants (${spirit.variants.length})</summary>
@@ -10747,6 +11024,7 @@
   `;
         const ratingBadgeEl = spiritViewStatsEl.querySelector('.ratingBadgeClickable');
         if (ratingBadgeEl) ratingBadgeEl.onclick = () => showRatersList(spiritsCol, spirit.id);
+        wireWantButton(spiritViewStatsEl);
       }
 
       function refreshSpiritViewIfOpen() {
@@ -12481,6 +12759,18 @@
           emoji: '📝', name: 'Reviewer', unit: 'reviews written', tiers: [5, 15, 30, 60],
           getValue: (userId) => getUserStats(userId).reviewsWritten,
         },
+        {
+          emoji: '🌍', name: 'Globetrotter', unit: 'countries tried', tiers: [3, 8, 15, 25],
+          getValue: (userId) => countriesTried(userId).length,
+        },
+        {
+          emoji: '🍸', name: 'Pub Crawler', unit: 'pubs partied at', tiers: [2, 5, 10, 20],
+          getValue: (userId) => pubsPartiedAt(userId),
+        },
+        {
+          emoji: '🥃', name: 'Spirit Hunter', unit: 'different spirits tried', tiers: [3, 10, 25, 50],
+          getValue: (userId) => new Set(allRatings.filter(r => r.userId === userId && allSpirits.some(sp => sp.id === r.beerId)).map(r => r.beerId)).size,
+        },
       ];
       // Shared by the profile view's own section and the Wrapped recap
       // card below - achievements are lifetime/cumulative, not scoped to
@@ -12804,6 +13094,7 @@
         }
         renderProfileViewInventory(u, userId === myUid);
         renderAchievements(userId);
+        renderCountriesTried(userId);
       }
 
       function renderCardSlots() {
@@ -12853,6 +13144,12 @@
       usersCol.onSnapshot(snap => {
         allUsers = snap.docs.map(d => ({ id: d.id, ...d.data() }));
         renderHeaderAvatar();
+        renderFilters();
+        renderSpiritFilters();
+        render();
+        renderSpiritList();
+        refreshViewIfOpen();
+        refreshSpiritViewIfOpen();
         refreshProfileDisplays();
         updateUacFabVisibility();
         refreshJackpotIfOpen();
@@ -12991,6 +13288,8 @@
         renderSpiritList();
         renderNikotinList();
         renderKoffeinList();
+        refreshViewIfOpen();
+        refreshSpiritViewIfOpen();
       }, err => showToast('Sync error: ' + err.message));
 
       db.collectionGroup('comments').onSnapshot(snap => {
