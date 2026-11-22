@@ -7,6 +7,10 @@ const { getFirestore, FieldValue } = require('firebase-admin/firestore');
 const { getAuth } = require('firebase-admin/auth');
 const webpush = require('web-push');
 
+// Firestore triggers run next to the database (europe-central2); the callable functions stay in
+// us-central1, where the app calls them.
+const TRIGGER_REGION = 'europe-central2';
+
 initializeApp();
 
 // The one thing that gates real membership: signing in anonymously is free
@@ -409,7 +413,7 @@ async function notifyUser(uid, title, body) {
   }));
 }
 
-exports.onTttInviteCreated = onDocumentCreated({ document: 'tttInvites/{id}', secrets: [VAPID_PUBLIC_KEY, VAPID_PRIVATE_KEY] }, event => {
+exports.onTttInviteCreated = onDocumentCreated({ document: 'tttInvites/{id}', region: TRIGGER_REGION, secrets: [VAPID_PUBLIC_KEY, VAPID_PRIVATE_KEY] }, event => {
   const invite = event.data.data();
   if (invite.status !== 'pending') return null;
   return notifyUser(invite.to, '🎮 Tic Tac Toe invite!', `${invite.fromName || 'Someone'} wants to play with you`);
@@ -446,7 +450,7 @@ async function notifyEveryone(title, body, excludeUid) {
   }));
 }
 
-exports.onAnnouncementCreated = onDocumentCreated({ document: 'announcements/{id}', secrets: [VAPID_PUBLIC_KEY, VAPID_PRIVATE_KEY] }, event => {
+exports.onAnnouncementCreated = onDocumentCreated({ document: 'announcements/{id}', region: TRIGGER_REGION, secrets: [VAPID_PUBLIC_KEY, VAPID_PRIVATE_KEY] }, event => {
   const a = event.data.data();
   const text = String(a.text || '').trim();
   return notifyEveryone(
@@ -456,7 +460,7 @@ exports.onAnnouncementCreated = onDocumentCreated({ document: 'announcements/{id
   );
 });
 
-exports.onIdeaCreated = onDocumentCreated({ document: 'ideas/{id}', secrets: [VAPID_PUBLIC_KEY, VAPID_PRIVATE_KEY] }, event => {
+exports.onIdeaCreated = onDocumentCreated({ document: 'ideas/{id}', region: TRIGGER_REGION, secrets: [VAPID_PUBLIC_KEY, VAPID_PRIVATE_KEY] }, event => {
   const idea = event.data.data();
   const text = String(idea.text || '').trim();
   return notifyEveryone(
@@ -486,32 +490,32 @@ async function notifyNewItem(title, data, label) {
   return notifyEveryone(title, `${creatorName} added ${label}`, data.createdBy);
 }
 
-exports.onBeerCreated = onDocumentCreated({ document: 'beers/{id}', secrets: [VAPID_PUBLIC_KEY, VAPID_PRIVATE_KEY] }, event => {
+exports.onBeerCreated = onDocumentCreated({ document: 'beers/{id}', region: TRIGGER_REGION, secrets: [VAPID_PUBLIC_KEY, VAPID_PRIVATE_KEY] }, event => {
   const data = event.data.data();
   return notifyNewItem('🍺 New beer added', data, `"${itemLabel(data)}"`);
 });
 
-exports.onSpiritCreated = onDocumentCreated({ document: 'spirits/{id}', secrets: [VAPID_PUBLIC_KEY, VAPID_PRIVATE_KEY] }, event => {
+exports.onSpiritCreated = onDocumentCreated({ document: 'spirits/{id}', region: TRIGGER_REGION, secrets: [VAPID_PUBLIC_KEY, VAPID_PRIVATE_KEY] }, event => {
   const data = event.data.data();
   return notifyNewItem('🥃 New alko added', data, `"${itemLabel(data)}"`);
 });
 
-exports.onNikotinCreated = onDocumentCreated({ document: 'nikotin/{id}', secrets: [VAPID_PUBLIC_KEY, VAPID_PRIVATE_KEY] }, event => {
+exports.onNikotinCreated = onDocumentCreated({ document: 'nikotin/{id}', region: TRIGGER_REGION, secrets: [VAPID_PUBLIC_KEY, VAPID_PRIVATE_KEY] }, event => {
   const data = event.data.data();
   return notifyNewItem('🚬 New nikotin added', data, `"${itemLabel(data)}"`);
 });
 
-exports.onKoffeinCreated = onDocumentCreated({ document: 'koffein/{id}', secrets: [VAPID_PUBLIC_KEY, VAPID_PRIVATE_KEY] }, event => {
+exports.onKoffeinCreated = onDocumentCreated({ document: 'koffein/{id}', region: TRIGGER_REGION, secrets: [VAPID_PUBLIC_KEY, VAPID_PRIVATE_KEY] }, event => {
   const data = event.data.data();
   return notifyNewItem('⚡ New koffein added', data, `"${itemLabel(data)}"`);
 });
 
-exports.onPartyCreated = onDocumentCreated({ document: 'parties/{id}', secrets: [VAPID_PUBLIC_KEY, VAPID_PRIVATE_KEY] }, event => {
+exports.onPartyCreated = onDocumentCreated({ document: 'parties/{id}', region: TRIGGER_REGION, secrets: [VAPID_PUBLIC_KEY, VAPID_PRIVATE_KEY] }, event => {
   const data = event.data.data();
   return notifyNewItem('🎉 New party added', data, `"${data.name || 'a party'}"`);
 });
 
-exports.onPubCreated = onDocumentCreated({ document: 'pubs/{id}', secrets: [VAPID_PUBLIC_KEY, VAPID_PRIVATE_KEY] }, event => {
+exports.onPubCreated = onDocumentCreated({ document: 'pubs/{id}', region: TRIGGER_REGION, secrets: [VAPID_PUBLIC_KEY, VAPID_PRIVATE_KEY] }, event => {
   const data = event.data.data();
   return notifyNewItem('🍸 New pub added', data, `"${data.name || 'a pub'}"`);
 });
